@@ -89,7 +89,7 @@ class CommonCTSChecks:
                     if TypeCheck=='Packet' :
                         if self.file_list[id]['pktType']=="Extended Identification":
                             FE_Check=self.PktMethod.GetPayloadDetails(id,'Extended_Device_Identifier')[0]['sRawData']
-                            res.append([f'Prx sent the Extended Identification data packet with {FE_Check} Exp:"0xFE"','Fail' if FE_Check !="0xFE" else 'Pass'])
+                            res.append([f'Prx sent the Extended Identification data packet with {FE_Check} (Expected:!= 0xFE)','Fail' if FE_Check =="0xFE" else 'Pass'])
                         else:  res.append([f'Prx sent the {self.file_list[id]['pktType']} data packet.','Fail'])
                         break     
                     id+=1
