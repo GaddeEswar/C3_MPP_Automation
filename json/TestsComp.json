@@ -1,0 +1,959 @@
+{
+  "C3": {
+    "TPR": {},
+    "TPT": {
+      "V_2.3.0": {
+        "Notals": {
+          "MPP25": [
+            false,
+            [
+              {
+                "Notal_240627_1": [
+                  [
+                    false,
+                    "PRX_CPX_CFG_S05_BPX_002",
+                    [
+                      false,
+                      [
+                        {
+                          "SupportedOptionalProtocols": [
+                            "ExtendedProtocol",
+                            "IN",
+                            "String"
+                          ]
+                        }
+                      ]
+                    ]
+                  ],
+                  [true, "PRX_CPX_CFG_S05_BPX_002",[false]]
+                ]
+              }
+            ]
+          ],
+          "BPP": [false],
+          "EPP": [false],
+          "MPP15": [false]
+        },
+
+        "Tests": {
+          "Signal_Strength": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "Guaranteed_power": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_PDX_GPX_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false]
+            }
+          },
+          "PRX_PDX_GPX_002": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "Load_modulation_41": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "Load_modulation_41a": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "MP_RX_COMMINTERF_FREQDEMOD_TC1": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "MP_RX_COMMINTERF_FREQDEMOD_TC2": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "MP_RX_COMMINTERF_FREQDEMOD_TC3": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "MP_RX_COMMINTERF_FREQDEMOD_TC4": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_PNG_S01_TWK_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_PNG_S01_WAK_002": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_PNG_SXF_RST_002": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S02_IDX_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S02_IDX_002": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S02_IDX_003": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S03_XID_001": {
+            "EsdfFields": {
+              "BPP": [
+                true,
+                [
+                  {
+                    "XIDDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "EPP": [
+                true,
+                [
+                  {
+                    "XIDDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_CFG_S04_CFG_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S04_PCH_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_CFG_S04_PCH_002": {
+            "EsdfFields": {
+              "BPP": [
+                true,
+                [
+                  {
+                    "PCHDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "EPP": [
+                true,
+                [
+                  {
+                    "PCHDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "PCHDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "PCHDataPacketSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_CFG_S05_BPX_001": {
+            "EsdfFields": {
+              "BPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S05_BPX_002": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_CFG_S06_BPX_002": {
+            "EsdfFields": {
+              "EPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S06_BPX_003": {
+            "EsdfFields": {
+              "EPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S06_BPX_004": {
+            "EsdfFields": {
+              "EPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S06_BPX_005": {
+            "EsdfFields": {
+              "EPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S06_BPX_006": {
+            "EsdfFields": {
+              "EPP": [false]
+            }
+          },
+          "PRX_CPX_CFG_S06_EPX_001": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_CFG_S06_EPX_002": {
+            "EsdfFields": {
+              "EPP": [false],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_CFG_SXX_TIM_001": {
+            "EsdfFields": {
+              "BPP": [false],
+              "EPP": [false],
+              "MPP15": [false],
+              "MPP25": [false]
+            }
+          },
+          "PRX_CPX_NEG_S07_WID_001": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_NEG_S07_WID_002": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "WPIDSupport": [false, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [false, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [false, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_NEG_S07_WID_003": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "WPIDSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_POW_S11_ADT_001": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_POW_S11_ADT_002": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_POW_S11_ADT_003": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_POW_S11_DSR_036": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "SupportedPTxPROPDataPackets": [
+                      "PROP/1e",
+                      "NOT-IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "SupportedPTxPROPDataPackets": [
+                      "PROP/1e",
+                      "NOT-IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "SupportedPTxPROPDataPackets": [
+                      "PROP/1e",
+                      "NOT-IN",
+                      "String"
+                    ]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_POW_S11_OXE_001": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "AuthenticationSupport": [true, "EQL", "Boolean"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_RNG_S07_GLP_001": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ]
+            }
+          },
+          "PRX_CPX_RNG_S07_TRP_003": {
+            "EsdfFields": {
+              "EPP": [
+                true,
+                [
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ],
+              "MPP25": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ],
+              "MPP15": [
+                true,
+                [
+                  {
+                    "SupportedOptionalProtocols": [
+                      "ExtendedProtocol",
+                      "IN",
+                      "String"
+                    ]
+                  },
+                  {
+                    "GuaranteedLoadPower": [5, "GTE", "Number"]
+                  }
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "C3TPT": {
+        "Certification": {
+          "PowerProfile": {
+            "Notals": [
+              true,
+              {
+                "Notalnumber": [
+                  [false, "mTestID"],
+                  [true, "mTestID"]
+                ]
+              }
+            ],
+            "Tests": {
+              "TestName(mTestID)": {
+                "EsdfFields": [
+                  true,
+                  [
+                    {
+                      "Fieldname": ["value", "Comp", "Type"]
+                    }
+                  ]
+                ]
+              }
+            }
+          },
+          "PowerProfile2": {
+            "Notals": [false],
+            "Tests": {
+              "TestName(mTestID)": {
+                "EsdfFields": [false]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

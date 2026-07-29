@@ -1,0 +1,32 @@
+{
+  "Product": "MPP",
+  "Mode": "TPT",
+  "Certificate": "2.3.0",
+  "PowerProfile": "MPP",
+  "Switch": "Offline",
+  "Offset": {
+    "MPP_TPR1": true,
+    "TPR_MPP4": true
+  },
+  "Chapters": {},
+  "All_Testcases": {},
+  "Selected_Testcases": {},
+  "Run": {
+    "Position": [
+      "NA"
+    ],
+    "UsedPorts": "",
+    "Project": "",
+    "PositionTool": true,
+    "PositionToolRemoved": false,
+    "RepeatCount": 0,
+    "TAD": false,
+    "TADFilter": "",
+    "EnableSmartSwitch": false,
+    "SmartSwitch_Mode": true,
+    "PowerOFF&ON": false
+  },
+  "Plug_IP": "192.168.137.44",
+  "SP_MAC": "SP-e6:21",
+  "SPConnection": false
+}

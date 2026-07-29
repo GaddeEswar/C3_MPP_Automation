@@ -72,14 +72,14 @@ Results/OptimumResults/*
 
 ### Ignore Json Files ###
 
-json/AllMOIRun.json
-json/Debuglogs.json
-json/TestResults.json
-json/ESDF.json
-json/TPTSetPackets.json
-json/TestsComp.json
-json/QIconfig.json
-json/Dummy.json
-json/MOIJson.json
-json/Test_config_properties.json
-json/TestConfig.json
+# json/AllMOIRun.json
+# json/Debuglogs.json
+# json/TestResults.json
+# json/ESDF.json
+# json/TPTSetPackets.json
+# json/TestsComp.json
+# json/QIconfig.json
+# json/Dummy.json
+# json/MOIJson.json
+# json/Test_config_properties.json
+# json/TestConfig.json

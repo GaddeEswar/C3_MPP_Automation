@@ -1,0 +1,615 @@
+{
+  "MPP": {
+    "TPR": {
+      "Esdf_Elements": [
+        {
+          "Field": "SchemaVersion",
+          "unit": "",
+          "Value": "1.0"
+        },
+        {
+          "Field": "ApplicantName",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "ProductName",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "PartNumber",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "QIID",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "PowerProfile",
+          "unit": "",
+          "Value": "MPP25"
+        },
+        {
+          "Field": "PotentialLoadPower",
+          "unit": "W",
+          "Value": 25
+        },
+        {
+          "Field": "ManufacturerCode",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "SupportedSpecification",
+          "unit": "",
+          "Value": "2.3.0"
+        },
+        {
+          "Field": "PTxDesign",
+          "unit": "",
+          "Value": "A2"
+        },
+        {
+          "Field": "USBPowerSupplySupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "NFCTagProtectionSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "GRQ_xcapSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "AuthenticationSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "WPIDSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "_128HMPPingSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "SupportedProtocols",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "UnpopulatedSlotNumbers",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "SupportedPROPDataPackets",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "SupportedPROPDataPackets",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "SupportedSRQ_PROPDataPackets",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "SupportedGetRequests",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "PTxInitiatedCloakSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "PTxInitiatedCloakExitSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "UniqueIdentifierSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "IncreasedCoverThickness",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "PTxSupportsDeltaPloss",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "Setup_PowerSupply",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "PM_Preference",
+          "unit": "",
+          "Value": [
+            "LPM",
+            "NPM",
+            "HPM"
+          ]
+        }
+      ],
+      "isFromEdit": false
+    },
+    "TPT": {
+      "Esdf_Elements": [
+        {
+          "Field": "SchemaVersion",
+          "unit": "",
+          "Value": "1.0"
+        },
+        {
+          "Field": "ApplicantName",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "ProductName",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "PartNumber",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "QIID",
+          "unit": "",
+          "Value": ""
+        },
+        {
+          "Field": "SupportedSpecification",
+          "unit": "",
+          "Value": "2.2.1"
+        },
+        {
+          "Field": "PowerProfile",
+          "unit": "",
+          "Value": "MPP25"
+        },
+        {
+          "Field": "ManufacturerCode",
+          "unit": "",
+          "Value": "0x010E"
+        },
+        {
+          "Field": "AuthenticationSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "OBSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "DupSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "NegotiationSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "WPIDSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "SupportedPROPDataPackets",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "XIDDataPacketSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "PCHDataPacketSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "SupportedProtocols",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "GuaranteedLoadPower",
+          "unit": "W",
+          "Value": 15
+        },
+        {
+          "Field": "RestrictedToFullMode",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "CloakSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "SupportedCloakReasons",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "CloakRetryCount",
+          "unit": "",
+          "Value": 1
+        },
+        {
+          "Field": "DetectPingSupport",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "SupportedGetRequests",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "PRxSupportsDeltaPloss",
+          "unit": "",
+          "Value": false
+        },
+        {
+          "Field": "PRxSupportedSRQRequests",
+          "unit": "",
+          "Value": []
+        },
+        {
+          "Field": "PRxSupportedPowerModes",
+          "unit": "",
+          "Value": []
+        }
+      ],
+      "isFromEdit": false
+    }
+  },
+  "C3": {
+    "TPR": {
+      "Esdf_Elements": [
+        {
+          "Field": "SchemaVersion",
+          "Value": "2.0",
+          "unit": ""
+        },
+        {
+          "Field": "ApplicantName",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "ProductName",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "SerialNumber",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "PartNumber",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "QIID",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "PowerProfile",
+          "Value": "BPP",
+          "unit": ""
+        },
+        {
+          "Field": "PotentialLoadPower",
+          "Value": 5,
+          "unit": "W"
+        },
+        {
+          "Field": "MemberCode",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "SpecificationSupported",
+          "Value": "2.3.1",
+          "unit": ""
+        },
+        {
+          "Field": "PTxDesign",
+          "Value": "A2",
+          "unit": ""
+        },
+        {
+          "Field": "USBPowerSupplySupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "NFCTagProtectionSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "AuthenticationSupport",
+          "Value": true,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedOptionalGRQRequests",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "WPIDSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "_128HPMDigitalPingSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "_5VoltInputVoltageSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "_9VoltInputVoltageSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedOptionalProtocols",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "UnpopulatedSlotNumbers",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "SupportedPRxPROPDataPackets",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "SupportedSRQ_PROPDataPackets",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "SupportedPTxPROPDataPackets",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "SupportedADC_PROPDataPackets",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "PotentialLoadPowerEP",
+          "Value": 5,
+          "unit": "W"
+        },
+        {
+          "Field": "SupportedOptionalGetRequests",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "PTxInitiatedCloakSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "UniqueIdentifierSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "IncreasedCoverThickness",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "DPLOSSCalibrationSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedPowerModes",
+          "Value": "None",
+          "unit": ""
+        }
+      ],
+      "isFromEdit": false
+    },
+    "TPT": {
+      "Esdf_Elements": [
+        {
+          "Field": "SchemaVersion",
+          "Value": "2.0",
+          "unit": ""
+        },
+        {
+          "Field": "ApplicantName",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "ProductName",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "SerialNumber",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "PartNumber",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "QIID",
+          "Value": "",
+          "unit": ""
+        },
+        {
+          "Field": "SpecificationSupported",
+          "Value": "2.3.0",
+          "unit": ""
+        },
+        {
+          "Field": "PowerProfile",
+          "Value": "MPP25",
+          "unit": ""
+        },
+        {
+          "Field": "MemberCode",
+          "Value": "0x010E",
+          "unit": ""
+        },
+        {
+          "Field": "AuthenticationSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "OBSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "DupSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "NegotiationSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "WPIDSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedPTxPROPDataPackets",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "XIDDataPacketSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "PCHDataPacketSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedOptionalProtocols",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "GuaranteedLoadPower",
+          "Value": 15,
+          "unit": "W"
+        },
+        {
+          "Field": "RestrictedModeSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "RestrictedToFullMode",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "CloakSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedCloakReasons",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "CloakRetryCount",
+          "Value": "1",
+          "unit": ""
+        },
+        {
+          "Field": "DetectPingSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedOptionalGetRequests",
+          "Value": [],
+          "unit": ""
+        },
+        {
+          "Field": "DPLOSSCalibrationSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SRQVerSelSupport",
+          "Value": false,
+          "unit": ""
+        },
+        {
+          "Field": "SupportedPowerModes",
+          "Value": "None",
+          "unit": ""
+        }
+      ],
+      "isFromEdit": false
+    }
+  }
+}
