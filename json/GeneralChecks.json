@@ -1,0 +1,38 @@
+{
+    "MPP":{
+        "TPR":{
+            "F1-Fq":{
+                "Default":
+                    {
+                        "expected": [127.5,128.5],
+                        "comp": 0,
+                        "flow": [1]
+                    },
+                "ExemeptedTC":[]
+            },
+            "F2-Fq":{
+                "Default":
+                    {
+                        "expected": [359.46,360.54],
+                        "comp": 0,
+                        "flow": [2]
+                    },
+                    "ExemeptedTC":[]
+            },
+            "ReserveBitChek": {
+                    "Default":{"expected": "0x00","flow":[1,2]},
+                    "ExemeptedTC":[]
+            },
+            "TestIssues":{
+                "Default":{"expected": "","flow":[1,2]},
+                "ExemeptedTC":[]
+            }
+        },
+        "TPT":{}
+    },
+    "C3":{
+        "TPT":{},
+        "TPR":{}
+    }
+    
+}

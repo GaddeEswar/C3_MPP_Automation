@@ -1,0 +1,17 @@
+pyinstaller
+xlsxwriter
+orjson
+requests
+psutil
+pymongo
+pandas
+serial
+pyserial
+scapy
+openpyxl
+pdfplumber
+jsonschema
+tkfilebrowser
+pywin32
+tinytuya
+asn1crypto

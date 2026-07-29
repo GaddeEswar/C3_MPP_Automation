@@ -1,0 +1,9 @@
+tkfilebrowser
+pymongo
+pandas
+scapy
+tinytuya
+xlsxwriter
+pyserial
+openpyxl
+pywin32

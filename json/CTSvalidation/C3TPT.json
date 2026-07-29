@@ -1,0 +1,7862 @@
+{
+  "Version": "6.0",
+  "C3": {
+    "TPT": {
+      "Signal_Strength": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "S18_S20": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_NEG_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Renego": [
+            {
+              "Pkt": [
+                "Renegotiate",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B0",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_OXE_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "ADTSeq": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/1e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/1e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_005": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/1o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/1o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_006": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/2e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/2e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_007": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/2o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/2o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_008": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/3e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/3e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_009": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/3o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/3o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_010": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/4e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/4e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_011": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/4o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/4o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_012": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/5e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/5e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_013": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/5o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/5o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_014": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/6e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/6e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_015": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/6o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/6o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_016": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/7e",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/7e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_004_017": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADT/7o",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADT/7o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      1
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_019": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      3
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_020": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      4
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_021": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      6
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_022": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      7
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_023": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      8
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_024": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      9
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_025": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_026": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      11
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_027": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      12
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_028": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      13
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_029": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      14
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_030": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Request",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      15
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_031": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Prop",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "ANY",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_032": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Prop",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "ANY",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_033": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Prop",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "ANY",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_018_034": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "ADC",
+                null
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "ADC",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Prop",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "ANY",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_036": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/1e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/1e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_037": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/1o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/1o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_038": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/2e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/2e",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_039": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/2o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/2o",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_040": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/3",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/3",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_041": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/4",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/4",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_042": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/5",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/5",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_043": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/6",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/6",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_044": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/7",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/7",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_045": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "PROP/9",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "PROP/9",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_046": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRCheck": [
+            {
+              "PTx": [
+                "Reserved",
+                null,
+                false
+              ],
+              "Pkt_count": 50,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Reserved",
+                null,
+                false
+              ],
+              "Pkt_count": 50,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Data Not Available",
+                null,
+                false
+              ],
+              "Pkt_count": 40,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Tdsr": [
+            {
+              "PTx": "ATN",
+              "flow": 1,
+              "Timing": "Tatn",
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Identification",
+                null,
+                false
+              ],
+              "Pkt_count": 40,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Tdsr": [
+            {
+              "PTx": "Power Transmitter Identification",
+              "flow": 1,
+              "Timing": "Tdsr",
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Identification",
+                null,
+                false
+              ],
+              "Pkt_count": 20,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "DSRPkts": [
+            {
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_DSR_035": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                false
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "DSR_Nego": [
+            {
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_ADT_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Auth": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "ADT": [
+            {
+              "ADT": [
+                "ATN"
+              ],
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 1000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_ADT_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Auth": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "ADT": [
+            {
+              "ADT": [
+                null
+              ],
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 1000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_ADT_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Auth": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "ADT": [
+            {
+              "ADT": [
+                "NAK"
+              ],
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 1000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_ADC_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "ADC": [
+            {
+              "ADC": [
+                "0x00",
+                "0x02",
+                "0x05"
+              ],
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 1000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_EVN_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 1000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "ADC_Auth": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_EPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCountCTS": [
+            {
+              "Pkt_count": 500,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "PTphasePkts": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_Center": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "Timing": 60000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_Centre": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "Timing": 60000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_North": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Timing": 60000,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_East": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Timing": 60000,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_South": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Timing": 60000,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Data_packet_content_West": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "BPP": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Timing": 60000,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_Center": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "Timing": 120000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_Centre": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "Timing": 120000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_North": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "Timing": 120000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_South": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "Timing": 120000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_East": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "Timing": 120000,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "RX_SYSCTRL_POWXFER_PACKCONT_West": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PFO": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "BPP": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Timing": 120000,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S08_TIM_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TimingPktCheck": [
+            {
+              "ExpPkt": [
+                "16 bit Received Power",
+                "Mode:1"
+              ],
+              "Time": 20000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_PNG_S01_WAK_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktNumCheck": [
+            {
+              "ExpPkt": [
+                "Signal strength",
+                "End Power Transfer"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "PktCount": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S02_IDX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktNumCheck": [
+            {
+              "ExpPkt": [
+                "Identification"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "PktCount": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_TIM_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tsient_Nego": [
+            {
+              "inpkt": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "enpkt": [
+                "SRQ [0x20] ",
+                "End Negotiation"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "PktCount": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_CAL_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "Calib",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "16 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_BPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "ExpResponse": [
+                "NAK"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_BPX_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_BPX_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_BPX_005": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "ExpResponse": [
+                "Reserved Response1"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_BPX_006": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "ExpResponse": [
+                "Reserved Response2"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Qf"
+              ],
+              "ExpResponse": [
+                "NAK"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Qf"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Qf"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Rf"
+              ],
+              "ExpResponse": [
+                "NAK"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001_005": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Rf"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_001_006": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "FOD Status",
+                "Rf"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "Inconclusive",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "FSK configuration"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_008": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "FSK configuration"
+              ],
+              "ExpResponse": [
+                "NAK"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_009": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "FSK configuration"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_010": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Guaranteed Load Power"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_011": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Guaranteed Load Power"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_012": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Received Power reporting"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_013": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Received Power reporting"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_014": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Reference Power"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_015": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Reference Power"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_016": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Re ping delay"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_017": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Re ping delay"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_018": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Recalibration support"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_019": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Recalibration support"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_020": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Power Control Hold Off"
+              ],
+              "ExpResponse": [
+                "NAK"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_021": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Power Control Hold Off"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_BPX_007_022": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "Power Control Hold Off"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "NotMandatory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S10_BPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "Compulsory",
+              "Expkts": [
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": 64,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S10_BPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation"
+              ],
+              "ExpResponse": [
+                "ATN"
+              ],
+              "Pkt": "Compulsory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S10_BPX_002_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": 64,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "Response_TPT": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation"
+              ],
+              "ExpResponse": [
+                "ND"
+              ],
+              "Pkt": "Compulsory",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S05_BPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "RPCheck": false,
+              "PktsCount": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "PacketDetails": [
+            {
+              "ExpectedPacket": [
+                [
+                  "Configuration",
+                  null,
+                  true,
+                  [
+                    {
+                      "Name": "Neg",
+                      "Byte": "B4",
+                      "Bit": "[7:7]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S05_BPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": false,
+              "PktsCount": false,
+              "RPCheck": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "PacketDetails": [
+            {
+              "ExpectedPacket": [
+                [
+                  "Configuration",
+                  null,
+                  true,
+                  [
+                    {
+                      "Name": "Neg",
+                      "Byte": "B4",
+                      "Bit": "[7:7]",
+                      "Exp": [
+                        1
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S10_EPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "CheckRP": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_EPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "CFG_EPX": [
+            {
+              "Pkts": [
+                [
+                  "SRQ [0x20] ",
+                  null
+                ],
+                [
+                  "FOD Status",
+                  null
+                ],
+                [
+                  "End Power Transfer",
+                  null
+                ],
+                [
+                  "General Request",
+                  null
+                ],
+                [
+                  "WPID(0x55)",
+                  null
+                ],
+                [
+                  "WPID(0x54)",
+                  null
+                ]
+              ],
+              "TimingCheck": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S06_EPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "CFG_EPX": [
+            {
+              "Pkts": [
+                [
+                  "SRQ [0x20] ",
+                  null
+                ],
+                [
+                  "FOD Status",
+                  null
+                ],
+                [
+                  "End Power Transfer",
+                  null
+                ],
+                [
+                  "General Request",
+                  null
+                ],
+                [
+                  "WPID(0x55)",
+                  null
+                ],
+                [
+                  "WPID(0x54)",
+                  null
+                ]
+              ],
+              "TimingCheck": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_BPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DataPktsCheck": [
+            {
+              "SeqPhase": "PT",
+              "PktCheck": "In",
+              "Expkts": [
+                "Control Error",
+                "Charge Status",
+                "End Power Transfer",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "SeqPhaseCheck": true,
+              "PktsCount": 500,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_CHS_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PhasePkts": [
+            {
+              "SeqPhase": "PT",
+              "PktsCount": 500,
+              "Count": true,
+              "PhaseCheck": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "Charge Status",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Charger_Status_Value",
+                    "Byte": "B0",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      0,
+                      100
+                    ],
+                    "comp": "BTW",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndRequired": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "MP_RX_COMMINTERF_FREQDEMOD_TC3": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PhasePkts": [
+            {
+              "SeqPhase": "PT",
+              "Count": false,
+              "PhaseCheck": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "MP_RX_COMMINTERF_FREQDEMOD_TC1": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PhasePkts": [
+            {
+              "SeqPhase": "PT",
+              "Count": false,
+              "PhaseCheck": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "MP_RX_COMMINTERF_FREQDEMOD_TC2": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PhasePkts": [
+            {
+              "SeqPhase": "PT",
+              "Count": false,
+              "PhaseCheck": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "MP_RX_COMMINTERF_FREQDEMOD_TC4": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PhasePkts": [
+            {
+              "SeqPhase": "PT",
+              "Count": false,
+              "PhaseCheck": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_RES_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "FOD Status",
+                "End Power Transfer",
+                "General Request",
+                "WPID(0x55)",
+                "WPID(0x54)"
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "Pkt": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_RPR_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "Received Power reporting",
+                true,
+                [
+                  {
+                    "Name": "Received_Power_Packet_Header",
+                    "Byte": "B1",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x31"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  }
+                ],
+                "Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_REP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "Re ping delay",
+                true,
+                [
+                  {
+                    "Name": "Re_ping_time",
+                    "Byte": "B1",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      1
+                    ],
+                    "comp": "GTE",
+                    "Type": "DEC",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_SRQ_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "FSK configuration",
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:5]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_SRQ_002_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "Guaranteed Load Power",
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_SRQ_002_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "Reference Power",
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_SRQ_002_005": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "LogPkts": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "ExpPkts": [
+                "SRQ [0x20] ",
+                "Re ping delay",
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Result_check": true
+                  }
+                ],
+                "Not-Compulsory"
+              ],
+              "Pkt": true,
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "EndRequired": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_WID_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "WPID(0x55)",
+                  null,
+                  false,
+                  [
+                    {
+                      "ResponseCheck": true,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ],
+                [
+                  "WPID(0x54)",
+                  null,
+                  false,
+                  [
+                    {
+                      "ResponseCheck": true,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "All",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_WID_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "WPID(0x55)",
+                  null,
+                  false,
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ],
+                [
+                  "WPID(0x54)",
+                  null,
+                  false,
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "None",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_WID_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "CRC": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_FOD_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "FOD Status",
+                  "Qf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "All",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_FOD_001_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "FOD Status",
+                  "Rf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        1
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "All",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_FOD_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "FOD Status",
+                  "Qf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ],
+                [
+                  "FOD Status",
+                  "Rf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        1
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "All",
+              "Inconclusive_Check": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_FOD_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PktsCheck": [
+            {
+              "StartPacket": [
+                "Configuration",
+                null,
+                false
+              ],
+              "EndPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "ExpPkts": [
+                [
+                  "FOD Status",
+                  "Qf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    },
+                    {
+                      "Name": "Reserved",
+                      "Byte": "B0",
+                      "Bit": "[7:2]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ],
+                [
+                  "FOD Status",
+                  "Rf",
+                  true,
+                  [
+                    {
+                      "Name": "Type",
+                      "Byte": "B0",
+                      "Bit": "[1:0]",
+                      "Exp": [
+                        1
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    },
+                    {
+                      "Name": "Reserved",
+                      "Byte": "B0",
+                      "Bit": "[7:2]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Type": "DEC"
+                    }
+                  ],
+                  [
+                    {
+                      "ResponseCheck": false,
+                      "ExpResp": [
+                        [
+                          "ACK",
+                          null,
+                          false
+                        ]
+                      ],
+                      "Result_check": true
+                    }
+                  ],
+                  [
+                    {
+                      "TimingCheck": false,
+                      "ExpTime": [
+                        6.5,
+                        3.5
+                      ],
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "Pkts": "All",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Inconclusive_Check": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_ENX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Nchanged": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_ENX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Nchanged": [
+            {
+              "ExpectedPacket": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                false
+              ],
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ],
+          "PacketDetails_TPT": [
+            {
+              "ExpectedPacket": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Potential_Power_Value",
+                    "Byte": "B1",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_PNG_SXF_RST_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tsignal_Tnext": [
+            {
+              "Tsignal": [
+                95,
+                10
+              ],
+              "Tnext": [
+                28.1,
+                0.1
+              ],
+              "SScheck": true,
+              "Pings": 10,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S02_IDX_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tsignal_Tnext": [
+            {
+              "Tsignal": [
+                160,
+                10
+              ],
+              "Tnext": [
+                1999,
+                1
+              ],
+              "SScheck": false,
+              "Pings": 2,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DeviceIDMatch": [
+            {
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S02_IDX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.0.0",
+          "1.3.3",
+          "2.2.1",
+          "2.1.0",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Major_Minor": [
+            {
+              "ExpectedPacket": [
+                "Identification",
+                null
+              ],
+              "comb": [
+                {
+                  "Major": [
+                    1
+                  ],
+                  "Minor": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "Major": [
+                    2
+                  ],
+                  "Minor": [
+                    0,
+                    1
+                  ]
+                }
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Manufacturer_Code": false,
+              "Result_check": true
+            }
+          ]
+        },
+        "2.3.0": {
+          "Notal": {},
+          "CTS": {
+            "Major_Minor": [
+              {
+                "ExpectedPacket": [
+                  "Identification",
+                  null
+                ],
+                "comb": [
+                  {
+                    "Major": [
+                      1
+                    ],
+                    "Minor": [
+                      1,
+                      2,
+                      3
+                    ]
+                  },
+                  {
+                    "Major": [
+                      2
+                    ],
+                    "Minor": [
+                      0,
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+                ],
+                "flow": 1,
+                "CheckSEQ": 1,
+                "Manufacturer_Code": false,
+                "Result_check": true
+              }
+            ]
+          }
+        }
+      },
+      "PRX_CPX_CFG_S02_IDX_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Major_Minor": [
+            {
+              "ExpectedPacket": [
+                "Identification",
+                null
+              ],
+              "comb": [
+                {
+                  "Major": [
+                    2
+                  ],
+                  "Minor": [
+                    0,
+                    1,
+                    2
+                  ]
+                }
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Manufacturer_Code": true,
+              "Result_check": true
+            }
+          ]
+        },
+        "2.1.0": {
+          "Notal": {},
+          "CTS": {
+            "Major_Minor": [
+              {
+                "ExpectedPacket": [
+                  "Identification",
+                  null
+                ],
+                "comb": [
+                  {
+                    "Major": [
+                      2
+                    ],
+                    "Minor": [
+                      1
+                    ]
+                  }
+                ],
+                "flow": 1,
+                "CheckSEQ": 1,
+                "Manufacturer_Code": false,
+                "Result_check": true
+              }
+            ]
+          }
+        },
+        "2.2.1": {
+          "Notal": {},
+          "CTS": {
+            "Major_Minor": [
+              {
+                "ExpectedPacket": [
+                  "Identification",
+                  null
+                ],
+                "comb": [
+                  {
+                    "Major": [
+                      2
+                    ],
+                    "Minor": [
+                      0,
+                      1,
+                      2
+                    ]
+                  }
+                ],
+                "flow": 1,
+                "CheckSEQ": 1,
+                "Manufacturer_Code": false,
+                "Result_check": true
+              }
+            ]
+          }
+        }
+      },
+      "PRX_CPX_CFG_S03_XID_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "XIDCheck": [
+            {
+              "XID": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S03_XID_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.0.0",
+          "1.3.3"
+        ],
+        "CTSChecks": {
+          "XIDCheck": [
+            {
+              "XID": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S04_CFG_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "SDF_Checks": [
+            {
+              "Pkts": [
+                [
+                  "Configuration",
+                  null,
+                  [
+                    {
+                      "SDFName": "AuthenticationSupport",
+                      "Name": "Authentication",
+                      "comp": "EQL"
+                    },
+                    {
+                      "SDFName": "OBSupport",
+                      "Name": "OutofBand",
+                      "comp": "EQL"
+                    },
+                    {
+                      "SDFName": "DupSupport",
+                      "Name": "Dup",
+                      "comp": "EQL"
+                    },
+                    {
+                      "SDFName": "NegotiationSupport",
+                      "Name": "Neg",
+                      "comp": "EQL"
+                    }
+                  ]
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "PacketDetails": [
+            {
+              "ExpectedPacket": [
+                [
+                  "Configuration",
+                  null,
+                  true,
+                  [
+                    {
+                      "Name": "Maximum_Power_Value",
+                      "Byte": "B0",
+                      "Bit": "[5:0]",
+                      "Exp": [
+                        10
+                      ],
+                      "comp": "LTE",
+                      "Result_check": true
+                    },
+                    {
+                      "Name": "Reserved",
+                      "Byte": "B1",
+                      "Bit": "[7:0]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    },
+                    {
+                      "Name": "Reserved",
+                      "Byte": "B2",
+                      "Bit": "[5:5]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    },
+                    {
+                      "Name": "Zero",
+                      "Byte": "B2",
+                      "Bit": "[7:7]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    },
+                    {
+                      "Name": "Zero",
+                      "Byte": "B2",
+                      "Bit": "[3:3]",
+                      "Exp": [
+                        0
+                      ],
+                      "comp": "EQL",
+                      "Result_check": true
+                    },
+                    {
+                      "Name": "Window_Size",
+                      "Byte": "B3",
+                      "Bit": "[7:3]",
+                      "Exp": [
+                        2
+                      ],
+                      "comp": "GTE",
+                      "Result_check": true
+                    }
+                  ]
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "Compare_PCH_Count": [
+            {
+              "flow": 1,
+              "CheckSEQ": 3,
+              "PchLimit": false,
+              "Result_check": true
+            }
+          ],
+          "Neg_Compare": [
+            {
+              "Bits": [
+                "Authentication",
+                "OutofBand",
+                "Dup",
+                "Polarity",
+                "Depth",
+                "Buffer Size"
+              ],
+              "flow": 1,
+              "CheckSEQ": 4,
+              "PchLimit": false,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S04_PCH_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Compare_PCH_Count": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "PchLimit": true,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_S04_PCH_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "OptionalDatapkts": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_PNG_S01_TWK_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TimingCheck": [
+            {
+              "TimingCheck": [
+                "Twake"
+              ],
+              "ExpTime": [
+                {
+                  "Twake": [
+                    19,
+                    64
+                  ]
+                }
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_CFG_SXX_TIM_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TimingCheck": [
+            {
+              "TimingCheck": [
+                "Tstart",
+                "Tsilent"
+              ],
+              "ExpTime": [
+                {
+                  "Tstart": [
+                    11.5,
+                    19
+                  ],
+                  "Tsilent": [
+                    6
+                  ]
+                }
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_GRQ_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "GeneralRequest": [
+            {
+              "ExpPkts": [
+                "PT-CAP 0x31",
+                "PT-ID 0x30",
+                "PT-NULL",
+                "PT-Prop",
+                "PT-XCAP"
+              ],
+              "SeqPhase": "Nego",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_RPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "RPPkts": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_RPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "PacketDetails2": [
+            {
+              "ExpectedPacket": [
+                "16 bit Received Power",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B0",
+                    "Bit": "[7:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TCE_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "TimingCheck": "Tinterval",
+              "Limit": [
+                0,
+                350
+              ],
+              "Pkts": 100,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TCE_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "TimingCheck": "Tinterval",
+              "Limit": [
+                0,
+                700
+              ],
+              "Pkts": 200,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TR8_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                4050
+              ],
+              "Pkts": 50,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "TimeBetweenPkts": [
+            {
+              "Pkt1": [
+                "Configuration",
+                null,
+                false
+              ],
+              "Pkt2": [
+                "8 bit Received Power",
+                null,
+                false
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                4050
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TRP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:1"
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                500
+              ],
+              "Pkts": 10,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "ResponseNak": [
+            {
+              "Count": 9,
+              "response": "NAK",
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "TimeBetweenPkts": [
+            {
+              "Pkt1": [
+                "SRQ [0x20] ",
+                "End Negotiation",
+                true
+              ],
+              "Pkt2": [
+                "16 bit Received Power",
+                "Mode:1",
+                false
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                4050
+              ],
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TRP_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:2"
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                2050
+              ],
+              "Pkts": 2,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "TimeBetweenPkts": [
+            {
+              "Pkt1": [
+                "16 bit Received Power",
+                "Mode:1",
+                true
+              ],
+              "Pkt2": [
+                "16 bit Received Power",
+                "Mode:2",
+                false
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                4050
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TRP_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:0"
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                2050
+              ],
+              "Pkts": 20,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "TimeBetweenPkts": [
+            {
+              "Pkt1": [
+                "16 bit Received Power",
+                "Mode:2",
+                true
+              ],
+              "Pkt2": [
+                "16 bit Received Power",
+                "Mode:0",
+                false
+              ],
+              "TimingCheck": "Treceived",
+              "Limit": [
+                0,
+                4050
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TCE_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tinterval_Treceived": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "TimingCheck": "Tinterval",
+              "Limit": [
+                0,
+                350
+              ],
+              "Pkts": 100,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "PacketDetails_TPT": [
+            {
+              "ExpectedPacket": [
+                "Power Transmitter Identification",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Major_Version",
+                    "Byte": "B0",
+                    "Bit": "[7:4]",
+                    "Exp": [
+                      1
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Minor_Version",
+                    "Byte": "B0",
+                    "Bit": "[3:0]",
+                    "Exp": [
+                      2
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Phase": "Nego",
+              "Result_check": true
+            }
+          ],
+          "PktReponses": [
+            {
+              "Pkt": [
+                "ADC",
+                null
+              ],
+              "response": null,
+              "Timing": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            },
+            {
+              "Pkt": [
+                "ADT",
+                null
+              ],
+              "response": null,
+              "Timing": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            },
+            {
+              "Pkt": [
+                "DSR",
+                null
+              ],
+              "response": null,
+              "Timing": false,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TIM_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tcontrol_Tdelay": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "Pkts": 100,
+              "Neg": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TIM_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TsilentChecks": [
+            {
+              "Pkt": [
+                "Charge Status",
+                "PROP",
+                "8 bit Received Power"
+              ],
+              "EPP": false,
+              "Pkts": 40,
+              "combine": false,
+              "Neg": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TIM_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "Tcontrol_Tdelay": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "Pkts": 200,
+              "Neg": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_TIM_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TsilentChecks": [
+            {
+              "Pkt": [
+                "Charge Status",
+                "PROP"
+              ],
+              "Pkt2": [
+                "ADC",
+                "ADT",
+                "DSR",
+                "Renegotiate",
+                "16 bit Received Power"
+              ],
+              "EPP": true,
+              "Pkts": 500,
+              "combine": true,
+              "Neg": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S13_RSP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "ResponseAfterPkt": [
+            {
+              "Pkt": [
+                "ADC",
+                "ADT",
+                "Control Error",
+                "Renegotiate",
+                "Charge Status",
+                "DSR",
+                "End Power Transfer",
+                "PROP",
+                "16 bit Received Power"
+              ],
+              "Pkt_count": 50,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S14_RNG_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TC8436": [
+            {
+              "Pkt": [
+                [
+                  "WPID",
+                  null
+                ],
+                [
+                  "SRQ [0x20] ",
+                  "Guaranteed Load Power"
+                ],
+                [
+                  "SRQ [0x20] ",
+                  "Reference Power"
+                ],
+                [
+                  "SRQ [0x20] ",
+                  "FSK configuration"
+                ],
+                [
+                  "SRQ [0x20] ",
+                  "Re ping delay"
+                ],
+                [
+                  "SRQ [0x20] ",
+                  "End Negotiation"
+                ],
+                [
+                  "GeneralRequest",
+                  null
+                ]
+              ],
+              "Pkts": 500,
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S14_RNG_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TC8437": [
+            {
+              "Pkt": [
+                "ADC",
+                "ADT",
+                "DSR",
+                "Control Error",
+                "Charge Status",
+                "16 bit Received Power"
+              ],
+              "Pkts": 500,
+              "Response": "ATN",
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S14_RNG_002_004": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TC8437": [
+            {
+              "Pkt": [
+                "ADC",
+                "ADT",
+                "DSR",
+                "Control Error",
+                "Charge Status",
+                "16 bit Received Power"
+              ],
+              "Pkts": 500,
+              "Response": "ND",
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S14_RNG_002_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "TC8437": [
+            {
+              "Pkt": [
+                "ADC",
+                "ADT",
+                "DSR",
+                "Control Error",
+                "Charge Status",
+                "16 bit Received Power"
+              ],
+              "Pkts": 500,
+              "Response": "NAK",
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_WDW_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "WDW": [
+            {
+              "Pkt": [
+                "8 bit Received Power",
+                null
+              ],
+              "Pkts": 50,
+              "Neg": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S11_WDW_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "WDW": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                null
+              ],
+              "Pkts": 50,
+              "Neg": true,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_RNG_S07_GLP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "RenegoTimingSeq": [
+            {
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 1,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_RNG_S07_TCE_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "RenegoTiming": [
+            {
+              "Pkt": [
+                "Control Error",
+                null
+              ],
+              "Limit": [
+                0,
+                700
+              ],
+              "TimingCheck": "Tinterval",
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 1,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_RNG_S07_TRP_003": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "RenegoTiming": [
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:0"
+              ],
+              "Limit": [
+                0,
+                2050
+              ],
+              "TimingCheck": "Treceived",
+              "flow": 1,
+              "CheckSEQ": 3,
+              "Result_check": true
+            }
+          ],
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Guaranteed_Power_Value",
+                    "Byte": "B0",
+                    "Bit": "[5:0]",
+                    "Exp": [
+                      10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC"
+                  }
+                ]
+              ],
+              "Pkt_count": 1,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S15_NUL_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Data Not Available",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B0",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0xFF"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "Fail": true,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S15_CAP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B0",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      "0x03"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      "0x03"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "Fail": true,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_POW_S14_CAP_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "DSRATN": [
+            {
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "DSRPOLL": [
+            {
+              "PTx": [
+                "Power Transmitter Capability",
+                null,
+                true,
+                [
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B0",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      "0x03"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      "0x03"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Result_check": true
+                  }
+                ]
+              ],
+              "Pkt_count": 10,
+              "Fail": true,
+              "flow": 1,
+              "CheckSEQ": 2,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "MP_RX_FOD_REQFODSTATUS_TC2": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "FtQt": [
+            {
+              "pkts": [
+                [
+                  "Rf",
+                  "referenceResonance",
+                  2
+                ],
+                [
+                  "Qf",
+                  "referenceQuality",
+                  10
+                ]
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_CPX_NEG_S07_SRQ_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "SRQCheck": [
+            {
+              "inpkt": [
+                "Configuration",
+                "Neg:true"
+              ],
+              "enpkt": [
+                "SRQ [0x20] ",
+                "End Negotiation"
+              ],
+              "values": [
+                "Guaranteed Load Power",
+                "End Negotiation",
+                "Reference Power",
+                "Re ping delay",
+                "FSK configuration",
+                "Received Power reporting",
+                "Proprietary"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_PDX_GPX_001": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "GP": [
+            {
+              "EPP": false,
+              "PFO": false,
+              "Time": 300000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "PRX_PDX_GPX_002": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "GP": [
+            {
+              "EPP": true,
+              "PFO": false,
+              "Time": 300000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      },
+      "Guaranteed_power": {
+        "Certifications": [
+          "2.0.1",
+          "2.1.0",
+          "2.2.1",
+          "2.3.0",
+          "2.0.0",
+          "1.3.3",
+          "2.3.1"
+        ],
+        "CTSChecks": {
+          "GP": [
+            {
+              "EPP": false,
+              "PFO": true,
+              "Time": 120000,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Format": {
+    "TestID": {
+      "Certifications": [],
+      "2.3.0": {
+        "Notal": {},
+        "CTS": {
+          "MethodName1": [
+            {
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ]
+        }
+      },
+      "2.2.1": {
+        "Notal": {
+          "NotalNumber": {
+            "MethodName1": [
+              {
+                "flow": 1,
+                "Result_check": true,
+                "CheckSEQ": 1
+              }
+            ],
+            "MethodName2": [
+              {
+                "flow": 1,
+                "Result_check": true,
+                "CheckSEQ": 1
+              }
+            ]
+          }
+        },
+        "CTS": {
+          "MethodName1": [
+            {
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}

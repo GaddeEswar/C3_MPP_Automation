@@ -1,0 +1,1 @@
+py -m pip install -r .\py_requirements.txt

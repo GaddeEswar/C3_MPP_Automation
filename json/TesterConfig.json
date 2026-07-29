@@ -1,0 +1,333 @@
+{
+  "MPP": {
+    "TPR": {
+      "TesterConfigurationModel": {
+        "isOptimumCoilEnable": false,
+        "isDUTPopupEnabled": false,
+        "isEDSPopUpReq": false,
+        "ambientTempCheck": true,
+        "isCoilPlacePopupEnabled": true,
+        "isPtxSupportsMultiPings": false,
+        "ptmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "prmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "bdiValue": "30313235",
+        "repCount": 0,
+        "kiActual_P1": 0.0,
+        "kiActual_P2": 0.0,
+        "prxCloakWaitTime": 2,
+        "referenceResonance": 50,
+        "referenceQuality": 10,
+        "batteryCharge": 0,
+        "mplaOffset": 0,
+        "nonceValue": "",
+        "notal": {
+          "Notal_240703_1_MPP_PTX_POW_VRECT_CONTROL": {
+            "appModeDescription": [
+              "2.0.1"
+            ],
+            "isActive": true,
+            "displayString": "240703-1 MPP.PTX.POW.VRECT.CONTROL",
+            "dutProfile": [
+              "MPP"
+            ],
+            "dutProfileDescription": [
+              "MPP"
+            ],
+            "toolTip": "MPP.PTX.POW.VRECT.CONTROL"
+          },
+          "Notal_240718_1_MPP_PTX_PHY_FSK_MOD_TC3": {
+            "appModeDescription": [
+              "2.0.1"
+            ],
+            "isActive": true,
+            "displayString": "240718-1 MPP.PTX.PHY.FSK.MOD.TC3",
+            "dutProfile": [
+              "MPP"
+            ],
+            "dutProfileDescription": [
+              "MPP"
+            ],
+            "toolTip": "MPP.PTX.PHY.FSK.MOD.TC3"
+          },
+          "Notal_205624_1MPP_PTX_CPX_PNG_VMC_MPP": {
+            "appModeDescription": [
+              "2.1.0"
+            ],
+            "isActive": true,
+            "displayString": "250624-1 MPP.PTX.CPX.PNG.VMC.MPP",
+            "dutProfile": [
+              "MPP",
+              "APP"
+            ],
+            "dutProfileDescription": [
+              "MPP",
+              "APP"
+            ],
+            "toolTip": "11.2.8 MPP.PTX.CPX.PNG.VMC.MPP XXX"
+          },
+          "Notal_250716_1_MPP_PTX_PHY_FSK_MOD_TC1": {
+            "appModeDescription": [
+              "2.1.0"
+            ],
+            "isActive": true,
+            "displayString": "250716-1 MPP.PTX.PHY.FSK.MOD_TC1",
+            "dutProfile": [
+              "MPP",
+              "APP"
+            ],
+            "dutProfileDescription": [
+              "MPP",
+              "APP"
+            ],
+            "toolTip": "10.5 MPP.PTX.PHY.FSK_MOD.TC1"
+          }
+        },
+        "isRandomPrmc": true,
+        "isExcludeDutPrmc": true,
+        "prmc_Ptmc_Source": "Use Pool Data",
+        "randomSeed": 727183974,
+        "noOfCoils": 1,
+        "kiActual_P3": 0,
+        "rpMode": 0,
+        "isSimpleMode": false,
+        "is16bitRPForced": false
+      },
+      "ReportConfigurationModel": {
+        "testlabmanager": "",
+        "testLab": "",
+        "testlablocation": "",
+        "testEngineer": "",
+        "phonenumber": "",
+        "email": "",
+        "remarksComments": ""
+      }
+    },
+    "TPT": {
+      "TesterConfigurationModel": {
+        "isOptimumCoilEnable": false,
+        "isDUTPopupEnabled": false,
+        "isEDSPopUpReq": false,
+        "ambientTempCheck": true,
+        "isCoilPlacePopupEnabled": true,
+        "isPtxSupportsMultiPings": false,
+        "ptmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "prmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "bdiValue": "30313235",
+        "repCount": 0,
+        "kiActual_P1": 0,
+        "kiActual_P2": 0,
+        "prxCloakWaitTime": 2,
+        "referenceResonance": 50,
+        "referenceQuality": 10,
+        "batteryCharge": 0,
+        "mplaOffset": 0,
+        "nonceValue": "",
+        "notal": {
+          "Notal_241204_1_MPP_PRX_CPX_CFG_PROFILE_ACTIVATION": {
+            "appModeDescription": [
+              "2.1.0"
+            ],
+            "isActive": true,
+            "displayString": "241204-1 11.1.5 MPP.PRX.CPX.CFG.PROFILE_ACTIVATION",
+            "dutProfile": [
+              "MPP"
+            ],
+            "dutProfileDescription": [
+              "MPP"
+            ],
+            "toolTip": "MPP.PRX.CPX.CFG.PROFILE_ACTIVATION"
+          }
+        },
+        "isRandomPrmc": false,
+        "isExcludeDutPrmc": true,
+        "prmc_Ptmc_Source": "Use Pool Data",
+        "randomSeed": 145331132,
+        "noOfCoils": 1,
+        "kiActual_P3": 0,
+        "rpMode": 0,
+        "isSimpleMode": false,
+        "is16bitRPForced": false
+      },
+      "ReportConfigurationModel": {
+        "testlabmanager": "",
+        "testLab": "",
+        "testlablocation": "",
+        "testEngineer": "",
+        "phonenumber": "",
+        "email": "",
+        "remarksComments": ""
+      }
+    }
+  },
+  "C3": {
+    "TPR": {
+      "TesterConfigurationModel": {
+        "isOptimumCoilEnable": false,
+        "isDUTPopupEnabled": false,
+        "isEDSPopUpReq": false,
+        "ambientTempCheck": true,
+        "isCoilPlacePopupEnabled": false,
+        "isPtxSupportsMultiPings": true,
+        "ptmcCode": "0x01BC,0x00D6,0x019C,0x00D1,0x00F2,0x01C8,0x0112,0x01BD,0x0066,0x00FD,0xEB60,0xEFD7,0x09A9,0x93BC,0xB0CB,0xD1A3,0x1E23,0xB1FA,0x5EF5,0x11C1,0x6F52,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "prmcCode": "0x010E",
+        "bdiValue": "30313235",
+        "repCount": 0,
+        "kiActual_P1": 0,
+        "kiActual_P2": 0,
+        "prxCloakWaitTime": 2,
+        "referenceResonance": 50,
+        "referenceQuality": 10,
+        "batteryCharge": 0,
+        "mplaOffset": 0,
+        "nonceValue": "",
+        "notal": {
+          "Notal_240627_1": {
+            "appModeDescription": [
+              "V_2.0.0",
+              "V_2.1.0",
+              "V_2.0.1",
+              "V_2.2.1"
+            ],
+            "isActive": true,
+            "displayString": "240627-1 TPR placement for different ping levels",
+            "dutProfile": [
+              "BPP",
+              "EPP",
+              "EPP5",
+              "MPP",
+              "APP",
+              "MPP15",
+              "MPP25",
+              "APP15",
+              "APP25"
+            ],
+            "dutProfileDescription": [
+              "BPP",
+              "EPP",
+              "EPP5",
+              "MPP",
+              "APP",
+              "MPP15",
+              "MPP25",
+              "APP15",
+              "APP25"
+            ],
+            "toolTip": "testcases as per NOTAL 240627-1 (TPR placement for different ping levels)"
+          },
+          "Notal_205624_1_PTX_CPX_PNG_VMC": {
+            "appModeDescription": [
+              "V_2.1.0"
+            ],
+            "isActive": true,
+            "displayString": "250624-1PTX.CPX.CFG.S02.VMC, PTX.CPX.CFG.S02.VMC.EPP",
+            "dutProfile": [
+              "BPP",
+              "EPP",
+              "EPP5",
+              "MPP",
+              "APP"
+            ],
+            "dutProfileDescription": [
+              "BPP",
+              "EPP",
+              "EPP5",
+              "MPP",
+              "APP"
+            ],
+            "toolTip": "PTX.CPX.CFG.S02.VMC.00X and PTX.CPX.CFG.S02.VMC.EPP.00X"
+          },
+          "Notal_230516_1": {
+            "appModeDescription": [
+              "V_1.3.3"
+            ],
+            "isActive": true,
+            "displayString": "230516-1 8.3.30 PTX.CPX.NEG.S09.GRQ.010",
+            "dutProfile": [
+              "EPP",
+              "EPP5"
+            ],
+            "dutProfileDescription": [
+              "EPP",
+              "EPP5"
+            ],
+            "toolTip": "8.3.30 PTX.CPX.NEG.S09.GRQ.010"
+          }
+        },
+        "isRandomPrmc": true,
+        "isExcludeDutPrmc": true,
+        "prmc_Ptmc_Source": "PRMC",
+        "randomSeed": 445992154,
+        "noOfCoils": 1,
+        "kiActual_P3": 0,
+        "rpMode": 0,
+        "isSimpleMode": false,
+        "is16bitRPForced": false
+      },
+      "ReportConfigurationModel": {
+        "testlabmanager": "Eswar",
+        "testLab": "",
+        "testlablocation": "",
+        "testEngineer": "",
+        "phonenumber": "",
+        "email": "",
+        "remarksComments": ""
+      }
+    },
+    "TPT": {
+      "TesterConfigurationModel": {
+        "isOptimumCoilEnable": false,
+        "isDUTPopupEnabled": false,
+        "isEDSPopUpReq": false,
+        "ambientTempCheck": true,
+        "isCoilPlacePopupEnabled": true,
+        "isPtxSupportsMultiPings": false,
+        "ptmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "prmcCode": "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042",
+        "bdiValue": "30313235",
+        "repCount": 0,
+        "kiActual_P1": 0,
+        "kiActual_P2": 0,
+        "prxCloakWaitTime": 2,
+        "referenceResonance": 50,
+        "referenceQuality": 10,
+        "batteryCharge": 0,
+        "mplaOffset": 0,
+        "nonceValue": "",
+        "notal": {
+          "Notal_241204_1_MPP_PRX_CPX_CFG_PROFILE_ACTIVATION": {
+            "appModeDescription": [
+              "2.1.0"
+            ],
+            "isActive": true,
+            "displayString": "241204-1 11.1.5 MPP.PRX.CPX.CFG.PROFILE_ACTIVATION",
+            "dutProfile": [
+              "MPP"
+            ],
+            "dutProfileDescription": [
+              "MPP"
+            ],
+            "toolTip": "MPP.PRX.CPX.CFG.PROFILE_ACTIVATION"
+          }
+        },
+        "isRandomPrmc": false,
+        "isExcludeDutPrmc": true,
+        "prmc_Ptmc_Source": "Use Pool Data",
+        "randomSeed": 145331132,
+        "noOfCoils": 1,
+        "kiActual_P3": 0,
+        "rpMode": 0,
+        "isSimpleMode": false,
+        "is16bitRPForced": false
+      },
+      "ReportConfigurationModel": {
+        "testlabmanager": "Naresh",
+        "testLab": "GRL",
+        "testlablocation": "BLR",
+        "testEngineer": "ESWAR",
+        "phonenumber": "",
+        "email": "",
+        "remarksComments": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,1606 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GRL Test Report Schema",
+  "description": "Schema for validating Granite River Labs (GRL) Wireless Power Test Reports",
+  "type": "object",
+
+  "properties": {
+    "SchemaVersion": {
+      "type": "string",
+      "description": "The version of the reporting schema used.",
+      "enum": ["2.0"]
+    },
+    "TestLab": {
+      "type": "object",
+      "properties": {
+        "LabName": { "type": "string" },
+        "LabLocation": { "type": "string" },
+        "LabManager": { "type": "string" },
+        "TestEngineer": { "type": "string" },
+        "EMail": { "type": "string" },
+        "Remarks": { "type": "string" }
+      },
+      "required": ["LabName", "LabLocation", "LabManager", "TestEngineer"],
+      "additionalProperties": false
+    },
+    "TestExecutionDetails": {
+      "type": "object",
+
+      "properties": {
+        "ProjectId": { "type": "string" },
+        "ReportSequence": { "type": "integer" },
+        "TestScope": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "TestResult": { "type": "string" },
+        "Passed": { "type": "integer" },
+        "Failed": { "type": "integer" },
+        "Inconclusive": { "type": "integer" },
+        "NotRun": { "type": "integer" },
+        "CreationTime": { "type": "string", "format": "date-time" },
+        "SpecVersion": {
+          "type": "string",
+          "enum": [
+            "1.2.4",
+            "1.3.0",
+            "1.3.1",
+            "1.3.2",
+            "1.3.3",
+            "2.0.0",
+            "2.0.1",
+            "2.1.0",
+            "2.2.1",
+            "2.3.1"
+          ]
+        }
+      },
+      "required": [
+        "ProjectId",
+        "TestScope",
+        "TestResult",
+        "Passed",
+        "Failed",
+        "Inconclusive",
+        "NotRun",
+        "CreationTime",
+        "SpecVersion"
+      ],
+      "additionalProperties": false
+    },
+    "ReportRemark": {
+      "description": "Operator Remarks for the test report",
+      "type": "string"
+    },
+    "TestToolInfo": {
+      "type": "object",
+
+      "properties": {
+        "TestToolManufacturer": { "type": "string" },
+        "ModelName": { "type": "string" },
+        "SerialNumber": { "type": "string" },
+        "LastCalibrationDate": { "type": "string", "format": "date" },
+        "IsCalibrated": { "type": "boolean" },
+        "SoftwareVersion": { "type": "string" },
+        "FirmwareVersion": { "type": "string" },
+        "HardwareVersion": { "type": "string" }
+      },
+      "required": [
+        "TestToolManufacturer",
+        "ModelName",
+        "SerialNumber",
+        "LastCalibrationDate",
+        "IsCalibrated",
+        "SoftwareVersion",
+        "FirmwareVersion"
+      ],
+      "additionalProperties": false
+    },
+    "DutInfo": {
+      "type": "object",
+
+      "properties": {
+        "DutType": { "type": "string", "enum": ["PTx", "PRx"] },
+        "BrandName": { "type": "string" },
+        "MemberCode": {
+          "type": "string",
+          "pattern": "^0x[A-Z0-9]{4}"
+        },
+        "ProductName": { "type": "string" },
+        "PartNumber": { "type": "string" },
+        "QiId": { "type": "string" },
+
+        "SerialNumber": { "type": "string" },
+        "PowerProfile": {
+          "type": "string",
+          "enum": [
+            "BPP",
+            "EPP",
+            "EPP5",
+            "MPP",
+            "APP",
+            "MCPM",
+            "MCPE",
+            "MPP15",
+            "MPP25",
+            "APP15",
+            "APP25"
+          ]
+        },
+        "SpecificationSupported": {
+          "description": "Supported Specification version whitelist",
+          "type": "string",
+          "enum": [
+            "1.2.4",
+            "1.3.0",
+            "1.3.1",
+            "1.3.2",
+            "1.3.3",
+            "2.0.0",
+            "2.0.1",
+            "2.1.0",
+            "2.2.1","2.3.1"
+          ]
+        },
+        "PTx": {
+          "type": "object",
+
+          "properties": {
+            "PotentialLoadPower": {
+              "description": "Potential Load Power (W)",
+              "type": "number",
+              "enum": [5, 8, 12, 15, 25]
+            },
+            "PTxDesign": {
+              "description": "PTx reference design [Optional]",
+              "type": "string",
+              "enum": [
+                "A2",
+                "A3",
+                "A6",
+                "A7",
+                "A8",
+                "A10",
+                "A11",
+                "A11a",
+                "A13",
+                "A14",
+                "A16",
+                "A17",
+                "A18",
+                "A20",
+                "A21",
+                "A22",
+                "A23",
+                "A26",
+                "A28",
+                "A28a",
+                "A28b",
+                "A30",
+                "A31",
+                "A32",
+                "A34",
+                "A36",
+                "A38",
+                "A40",
+                "A41",
+                "B2",
+                "MP-A1",
+                "MP-A2",
+                "MP-A3",
+                "MP-A6",
+                "MP-A9",
+                "MP-A10",
+                "MP-A11",
+                "MP-A12a",
+                "MP-A13",
+                "MP-A14",
+                "MP-A15",
+                "MP-A16",
+                "MP-A17",
+                "MP-A19",
+                "MP-A20",
+                "MP-A21",
+                "MP-A22",
+                "MP-A23",
+                "MP-A24",
+                "MP-A25",
+                "MP-A26",
+                "MP-A27",
+                "MP-A28",
+                "MP-A29",
+                "MP-A30",
+                "MP-A31",
+                "MP-A32",
+                "MP-A33",
+                "MP-A34",
+                "MP-A35",
+                "MP-B1"
+              ]
+            },
+            "USBPowerSupplySupport": {
+              "description": "Does the PTx support USB Power Supply",
+              "type": "boolean"
+            },
+            "NFCTagProtectionSupport": {
+              "description": "Does the PTx support NFC Tag Protection",
+              "type": "boolean"
+            },
+            "SupportedOptionalGRQRequests": {
+              "description": "Supported optional GRQ requests",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["XCAP", "None"]
+              }
+            },
+            "AuthenticationSupport": {
+              "description": "Does the PTx support Authentication",
+              "type": "boolean"
+            },
+            "WPIDSupport": {
+              "description": "Does the PTx support Wireless Power ID",
+              "type": "boolean"
+            },
+            "SupportedOptionalProtocols": {
+              "description": "Supported optional protocols",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["ExtendedProtocol", "None"]
+              }
+            },
+            "PotentialLoadPowerEP": {
+              "description": "Potential load power in W for an MPP product when using Extended Protocol [Optional]",
+              "type": "number",
+              "enum": [5, 8, 12, 15]
+            },
+            "UnpopulatedSlotNumbers": {
+              "description": "Unpopulated slot numbers [Optional]",
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "enum": [0, 1, 2, 3]
+              }
+            },
+            "SupportedPRxPROPDataPackets": {
+              "description": "Supported proprietary PRx data packets",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "PROP/1a",
+                  "PROP/1b",
+                  "PROP/1e",
+                  "PROP/1o",
+                  "PROP/2a",
+                  "PROP/2b",
+                  "PROP/2e",
+                  "PROP/2o",
+                  "PROP/3",
+                  "PROP/4",
+                  "PROP/5",
+                  "PROP/6",
+                  "PROP/7",
+                  "PROP/8",
+                  "PROP/12",
+                  "PROP/16",
+                  "PROP/20",
+                  "PROP/39",
+                  "PROP/49",
+                  "PROP/59",
+                  "PROP/79",
+                  "PROP/85",
+                  "None"
+                ]
+              }
+            },
+            "SupportedPTxPROPDataPackets": {
+              "description": "Supported proprietary PTx data packets",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "PROP/1c",
+                  "PROP/1d",
+                  "PROP/1e",
+                  "PROP/1o",
+                  "PROP/2c",
+                  "PROP/2d",
+                  "PROP/2e",
+                  "PROP/2o",
+                  "PROP/3",
+                  "PROP/3e",
+                  "PROP/4",
+                  "PROP/4e",
+                  "PROP/5",
+                  "PROP/5e",
+                  "PROP/6",
+                  "PROP/7",
+                  "PROP/8e",
+                  "PROP/9",
+                  "None"
+                ]
+              }
+            },
+            "SupportedSRQ/PROPDataPackets": {
+              "description": "Supported SRQ/Prop data requests",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "0xF0",
+                  "0xF1",
+                  "0xF2",
+                  "0xF3",
+                  "0xF4",
+                  "0xF5",
+                  "0xF6",
+                  "0xF7",
+                  "0xF8",
+                  "0xF9",
+                  "0xFA",
+                  "0xFB",
+                  "0xFC",
+                  "0xFD",
+                  "0xFE",
+                  "0xFF",
+                  "None"
+                ]
+              }
+            },
+            "SupportedADC/PROPDataPackets": {
+              "description": "Supported ADC/Prop data requests",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "0x10",
+                  "0x11",
+                  "0x12",
+                  "0x13",
+                  "0x14",
+                  "0x15",
+                  "0x16",
+                  "0x17",
+                  "0x18",
+                  "0x19",
+                  "0x1A",
+                  "0x1B",
+                  "0x1C",
+                  "0x1D",
+                  "0x1E",
+                  "0x1F",
+                  "None"
+                ]
+              }
+            },
+            "SupportedOptionalGetRequests": {
+              "description": "Supported GET requests",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["Charge Status", "None"]
+              }
+            },
+            "PTxInitiatedCloakSupport": {
+              "description": "Does the PTx support PTx-initiated cloaking",
+              "type": "boolean"
+            },
+            "UniqueIdentifierSupport": {
+              "description": "Does the PTx support a unique identifier",
+              "type": "boolean"
+            },
+            "IncreasedCoverThickness": {
+              "description": "Does the PTx have an increased cover thickness (dz1)",
+              "type": "boolean"
+            },
+            "SupportedPowerModes": {
+              "description": "Supported Power Modes",
+              "type": "string",
+              "enum": ["LPM+NPM", "LPM+NPM+HPM", "CPM", "None"]
+            },
+            "128HPMDigitalPingSupport": {
+              "description": "Does the PTx support 128kHz HPM Digital Ping",
+              "type": "boolean"
+            },
+            "5VoltInputVoltageSupport": {
+              "description": "Does the PTx support an input voltage of 5V",
+              "type": "boolean"
+            },
+            "9VoltInputVoltageSupport": {
+              "description": "Does the PTx support an input voltage of 9V",
+              "type": "boolean"
+            },
+            "DPLOSSCalibrationSupport": {
+              "description": "Does the PTx support DPLOSS calibration",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "PotentialLoadPower",
+            "USBPowerSupplySupport",
+            "NFCTagProtectionSupport",
+            "SupportedOptionalGRQRequests",
+            "AuthenticationSupport",
+            "WPIDSupport",
+            "SupportedOptionalProtocols",
+            "SupportedPRxPROPDataPackets",
+            "SupportedPTxPROPDataPackets",
+            "SupportedSRQ/PROPDataPackets",
+            "SupportedADC/PROPDataPackets",
+            "SupportedOptionalGetRequests",
+            "PTxInitiatedCloakSupport",
+            "UniqueIdentifierSupport",
+            "IncreasedCoverThickness",
+            "SupportedPowerModes",
+            "128HPMDigitalPingSupport",
+            "5VoltInputVoltageSupport",
+            "9VoltInputVoltageSupport",
+            "DPLOSSCalibrationSupport"
+          ],
+          "additionalProperties": false
+        },
+        "PRx": {
+          "type": "object",
+          "properties": {
+            "AuthenticationSupport": {
+              "description": "Does the PRx support Authentication",
+              "type": "boolean"
+            },
+            "OBSupport": {
+              "description": "Does the PRx support Out-of-band communications",
+              "type": "boolean"
+            },
+            "DupSupport": {
+              "description": "Does the PRx support Simultaneous incoming and outgoing data streams",
+              "type": "boolean"
+            },
+            "NegotiationSupport": {
+              "description": "Does the PRx support Negotiation",
+              "type": "boolean"
+            },
+            "WPIDSupport": {
+              "description": "Does the PRx support WPID",
+              "type": "boolean"
+            },
+            "SupportedPTxPROPDataPackets": {
+              "description": "Supported proprietary PTx data packets",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "PROP/1c",
+                  "PROP/1d",
+                  "PROP/1e",
+                  "PROP/1o",
+                  "PROP/2c",
+                  "PROP/2d",
+                  "PROP/2e",
+                  "PROP/2o",
+                  "PROP/3",
+                  "PROP/3e",
+                  "PROP/4",
+                  "PROP/4e",
+                  "PROP/5",
+                  "PROP/5e",
+                  "PROP/6",
+                  "PROP/7",
+                  "PROP/8e",
+                  "PROP/9",
+                  "None"
+                ]
+              }
+            },
+            "XIDDataPacketSupport": {
+              "description": "Does the PRx send ID/x data packet",
+              "type": "boolean"
+            },
+            "PCHDataPacketSupport": {
+              "description": "Does the PRx send one or more PCH packets",
+              "type": "boolean"
+            },
+            "SupportedOptionalProtocols": {
+              "description": "Supported protocols",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["ExtendedProtocol", "None"]
+              }
+            },
+            "GuaranteedLoadPower": {
+              "description": "Guaranteed load power (W)",
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 25.0
+            },
+            "RestrictedModeSupport": {
+              "description": "Does the PRx support restricted mode",
+              "type": "boolean"
+            },
+            "RestrictedToFullMode": {
+              "description": "Does the PRx allows the transition from restricted to full mode",
+              "type": "boolean"
+            },
+            "CloakSupport": {
+              "description": "Does the PRx support cloak",
+              "type": "boolean"
+            },
+            "SupportedCloakReasons": {
+              "description": "Reasons a PRx may initiate cloak",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Generic",
+                  "ThermallyConstrained",
+                  "InsufficientPower",
+                  "CoexMitigation",
+                  "EndOfCharge",
+                  "PTxInitiated",
+                  "ForeignObjectDetection",
+                  "Forced",
+                  "None"
+                ]
+              }
+            },
+            "CloakRetryCount": {
+              "description": "How many times will the product attempt to re-detect a Cloak Ping [Optional]",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 255
+            },
+            "DetectPingSupport": {
+              "description": "Does the PRx support the detect ping mechanism",
+              "type": "boolean"
+            },
+            "SupportedOptionalGetRequests": {
+              "description": "Supported GET requests",
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["Charge Status", "None"]
+              }
+            },
+            "SRQVerSelSupport": {
+              "description": "Does the PRx support the SRQ/verSel request",
+              "type": "boolean"
+            },
+            "DPLOSSCalibrationSupport": {
+              "description": "Does the PRx support DPLOSS calibration",
+              "type": "boolean"
+            },
+            "SupportedPowerModes": {
+              "description": "Supported Power Modes",
+              "type": "string",
+              "enum": ["CPM+NPM+HPM", "CPM+LPM+NPM+HPM", "None"]
+            }
+          },
+          "required": [
+            "AuthenticationSupport",
+            "OBSupport",
+            "DupSupport",
+            "NegotiationSupport",
+            "WPIDSupport",
+            "SupportedPTxPROPDataPackets",
+            "XIDDataPacketSupport",
+            "PCHDataPacketSupport",
+            "SupportedOptionalProtocols",
+            "GuaranteedLoadPower",
+            "RestrictedModeSupport",
+            "RestrictedToFullMode",
+            "CloakSupport",
+            "SupportedCloakReasons",
+            "DetectPingSupport",
+            "SupportedOptionalGetRequests",
+            "SRQVerSelSupport",
+            "DPLOSSCalibrationSupport",
+            "SupportedPowerModes"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "allOf": [
+        {
+          "required": [
+            "DutType",
+            "BrandName",
+            "MemberCode",
+            "ProductName",
+            "QiId",
+            "SerialNumber",
+            "PowerProfile",
+            "SpecificationSupported"
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "required": ["PTx"]
+            },
+            {
+              "required": ["PRx"]
+            }
+          ]
+        }
+      ],
+
+      "additionalProperties": false
+    },
+    "TestingScope": {
+      "type": "array",
+      "items": {
+        "type": "object",
+
+        "properties": {
+          "TestId": { "type": "string" },
+          "TestName": { "type": "string" },
+          "AppliedNOTALs": {
+            "description": "List of NOTAL(s) applied when running this test case",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "TestStartTime": {
+            "description": "Start time in date-time format as per RFC3339",
+            "type": "string",
+            "format": "date-time"
+          },
+          "TestEndTime": {
+            "description": "Test end time in date-time format as per RFC3339",
+            "type": "string",
+            "format": "date-time"
+          },
+          "TestResult": {
+            "description": "Test result for this test case",
+            "type": "string",
+            "enum": ["Pass", "Fail", "Inconclusive", "Not Run"]
+          },
+          "ManufacturerCode": {
+            "description": "4-digit Member Code from the PRMC pool in 0x format",
+            "type": "string",
+            "pattern": "^0x[A-Z0-9]{4}"
+          },
+          "IsAmbientTemperatureMeasured": {
+            "description": "State whether or not the ambient temperature was measured",
+            "type": "boolean"
+          },
+          "AmbientTemperature": {
+            "description": "Ambient Temperature in degree Celsius. This property should only be included if the ambient temperature is measured [Optional]",
+            "type": "number"
+          },
+          "TesterConfiguration": {
+            "description": "Test platform configuration information",
+            "type": "object",
+            "properties": {
+              "CoilUsed": {
+                "description": "Coil used",
+                "type": "string",
+                "enum": [
+                  "TPR#1A",
+                  "TPR#1B",
+                  "TPR#1D",
+                  "TPR#1E",
+                  "TPR#1F",
+                  "TPR#3",
+                  "TPR#5",
+                  "TPR#6",
+                  "TPR#7",
+                  "TPR#MP1A",
+                  "TPR#MP1B",
+                  "TPR#MP1C",
+                  "TPR#MP3",
+                  "TPR#MP4",
+                  "TPR#MPP1",
+                  "TPR#MPP4",
+                  "TPR#MPP1-COIL1",
+                  "TPR#MPP3-COIL1",
+                  "TPR-THERMAL-15W",
+                  "TPR-THERMAL-5W",
+                  "TPT#2",
+                  "TPT#MP1",
+                  "TPT#MPP1",
+                  "TPT#MPP1-COIL1",
+                  "TPT#MPP4"
+                ]
+              },
+              "TargetVoltage": {
+                "description": "Target voltage in volts",
+                "type": "number"
+              },
+              "LoadDuringPingPhase": {
+                "description": "Load in ping phase in Ohms",
+                "type": "number"
+              },
+              "LoadDuringPingPhaseUnit": {
+                "description": "Measurement unit for the LoadDuringPingPhase value",
+                "type": "string",
+                "enum": ["Ohm", "mA"]
+              },
+              "LoadDuringPowerTransferPhase": {
+                "description": "Load in Power Transfer phase in Ohms [Optional]",
+                "type": "number"
+              },
+              "LoadDuringPowerTransferPhaseUnit": {
+                "description": "Measurement unit for the LoadDuringPingPhase value [Optional]",
+                "type": "string",
+                "enum": ["Ohm", "mA"]
+              },
+              "ASKModulation": {
+                "description": "ASK modulation in nF [Optional]",
+                "type": "number"
+              },
+              "ReceivedPowerWindowsSize": {
+                "description": "Received Power Window Size in mSec",
+                "type": "integer"
+              },
+              "ReceivedPowerWindowsOffset": {
+                "description": "Received Windows Offset in mSec",
+                "type": "integer"
+              },
+              "PowerControlHoldOff": {
+                "description": "Power control Hold Off in mSec [Optional]",
+                "type": "integer"
+              },
+              "FSKPolarity": {
+                "description": "FSK polarity used [Optional]",
+                "type": "string",
+                "enum": ["Positive", "Negative", "NA"]
+              },
+              "FSKDepth": {
+                "description": "FSK depth [Optional]",
+                "type": "integer",
+                "enum": [0, 1, 2, 3]
+              },
+              "ReceivedPowerReportingResolution": {
+                "description": "Received Power Reporting Resolution [Optional]",
+                "type": "integer"
+              },
+              "QfValue": {
+                "description": "Quality Factor value for FOD packets [Optional]",
+                "type": "number"
+              },
+              "PotentialPowerValue": {
+                "description": "Potential power value in Request packet in Watts [Optional]",
+                "type": "number"
+              },
+              "GuaranteedPowerValue": {
+                "description": "Guaranteed Power Value in Watts [Optional]",
+                "type": "number"
+              },
+              "MaximumPowerValue": {
+                "description": "Maximum Power Value in Watts [Optional]",
+                "type": "number"
+              },
+              "RPOffsetValue": {
+                "description": "Received Power Offset value in mW [Optional]",
+                "type": "number"
+              },
+              "RePingDelay": {
+                "description": "Re-ping Delay in ms [Optional]",
+                "type": "number"
+              }
+            },
+            "required": [
+              "CoilUsed",
+              "TargetVoltage",
+              "LoadDuringPingPhase",
+              "LoadDuringPingPhaseUnit"
+              
+            ],
+            "additionalProperties": false
+          },
+          "Measurements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "MeasurementName": {
+                  "description": "Name of the measured Value as listed in the test specification",
+                  "type": "string",
+                  "enum": [
+                            "P_L_pot",
+                            "V_rect_ping1",
+                            "V_rect_pingx",
+                            "f_op",
+                            "V_rect_ping360",
+                            "t_ramp",
+                            "V_rect_ping128_HPM",
+                            "V_rect_peak",
+                            "Kest_err",
+                            "P_rect",
+                            "V_rect",
+                            "I_rect",
+                            "t_xce_stable",
+                            "z_max_gain",
+                            "V_rect_max",
+                            "V_rect_final_0",
+                            "V_rect_final_1",
+                            "V_rect_final_2",
+                            "abs_F_TOL",
+                            "ΔF_max",
+                            "ΔF_min",
+                            "G1_range",
+                            "G2_range",
+                            "ΔV_Inverter",
+                            "current_peak",
+                            "P_Received_Max",
+                            "P_Received_Min",
+                            "P_rect_0",
+                            "P_rect_1",
+                            "P_rect_2",
+                            "P_rect_3",
+                            "t_modecomplete",
+                            "t_ept_modechange",
+                            "XCE_data_packet_count",
+                            "RP8_average",
+                            "V_rect_1",
+                            "V_rect_2",
+                            "t_reping",
+                            "t_nopower",
+                            "t_terminate",
+                            "t_response",
+                            "t_xce_timeout",
+                            "t_pla_timeout",
+                            "DPL",
+                            "t_dactive",
+                            "t_cloakdetect",
+                            "t_cloak",
+                            "t_detect",
+                            "t_dts",
+                            "T_FO",
+                            "P_rect_avg",
+                            "t_xce_interval",
+                            "t_negtransitiontimeout_+_t_terminate",
+                            "t_renegotiate_+_t_terminate",
+                            "Vrect_drop",
+                            "Load_Voltage",
+                            "CPL",
+                            "t_capupdate",
+                            "U_ro",
+                            "Error",
+                            "t_cloaktimeout_+_t_terminate",
+                            "t_certReady",
+                            "V_rect_128_HPM_1",
+                            "V_rect_128_HPM_2",
+                            "V_rect_128_HPM_3",
+                            "V_rect_ref_0",
+                            "V_rect_ref_1",
+                            "V_rect_ref_2",
+                            "U_ro1 - U_ro2",
+                            "U_ro3 - U_ro4",
+                            "t_xce_timeout_+_t_terminate",
+                            "V_rect_Initial",
+                            "V_rect_Min",
+                            "S_18",
+                            "S_20",
+                            "Estimated_Transmitted_Power_Level_Maximum",
+                            "Estimated_Transmitted_Power_Level",
+                            "i_md1",
+                            "i_md2",
+                            "u_md1",
+                            "t_wake",
+                            "t_start",
+                            "t_silent",
+                            "t_silent_Minimum",
+                            "t_silent_Maximum",
+                            "Major_Version",
+                            "Minor_Version",
+                            "Manufacturer_ID",
+                            "XID_Byte_B0",
+                            "Power_Control_Hold_Off_time",
+                            "t_atn_Percentage",
+                            "t_dsr_Percentage",
+                            "t_interval",
+                            "t_interval_Percentage",
+                            "t_received",
+                            "t_received_Percentage",
+                            "t_measured_Minimum",
+                            "t_measured_Maximum",
+                            "t_delay_+_t_control_Minimum",
+                            "t_delay",
+                            "t_window",
+                            "t_offset",
+                            "None",
+                            "Ext_bit",
+                            "XID",
+                            "XID_Selector",
+                            "PCH_value",
+                            "RP8",
+                            "PLA",
+                            "XID_restricted_bit",
+                            "EPT_rst",
+                            "CFG",
+                            "SRQ_en",
+                            "CE",
+                            "SRQ_freqsel_B1_b1_b0",
+                            "EPT_rep",
+                            "ECAP",
+                            "GET_ECAP",
+                            "GET_PLAP",
+                            "PLAP",
+                            "KEST_COEFF_Selector",
+                            "SRQ_verSel",
+                            "t_delay_+_t_control_+_txce_responsetimeout_Min_Value",
+                            "t_plaresponsetimeout_+_tpla_delay_+_tpla_control_Min_Value",
+                            "t_pla_slow",
+                            "t_pla_fast_Max",
+                            "t_atn",
+                            "t_negtransition",
+                            "EPT/pmc",
+                            "t_eptc",
+                            "CAL_OP_RSP_[Status=ACCEPTED]",
+                            "ASK_CLOAK",
+                            "XCE",
+                            "t_responsetimeout",
+                            "t_ptxcloak",
+                            "SIG",
+                            "DSR_POLL",
+                            "SDSR_ERR_CRC",
+                            "SDSR_ACK",
+                            "t_getresponsetimeout",
+                            "t_getresponse",
+                            "DSR_nd",
+                            "Q_deflection_(ΔQ)",
+                            "SSV",
+                            "ID_EXT",
+                            "Kest_Err",
+                            "PLA_PRECT_P1",
+                            "PLA_PRECT_P2",
+                            "InvertVolt_1",
+                            "InvertVolt_2",
+                            "P_Delta",
+                            "I_TPT_Max",
+                            "XCEV_stable",
+                            "N_pass",
+                            "Window_Size",
+                            "Window_offset",
+                            "PRECT_delta",
+                            "PLA_Interval",
+                            "Avg_PFO_Loss",
+                            "PFO_Fail_Count",
+                            "MATEDQ_COEFF",
+                            "RFO_Detected",
+                            "dPloss_Range_Min",
+                            "dPloss_Range_Max",
+                            "t_CAL",
+                            "P_RECT_LEVEL1",
+                            "P_RECT_LEVEL2",
+                            "P_RECT_LEVEL3",
+                            "P_RECT_Diff",
+                            "Total_Calpoints",
+                            "P_loss_ave_RX_P1",
+                            "P_loss_ave_RX_P2",
+                            "P_loss_ave_RX_P3",
+                            "g_coil_TX",
+                            "ambient_temperature",
+                            "U_L",
+                            "t_stabilize",
+                            "cycle_lengths",
+                            "standard_deviations",
+                            "t_terminate_max",
+                            "t_terminate_min",
+                            "t_next_+_t_terminate",
+                            "t_negotiate_+_t_terminate",
+                            "t_nextping",
+                            "u_ro",
+                            "v_ro",
+                            "FSK_modulation_depth",
+                            "t_DigestReady",
+                            "t_CertReady",
+                            "t_FOD",
+                            "t_calibrated",
+                            "V_1",
+                            "V_2",
+                            "V_3",
+                            "V_min",
+                            "V_max",
+                            "u_ro-v_ro",
+                            "RL",
+                            "trestart_after_illegal",
+                            "V_RECT",
+                            ""
+                            
+                          ]
+                },
+                "TimeStamp": {
+                  "description": "Time stamp in date-time format per RFC3339",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "Value": {
+                  "description": "Measured value",
+                  "type": "number"
+                },
+                "BaseUnit": {
+                  "description": "Units of the measured Value",
+                  "type": "string",
+                  "enum": [
+                    "Hz",
+                    "Ohm",
+                    "Volt",
+                    "Amps",
+                    "Second",
+                    "Watt",
+                    "degC",
+                    "Percentage",
+                    "None"
+                  ]
+                },
+                "Prefix": {
+                  "description": "Prefix for the BaseUnit of the measured Value",
+                  "type": "string",
+                  "enum": ["a", "f", "p", "n", "m", "k", "M", "G", "None"]
+                }
+              },
+              "required": [
+                "MeasurementName",
+                "TimeStamp",
+                "Value",
+                "BaseUnit",
+                "Prefix"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "PlotData": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Title": {
+                  "description": "Plot title",
+                  "type": "string"
+                },
+                "MeasurementName": {
+                  "description": "Measurement name",
+                  "type": "string"
+                },
+                "StartTime": {
+                  "description": "Time the test case started",
+                  "type": "string"
+                },
+                "SampleInterval": {
+                  "description": "Sample Interval in milliseconds",
+                  "type": "number"
+                },
+                "TimeStamp": {
+                  "description": "Time stamp in SampleInterval ticks",
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "BaseUnit": {
+                  "description": "Units of the measured Value",
+                  "type": "string",
+                  "enum": [
+                    "Hz",
+                    "Ohm",
+                    "Volt",
+                    "Amps",
+                    "Second",
+                    "Watt",
+                    "degC"
+                  ]
+                },
+                "Prefix": {
+                  "description": "Prefix for the BaseUnit of the measured Value",
+                  "type": "string",
+                  "enum": ["a", "f", "p", "n", "m", "k", "M", "G", "None"]
+                },
+                "Value": {
+                  "description": "Array of measured values",
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": [
+                "Title",
+                "MeasurementName",
+                "StartTime",
+                "SampleInterval",
+                "TimeStamp",
+                "BaseUnit",
+                "Prefix",
+                "Value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "TestLogs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "TimeStamp": {
+                  "description": "Time stamp in date-time format",
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "OriginOfPacket": {
+                  "description": "Origin of the packet",
+                  "type": "string",
+                  "enum": ["Sent", "Received"]
+                },
+                "PacketType": {
+                  "description": "Packet type",
+                  "type": "string",
+                  "enum": ["FSK", "ASK", "MPP ASK", "MPP FSK", "Information"]
+                },
+                "PacketMnemonic": {
+                  "description": "The mnemonic of the packet as listed in the specification. This value also includes the modifier.",
+                  "type": "string",
+                  "enum": [ 
+
+                        "ADC", 
+
+                        "ADT/1e", 
+
+                        "ADT/1o", 
+
+                        "ADT/2e", 
+
+                        "ADT/2o", 
+
+                        "ADT/3e", 
+
+                        "ADT/3o", 
+
+                        "ADT/4e", 
+
+                        "ADT/4o", 
+
+                        "ADT/5e", 
+
+                        "ADT/5o", 
+
+                        "ADT/6e", 
+
+                        "ADT/6o", 
+
+                        "ADT/7e", 
+
+                        "ADT/7o", 
+
+                        "ADT/11e", 
+
+                        "ADT/11o", 
+
+                        "ADT/15e", 
+
+                        "ADT/15o", 
+
+                        "ADT/19e", 
+
+                        "ADT/19o", 
+
+                        "ADT/23e", 
+
+                        "ADT/23o", 
+
+                        "ADT/27e", 
+
+                        "ADT/27o", 
+
+                        "CAL_CAP", 
+
+                        "CAL_CAPTURE", 
+
+                        "CAL_CAPTURE_RSP", 
+
+                        "CAL_ENTER", 
+
+                        "CAL_ENTER_RSP", 
+
+                        "CAL_EXIT", 
+
+                        "CAL_OP", 
+
+                        "CAL_OP_RSP", 
+
+                        "CAP", 
+
+                        "CE", 
+
+                        "CFG", 
+
+                        "CHS", 
+
+                        "CLOAK", 
+
+                        "dPCAL_PARAM", 
+
+                        "DSR/ack", 
+
+                        "DSR/nak", 
+
+                        "DSR/nd", 
+
+                        "DSR/poll", 
+
+                        "ECAP", 
+
+                        "EDS", 
+
+                        "EPT/an", 
+
+                        "EPT/bf", 
+
+                        "EPT/cc", 
+
+                        "EPT/if", 
+
+                        "EPT/nfc", 
+
+                        "EPT/nr", 
+
+                        "EPT/nul", 
+
+                        "EPT/oc", 
+
+                        "EPT/ot", 
+
+                        "EPT/ov", 
+
+                        "EPT/pmc", 
+
+                        "EPT/ptxnfc", 
+
+                        "EPT/rcl", 
+
+                        "EPT/rep", 
+
+                        "EPT/rst", 
+
+                        "EPTR", 
+
+                        "ERR", 
+
+                        "FOD/qf", 
+
+                        "FOD/rf", 
+
+                        "GET/cal_cap", 
+
+                        "GET/chs", 
+
+                        "GET/dpcal_param", 
+
+                        "GET/ecap", 
+
+                        "GET/eds", 
+
+                        "GET/err", 
+
+                        "GET/gmp", 
+
+                        "GET/id", 
+
+                        "GET/inv", 
+
+                        "GET/kest", 
+
+                        "GET/matedq_res", 
+
+                        "GET/modecap", 
+
+                        "GET/modexcap", 
+
+                        "GET/plap", 
+
+                        "GET/plap_2", 
+
+                        "GET/rcs", 
+
+                        "GET/xid", 
+
+                        "GMP", 
+
+                        "GRQ", 
+
+                        "ID", 
+
+                        "INV", 
+
+                        "KEST", 
+
+                        "KEST-COEFF", 
+
+                        "MATEDQ_RES", 
+
+                        "MATEDQ-COEFF", 
+
+                        "MODECAP", 
+
+                        "MODEXCAP", 
+
+                        "MPP-XID", 
+
+                        "MSR", 
+
+                        "MSS/busy", 
+
+                        "MSS/fail", 
+
+                        "MSS/pending", 
+
+                        "MSS/success", 
+
+                        "NEGO", 
+
+                        "NULL", 
+
+                        "PCH", 
+
+                        "PLA", 
+
+                        "PLA_2", 
+
+                        "PLAP", 
+
+                        "PLAP_2", 
+
+                        "PROP/1a", 
+
+                        "PROP/1b", 
+
+                        "PROP/1c", 
+
+                        "PROP/1d", 
+
+                        "PROP/1e", 
+
+                        "PROP/1o", 
+
+                        "PROP/2a", 
+
+                        "PROP/2b", 
+
+                        "PROP/2c", 
+
+                        "PROP/2d", 
+
+                        "PROP/2e", 
+
+                        "PROP/2o", 
+
+                        "PROP/3", 
+
+                        "PROP/3e", 
+
+                        "PROP/4", 
+
+                        "PROP/4e", 
+
+                        "PROP/5", 
+
+                        "PROP/5e", 
+
+                        "PROP/5o", 
+
+                        "PROP/6", 
+
+                        "PROP/7", 
+
+                        "PROP/8", 
+
+                        "PROP/8e", 
+
+                        "PROP/9", 
+
+                        "PROP/12", 
+
+                        "PROP/16", 
+
+                        "PROP/20", 
+
+                        "PROP/39", 
+
+                        "PROP/49", 
+
+                        "PROP/59", 
+
+                        "PROP/79", 
+
+                        "PROP/85", 
+
+                        "RCS", 
+
+                        "REPORT", 
+
+                        "RP/0", 
+
+                        "RP/1", 
+
+                        "RP/2", 
+
+                        "RP/4", 
+
+                        "RP8", 
+
+                        "SADC", 
+
+                        "SADT/1e", 
+
+                        "SADT/1o", 
+
+                        "SADT/2e", 
+
+                        "SADT/2o", 
+
+                        "SADT/3e", 
+
+                        "SADT/3o", 
+
+                        "SADT/4e", 
+
+                        "SADT/4o", 
+
+                        "SADT/5e", 
+
+                        "SADT/5o", 
+
+                        "SADT/6e", 
+
+                        "SADT/6o", 
+
+                        "SDSR", 
+
+                        "SIG", 
+
+                        "SRQ/cloakh", 
+
+                        "SRQ/cloakl", 
+
+                        "SRQ/detect", 
+
+                        "SRQ/egpl", 
+
+                        "SRQ/en", 
+
+                        "SRQ/freqsel", 
+
+                        "SRQ/fsk", 
+
+                        "SRQ/gp", 
+
+                        "SRQ/MppProp", 
+
+                        "SRQ/pch", 
+
+                        "SRQ/pcp", 
+
+                        "SRQ/pla", 
+
+                        "SRQ/prop", 
+
+                        "SRQ/rcs", 
+
+                        "SRQ/rep", 
+
+                        "SRQ/rp", 
+
+                        "SRQ/rpr", 
+
+                        "SRQ/verSel", 
+
+                        "SRQ/xceGain", 
+
+                        "SRQ/xcemethod", 
+
+                        "WPID/hi", 
+
+                        "WPID/lo", 
+
+                        "XCAP", 
+
+                        "XCE", 
+
+                        "XID", 
+
+                        "N/A" 
+
+                        ] 
+                },
+                "PacketDescription": {
+                  "description": "Packet description as defined by the test platform vendor [Optional]",
+                  "type": "string"
+                },
+                "PacketDuration": {
+                  "description": "Packet duration in milliseconds",
+                  "type": "number"
+                },
+                "RawData": {
+                  "description": "Raw Data in hex array",
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "required": [
+                "TimeStamp",
+                "OriginOfPacket",
+                "PacketType",
+                "PacketMnemonic",
+                "PacketDuration",
+                "RawData"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "Remarks": {
+            "description": "Operator comments on the test results [Optional]",
+            "type": "string"
+          },
+          "VendorSpecificTestInformation": {
+            "description": "Vendor-specific information for the test case [Optional]",
+            "type": "string"
+          },
+          "DigitalSignatureInfo": {
+            "type": "object",
+            "properties": {
+              "EncryptedHash256Bits": {
+                "description": "Signed encrypted Hash Value of the report",
+                "type": "string"
+              },
+              "TestToolPublicKey": {
+                "description": "Test Platform Public Key",
+                "type": "string"
+              }
+            },
+            "required": ["EncryptedHash256Bits", "TestToolPublicKey"],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "TestName",
+          "AppliedNOTALs",
+          "TestStartTime",
+          "TestEndTime",
+          "TestResult",
+          "ManufacturerCode",
+          "IsAmbientTemperatureMeasured",
+          "TesterConfiguration",
+          "Measurements",
+          "TestLogs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "DigitalSignatureInfo": {
+      "description": "Digital signature for tamper-evident report",
+      "type": "object",
+      "properties": {
+        "EncryptedHash256Bits": {
+          "description": "Signed encrypted Hash Value of the report",
+          "type": "string"
+        },
+        "TestToolPublicKey": {
+          "description": "Test Platform Public Key",
+          "type": "string"
+        }
+      },
+      "required": ["EncryptedHash256Bits", "TestToolPublicKey"],
+      "additionalProperties": false
+    },
+    "VendorSpecificInformation": {
+      "description": "Vendor-specific information",
+      "type": "string"
+    }
+  },
+  "required": [
+    "SchemaVersion",
+    "TestLab",
+    "TestExecutionDetails",
+    "TestToolInfo",
+    "DutInfo",
+    "TestingScope",
+    "DigitalSignatureInfo"
+  ],
+  "additionalProperties": false
+}

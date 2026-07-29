@@ -1,0 +1,824 @@
+{
+    "MPP": {
+        "TPR": {
+            "twake": {
+                 "skip":["MPP_PTX_PHY_ASK_PREAMBLE_LONG"],
+                "default": [
+                    40,
+                    1
+                ],
+                "Preamble": 5.5,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "General",
+                        "Packet": "PD",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "Ping",
+                        "Packet": "Signal strength"
+                    }
+                }
+            },
+            "tsilent": {
+                "skip":["MPP_PTX_PHY_ASK_PREAMBLE_LONG","MPP_PTX_CPX_PNG_T_NOPOWER"],
+                "default": [
+                    30,
+                    24
+                ],
+                "Preamble": 0,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tstart": {
+                 "skip":["MPP_PTX_PHY_ASK_PREAMBLE_LONG","MPP_PTX_CPX_PNG_T_NOPOWER"],
+                "default": [
+                    15,
+                    1
+                ],
+                "Preamble": 5.5,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tresponse": {
+                 "skip":[],
+                "default": [
+                    6.5,
+                    3.5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase_Exp": [],
+                    "Packet_Exp": [
+                        "SADC",
+                        "SADT",
+                        "SDSR"
+                    ]
+                }
+            },
+            "tintervalCNF-XCE": {
+                 "skip":[],
+                "default": [
+                    250,
+                    100
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "ID&CFG",
+                        "Packet": "Configuration",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "PT",
+                        "Packet": "Extended Control Error"
+                    }
+                }
+            },
+            "tintervalXCE-XCE": {
+                 "skip":[],
+                "default": [
+                    250,
+                    100
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Extended Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "tintervalCE-CE_PT": {
+                 "skip":[],
+                "default": [
+                    250,
+                    100
+                ],
+                "TEST_PTX_CPX_POW_S12_PCH_002":[350,100],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "treceviedPLA-PLA": {
+                 "skip":[],
+                "default": [
+                    1025,
+                    1025
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Power Loss Accounting"
+                    ],
+                    "Value": []
+                }
+            }
+        },
+        "TPT": {
+            "twake": {
+                 "skip":[],
+                "default": [
+                    41.5,
+                    22.5
+                ],
+                "Preamble": 5.5,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "General",
+                        "Packet": "PD",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "Ping",
+                        "Packet": "Signal strength"
+                    }
+                }
+            },
+            "tsilent": {
+                 "skip":[],
+                "default": [
+                    0,
+                  6
+                ],
+                "Preamble": 0,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tstart": {
+                 "skip":[],
+                "default": [
+                    15.25,
+                    3.75
+                ],
+                "Preamble": 5.5,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tresponse": {
+                 "skip":[],
+                "default": [
+                    6.5,
+                    3.5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase_Exp": [],
+                    "Packet_Exp": [
+                        "SADC",
+                        "SADT",
+                        "SDSR"
+                    ]
+                }
+            },
+            "tresponseAuth": {
+                 "skip":[],
+                "default": [
+                    2501.5,
+                    2498.5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "SADC",
+                        "SADT",
+                        "SDSR"
+                    ]
+                }
+            },
+            "tintervalCNF-XCE": {
+                 "skip":[],
+                "default": [
+                    524,
+                    476
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "ID&CFG",
+                        "Packet": "Configuration",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "PT",
+                        "Packet": "Extended Control Error"
+                    }
+                }
+            },
+            "tintervalXCE-XCE": {
+                 "skip":[],
+                "default": [
+                    524,
+                    476
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Extended Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "treceviedPLA-PLA": {
+                 "skip":[],
+                "default": [
+                    1025,
+                    1025
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Power Loss Accounting"
+                    ],
+                    "Value": []
+                }
+            }
+        }
+    },
+    "C3": {
+        "TPR": {
+            "twake": {
+                 "skip":[],
+                "default": [
+                    41.5,
+                    22.5
+                ],
+                "TEST_PTX_CPX_PNG_S01_TIM_001": [
+                    63.9,
+                    0.1
+                ],
+                "Preamble": 5.5,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "General",
+                        "Packet": "PD",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "Ping",
+                        "Packet": "Signal strength"
+                    }
+                }
+            },
+            "tsilent": {
+                 "skip":["Signal_Strength_5","Signal_Strength_5a","Signal_Strength_5b"],
+                "default": [
+                    30,
+                    24
+                ],
+                "Preamble": 0,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                         "TEST_PTX_CPX_NEG_S07_ILL_003":[
+                            "Power control hold off"
+                        ],
+                        "TEST_PTX_CPX_NEG_S07_ILL_023":[
+                             "Extended Identification"
+                        ],
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ],
+                        "TEST_PTX_CPX_POW_S11_ILL_010": [
+                            "Extended Identification"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tstart": {
+                 "skip":["Signal_Strength_5","Signal_Strength_5a","Signal_Strength_5b"],
+                "default": [
+                    15,
+                    1
+                ],
+                "TEST_PTX_CPX_CFG_S02_TIM_001": [
+                    21.9,
+                    0.1
+                ],
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_NEG_S07_ILL_003":[
+                            "Power control hold off"
+                        ],
+                         "TEST_PTX_CPX_NEG_S07_ILL_023":[
+                             "Extended Identification"
+                        ],
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ],
+                        "TEST_PTX_CPX_POW_S11_ILL_010": [
+                            "Extended Identification"
+                        ]
+                    }
+                },
+                "Preamble": 5.5,
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tresponse": {
+                 "skip":[],
+                "default": [
+                    6.5,
+                    3.5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase_Exp": [],
+                    "Packet_Exp": []
+                }
+            },
+            "tintervalCFG-CE": {
+                 "skip":[],
+                "default": [
+                    250,
+                    100
+                ],
+                "TEST_PTX_CPX_POW_S11_CEX_001": [
+                    799,
+                    1
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "ID&CFG",
+                        "Packet": "Configuration",
+                        "Value": [
+                            "Neg:false"
+                        ]
+                    },
+                    "End": {
+                        "Phase": "PT",
+                        "Packet": "Control Error"
+                    }
+                }
+            },
+            "tintervalSRQ/EN-CE": {
+                 "skip":[],
+                "default": [
+                    150,
+                    100
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "Nego",
+                        "Packet": "SRQ [0x20] ",
+                        "Value": [
+                            "End Negotiation"
+                        ]
+                    },
+                    "End": {
+                        "Phase": "Calib",
+                        "Packet": "Control Error"
+                    }
+                }
+            },
+            "tCalibrate": {
+                 "skip":[],
+                "default": [
+                    150,
+                    100
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "Nego",
+                        "Packet": "SRQ [0x20] ",
+                        "Value": [
+                            "End Negotiation"
+                        ]
+                    },
+                    "End": {
+                        "Phase": "Calib",
+                        "Packet": [
+                            "16 bit Received Power"
+                        ],
+                        "Value": [
+                            "Mode:2"
+                        ]
+                    }
+                }
+            },
+            "tintervalCE-CE_PT": {
+                 "skip":[],
+                "default": [
+                    250,
+                    100
+                ],
+                "TEST_PTX_CPX_POW_S12_PCH_002":[350,100],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "tintervalCE-CE_CL": {
+                 "skip":[],
+                "default": [
+                    150,
+                    99
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "treceviedRPM1-RPM1": {
+                 "skip":[],
+                "default": [
+                    495,
+                    5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:1"
+                    ]
+                }
+            },
+            "treceviedRPM2-RPM2": {
+                "skip":[],
+                "default": [
+                    1995,
+                    5
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:2"
+                    ]
+                }
+            },
+            "treceviedRPM0-RPM0": {
+                "skip":["TEST_PTX_CPX_POW_S13_RPX_001","TEST_PTX_CPX_POW_S13_RPX_002","TEST_PTX_CPX_POW_S13_RPX_003","TEST_PTX_CPX_POW_S13_RPX_004"],
+                "default": [
+                    1995,
+                    5
+                ],
+                "TEST_PTX_CPX_POW_S11_RP0_001":[
+                    7967,10
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:0"
+                    ]
+                }
+            },
+            "treceviedRP8-RP8": {
+                 "skip":[],
+                "default": [
+                    1500,
+                    5
+                ],
+                 "TEST_PTX_CPX_POW_S11_RP8_002":[
+                    7967,10
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "8 bit Received Power"
+                    ],
+                    "Value": []
+                }
+            }
+        },
+        "TPT": {
+            "twake": {
+                 "skip":["PRX_CPX_PNG_S01_TWK_001"],
+                "default": [
+                    41.5,
+                    22.5
+                ],
+                "8.1.1 PRX.CPX.PNG.S01.TWK.001": [
+                    41.5,
+                    22.5
+                ],
+                "Preamble": 5.5,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "General",
+                        "Packet": "PD",
+                        "Value": []
+                    },
+                    "End": {
+                        "Phase": "Ping",
+                        "Packet": "Signal strength"
+                    }
+                }
+            },
+            "tsilent": {
+                 "skip":[],
+                "default": [
+                   0,6
+                ],
+                
+                "Preamble": 0,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tstart": {
+                 "skip":[],
+                "default": [
+                    15.25,
+                    3.75
+                ],
+                "Preamble": 5.5,
+                "IgnorePkts": {
+                    "ID&CFG": {
+                        "TEST_PTX_CPX_POW_S11_ILL_002": [
+                            "Power control hold off"
+                        ]
+                    }
+                },
+                "PhasePkts": {
+                    "Phase": [
+                        "Ping",
+                        "ID&CFG"
+                    ]
+                }
+            },
+            "tresponse": {
+                 "skip":[],
+                "default": [
+                    6.5,
+                    3.5
+                ],
+                "PRX_CPX_NEG_S08_TIM_004":[14.7,0.3],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase_Exp": [],
+                    "Packet_Exp": [
+                        "Configuration"
+                    ]
+                }
+            },
+            "tintervalCFG-CE": {
+                 "skip":[],
+                "default": [
+                    0,350
+                    
+                ],
+                "TEST_PTX_CPX_POW_S11_CEX_001": [
+                    799,
+                    1
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "ID&CFG",
+                        "Packet": "Configuration",
+                        "Value": [
+                           
+                        ]
+                    },
+                    "End": {
+                        "Phase": "PT",
+                        "Packet": "Control Error"
+                    }
+                }
+            },
+            "tintervalSRQ/EN-CE": {
+                 "skip":[],
+                "default": [
+                   0,350
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Start": {
+                        "Phase": "Nego",
+                        "Packet": "SRQ [0x20] ",
+                        "Value": [
+                            "End Negotiation"
+                        ]
+                    },
+                    "End": {
+                        "Phase": "Calib",
+                        "Packet": "Control Error"
+                    }
+                }
+            },
+            "tintervalCE-CE_PT": {
+                 "skip":[],
+                "default": [
+                    0,350
+                ], 
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "tintervalCE-CE_CL": {
+                 "skip":[],
+                "default": [
+                    0,350
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "Control Error"
+                    ],
+                    "Value": []
+                }
+            },
+            "treceviedRPM1-RPM1": {
+                 "skip":[],
+                "default": [
+                  0,2050
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:1"
+                    ]
+                }
+            },
+            "treceviedRPM2-RPM2": {
+                 "skip":[],
+                "default": [
+                   0,2050
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "Calib"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:2"
+                    ]
+                }
+            },
+            "treceviedRPM0-RPM0": {
+                 "skip":[],
+                "default": [
+                   0,2050
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "16 bit Received Power"
+                    ],
+                    "Value": [
+                        "Mode:0"
+                    ]
+                }
+            },
+            "treceviedRP8-RP8": {
+                 "skip":[],
+                "default": [
+                    0,
+                    4050
+                ],
+                "Preamble": 0,
+                "PhasePkts": {
+                    "Phase": [
+                        "PT"
+                    ],
+                    "Packet": [
+                        "8 bit Received Power"
+                    ],
+                    "Value": []
+                }
+            }
+        }
+    }
+}

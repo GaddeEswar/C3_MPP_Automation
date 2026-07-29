@@ -1,0 +1,9 @@
+PyInstaller==5.12.0
+xlsxwriter==3.1.1
+selenium==4.9.1
+webdriver_manager==3.8.6
+pymongo==4.4.0
+numpy==1.25.1
+tkfilebrowser==2.3.2
+pywin32==306
+pywin32-ctypes==0.2.0

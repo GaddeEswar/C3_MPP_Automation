@@ -1,0 +1,7 @@
+py -m PyInstaller --onefile -w MPPGUIform.py
+
+py -m PyInstaller --onefile -w MPPGUIform_New.py
+
+py -m PyInstaller MPPGUIform_New.spec
+
+a.datas += Tree("Resources\\tkfilebrowser", "tkfilebrowser") 

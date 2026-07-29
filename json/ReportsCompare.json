@@ -1,0 +1,658 @@
+{
+  "Inputs": {
+    "Test session information": "TestSessionInformation",
+    "Test facility & operator": "TestFacilityAndOperator",
+    "Specifications tested": "SpecificationsTested",
+    "Overview": "Overview",
+    "Details on Device Under Test": "DeviceUnderTest",
+    "Test Equipment": "TestEquipment",
+    "Testing scope and result summary": "TestingScopeAndResults"
+  },
+  "TestResult": {
+    "PASSEDTESTS": "PassedTests",
+    "FAILEDTESTS": "FailedTests",
+    "INCONCLUSIVETESTS": "InconclusiveTests",
+    "TESTSNOTRUN": "TestsNotRun"
+  },
+
+
+  "C3_MPP": {
+    "TPR": {
+      "PDF": {
+        "TestSessionInformation": {
+          "PROJECTNAME": "VBF_221_12",
+          "TESTSESSIONID": "7",
+          "REPORTGENERATIONDATE": "2026-02-12",
+          "RANDOMIZATIONSEED": "890267738",
+          "OPTIMALPOSITIONREQUIREMENT": "Disabled"
+        },
+        "TestFacilityAndOperator": {
+          "LABORATORYNAME": null,
+          "LABORATORYLOCATION": null,
+          "LABORATORYMANAGER": null,
+          "TESTENGINEER": null,
+          "PHONENUMBER": null,
+          "E-MAIL": null,
+          "NOTES": null
+        },
+        "SpecificationsTested": {
+          "SPECIFICATION": "2.2.1"
+        },
+        "Overview": {
+          "STARTED": "2026-02-1212:59:10.128",
+          "FINISHED": "2026-02-1213:01:52.321",
+          "TOTALNUMBEROFTESTS": "12",
+          "PASSED": "100.00%",
+          "FAILED": "00.00%",
+          "INCONCLUSIVE": "00.00%",
+          "NOTRUN": "00.00%"
+        },
+        "DeviceUnderTest": {
+          "BRAND": "Infineon",
+          "PRODUCTNAME": "Infineon",
+          "MANUFACTURERPARTNUMBER": null,
+          "QIID": null,
+          "SERIALNUMBER": null,
+          "MEMBERCODE": null,
+          "DUTTYPE": "PTx",
+          "POWERPROFILE": "EPP",
+          "WPID": "Yes",
+          "PTXDESIGN": "MP-A11",
+          "POTENTIALLOADPOWER": "15W",
+          "AUTHENTICATION": "Yes",
+          "SUPPORTEDPRXPROPDATAPACKETS": "PROP/2e,PROP/2o,PROP/3,PROP/4,PROP/1o.",
+          "SUPPORTEDPTXPROPDATAPACKETS": "PROP/1e,PROP/1o,PROP/3,PROP/2o,PROP/2e,PROP/4.",
+          "SUPPORTEDSRQPROPDATAPACKETS": "0xF1,0xF2,0xF4,0xF3,0xF6,0xF5.",
+          "SUPPORTEDADCPROPDATAPACKETS": "0x10,0x11,0x13,0x12,0x14.",
+          "USBPOWERSUPPLY": "No",
+          "NFCTAGPROTECTION": "Yes",
+          "SUPPORTEDOPTIONALGRQREQUESTS": "XCAP",
+          "SUPPORTEDOPTIONALPROTOCOLS": "ExtendedProtocol",
+          "POTENTIALLOADPOWERINEXTENDED": null,
+          "UNPOPULATEDSLOTNUMBERS": "2,3",
+          "MULTIPLETXPTX": "Yes",
+          "SUPPORTEDOPTIONALGETREQUESTS": null,
+          "PTX-INITIATEDCLOAK": "No",
+          "UNIQUEIDENTIFIER": "No",
+          "INCREASEDCOVERTHICKNESS": "No",
+          "SUPPORTEDPOWERMODES": null,
+          "128HPMDIGITALPING": "No",
+          "5VINPUTVOLTAGE": "No",
+          "9VINPUTVOLTAGE": "No",
+          "DPLOSSCALIBRATION": "No"
+        },
+        "TestEquipment": {
+          "BRAND": "GRL-WP-TPR-C3ComplianceTestSolution",
+          "MODEL": "GRL-WP-TPR-C3",
+          "SOFTWAREVERSION": "4.221.1.12",
+          "FIRMWAREVERSION": "7.0.0.30",
+          "HARDWAREVERSION": "E-2.7",
+          "SERIALNUMBER": "GRL-C3-2020024",
+          "CALIBRATIONDATE": "2024-12-21",
+          "CALIBRATIONEXPIRATIONDATE": "2025-12-21"
+        },
+        "TestingScopeAndResults": {
+          "PassedTests": [],
+          "FailedTests": [],
+          "InconclusiveTests": [],
+          "TestsNotRun": []
+        }
+      },
+      "JsonReferenceKeys": {
+        "TestSessionInformation": {
+          "PROJECTNAME": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "ProjectConfigurationModel",
+              "projectName"
+            ],
+            ["String", "String"]
+          ],
+          "OPTIMALPOSITIONREQUIREMENT": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "TesterConfigurationModel",
+              "isOptimumCoilEnable"
+            ],
+            ["String", "Boolean"]
+          ],
+          "TESTSESSIONID": [true, ["runCount"], ["String", "int"]]
+        },
+        "TestFacilityAndOperator": {
+          "LABORATORYNAME": [
+            false,
+            ["TestLab", "LabName"],
+            ["String", "String"]
+          ],
+          "LABORATORYLOCATION": [
+            false,
+            ["TestLab", "LabLocation"],
+            ["String", "String"]
+          ],
+          "LABORATORYMANAGER": [
+            false,
+            ["TestLab", "LabManager"],
+            ["String", "String"]
+          ],
+          "TESTENGINEER": [
+            false,
+            ["TestLab", "TestEngineer"],
+            ["String", "String"]
+          ],
+          "PHONENUMBER": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "ReportConfigurationModel",
+              "phonenumber"
+            ],
+            ["String", "String"]
+          ],
+          "E-MAIL": [false, ["TestLab", "EMail"], ["String", "String"]],
+          "NOTES": [false, ["TestLab", "Remarks"], ["String", "String"]]
+        },
+        "Overview": {
+          "STARTED": {},
+          "FINISHED": {},
+          "TOTALNUMBEROFTESTS": [1, false],
+          "PASSED": [2, true],
+          "FAILED": [3, true],
+          "INCONCLUSIVE": [4, true],
+          "NOTRUN": [5, true]
+        },
+        "SpecificationsTested": {
+          "SPECIFICATION": [
+            true,
+            ["testBkpAppModeString"],
+            ["String", "String"]
+          ]
+        },
+        "DeviceUnderTest": {
+          "BRAND": [false, ["DutInfo", "BrandName"], ["String", "String"]],
+          "PRODUCTNAME": [
+            false,
+            ["DutInfo", "ProductName"],
+            ["String", "String"]
+          ],
+          "MANUFACTURERPARTNUMBER": [
+            false,
+            ["DutInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+
+          "QIID": [false, ["DutInfo", "QiId"], ["String", "String"]],
+          "SERIALNUMBER": [
+            false,
+            ["DutInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+          "MEMBERCODE": [
+            false,
+            ["DutInfo", "MemberCode"],
+            ["String", "String"]
+          ],
+          "DUTTYPE": [false, ["DutInfo", "DutType"], ["String", "String"]],
+
+          "POWERPROFILE": [
+            false,
+            ["DutInfo", "PowerProfile"],
+            ["String", "String"]
+          ],
+          "WPID": [
+            false,
+            ["DutInfo", "PTx", "WPIDSupport"],
+            ["String", "Boolean"]
+          ],
+          "PTXDESIGN": [
+            false,
+            ["DutInfo", "PTx", "PTxDesign"],
+            ["String", "String"]
+          ],
+          "POTENTIALLOADPOWER": [
+            false,
+            ["DutInfo", "PTx", "PotentialLoadPower"],
+            ["String", "int"]
+          ],
+          "AUTHENTICATION": [
+            false,
+            ["DutInfo", "PTx", "AuthenticationSupport"],
+            ["String", "Boolean"]
+          ],
+
+          "SUPPORTEDPRXPROPDATAPACKETS": [
+            false,
+            ["DutInfo", "PTx", "SupportedPRxPROPDataPackets"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDPTXPROPDATAPACKETS": [
+            false,
+            ["DutInfo", "PTx", "SupportedPTxPROPDataPackets"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDSRQPROPDATAPACKETS": [
+            false,
+            ["DutInfo", "PTx", "SupportedSRQ/PROPDataPackets"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDADCPROPDATAPACKETS": [
+            false,
+            ["DutInfo", "PTx", "SupportedADC/PROPDataPackets"],
+            ["String", "List"]
+          ],
+          "USBPOWERSUPPLY": [
+            false,
+            ["DutInfo", "PTx", "USBPowerSupplySupport"],
+            ["String", "Boolean"]
+          ],
+          "NFCTAGPROTECTION": [
+            false,
+            ["DutInfo", "PTx", "NFCTagProtectionSupport"],
+            ["String", "Boolean"]
+          ],
+          "SUPPORTEDOPTIONALGRQREQUESTS": [
+            false,
+            ["DutInfo", "PTx", "SupportedOptionalGRQRequests"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDOPTIONALPROTOCOLS": [
+            false,
+            ["DutInfo", "PTx", "SupportedOptionalProtocols"],
+            ["String", "List"]
+          ],
+          "POTENTIALLOADPOWERINEXTENDED": [
+            false,
+            ["DutInfo", "PTx", "PotentialLoadPowerEP"],
+            ["String", "int"]
+          ],
+          "UNPOPULATEDSLOTNUMBERS": [
+            false,
+            ["DutInfo", "PTx", "UnpopulatedSlotNumbers"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDOPTIONALGETREQUESTS": [
+            false,
+            ["DutInfo", "PTx", "SupportedOptionalGetRequests"],
+            ["String", "List"]
+          ],
+          "PTX-INITIATEDCLOAK": [
+            false,
+            ["DutInfo", "PTx", "PTxInitiatedCloakSupport"],
+            ["String", "Boolean"]
+          ],
+          "UNIQUEIDENTIFIER": [
+            false,
+            ["DutInfo", "PTx", "UniqueIdentifierSupport"],
+            ["String", "Boolean"]
+          ],
+          "INCREASEDCOVERTHICKNESS": [
+            false,
+            ["DutInfo", "PTx", "IncreasedCoverThickness"],
+            ["String", "Boolean"]
+          ],
+          "SUPPORTEDPOWERMODES": [
+            false,
+            ["DutInfo", "PTx", "SupportedPowerModes"],
+            ["String", "List"]
+          ],
+          "128HPMDIGITALPING": [
+            false,
+            ["DutInfo", "PTx", "128HPMDigitalPingSupport"],
+            ["String", "Boolean"]
+          ],
+          "5VINPUTVOLTAGE": [
+            false,
+            ["DutInfo", "PTx", "5VoltInputVoltageSupport"],
+            ["String", "Boolean"]
+          ],
+          "9VINPUTVOLTAGE": [
+            false,
+            ["DutInfo", "PTx", "9VoltInputVoltageSupport"],
+            ["String", "Boolean"]
+          ],
+
+          "DPLOSSCALIBRATION": [
+            false,
+            ["DutInfo", "PTx", "DPLOSSCalibrationSupport"],
+            ["String", "Boolean"]
+          ]
+        },
+        "TestEquipment": {
+          "MODEL": [false, ["TestToolInfo", "ModelName"], ["String", "String"]],
+          "SERIALNUMBER": [
+            false,
+            ["TestToolInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+          "SOFTWAREVERSION": [
+            false,
+            ["TestToolInfo", "SoftwareVersion"],
+            ["String", "String"]
+          ],
+          "FIRMWAREVERSION": [
+            false,
+            ["TestToolInfo", "FirmwareVersion"],
+            ["String", "String"]
+          ],
+          "HARDWAREVERSION": [
+            false,
+            ["TestToolInfo", "HardwareVersion"],
+            ["String", "String"]
+          ],
+          "CALIBRATIONDATE": [
+            false,
+            ["TestToolInfo", "LastCalibrationDate"],
+            ["String", "String"]
+          ]
+        }
+      }
+    },
+    "TPT": {
+      "PDF": {
+        "TestSessionInformation": {
+          "PROJECTNAME": "Eswar",
+          "TESTSESSIONID": "1",
+          "REPORTGENERATIONDATE": "2026-02-10",
+          "RANDOMIZATIONSEED": "233789646",
+          "OPTIMALPOSITIONREQUIREMENT": "Disabled"
+        },
+        "TestFacilityAndOperator": {
+          "LABORATORYNAME": "GRL",
+          "LABORATORYLOCATION": "Banglore",
+          "LABORATORYMANAGER": "Naresh",
+          "TESTENGINEER": "Eswar",
+          "PHONENUMBER": "837465132898",
+          "E-MAIL": "india-drive@graniteriverlabs.com",
+          "NOTES": "Good"
+        },
+        "SpecificationsTested": {
+          "SPECIFICATION": "2.2.1"
+        },
+        "Overview": {
+          "STARTED": "2026-02-1011:00:48.916",
+          "FINISHED": "2026-02-1011:01:06.309",
+          "TOTALNUMBEROFTESTS": "1",
+          "PASSED": "00.00%",
+          "FAILED": "00.00%",
+          "INCONCLUSIVE": "100.00%",
+          "NOTRUN": "00.00%"
+        },
+        "DeviceUnderTest": {
+          "BRAND": "transmitter",
+          "PRODUCTNAME": "Iphone",
+          "MANUFACTURERPARTNUMBER": "564124",
+          "QIID": "2256",
+          "SERIALNUMBER": "564124",
+          "MEMBERCODE": "0x010E",
+          "POWERPROFILE": "MPP25",
+          "DUTTYPE": "PRx",
+          "WPID": false,
+          "NEGOTIATION": false,
+          "AUTHENTICATION": true,
+          "OUTOFBANDCOMMUNICATION": false,
+          "DUPLEXSUPPORT": null,
+          "SUPPORTEDPTxPROPDATAPACKETS": "PROP/1d,PROP/2c",
+          "XIDDATAPACKET": false,
+          "PCHDATAPACKET": false,
+          "SUPPORTEDOPTIONALPROTOCOLS": "None",
+          "GUARANTEEDLOADPOWER": "25",
+          "RESTRICTEDMODE": true,
+          "RESTRICTEDTO-FULLMODE": true,
+          "CLOAK": true,
+          "SUPPORTEDCLOAKREASONS": "Forced,ThermallyConstrained,InsufficientPower",
+          "CLOAKRETRYCOUNT": "5",
+          "DETECTPING": true,
+          "SUPPORTEDOPTIONALGETREQUESTS": "ChargeStatus",
+          "SRQVERSIONSELECT": true,
+          "DPLOSSCALIBRATION": true,
+          "SUPPORTEDPOWERMODES": "CPM+NPM+HPM"
+        },
+        "TestEquipment": {
+          "BRAND": "GRL-C3-TPTTestSolution",
+          "MODEL": "GRL-C3-MP-TPT",
+          "SOFTWAREVERSION": "3.221.0.22",
+          "FIRMWAREVERSION": "5.0.1.57",
+          "HARDWAREVERSION": "E-1.9",
+          "SERIALNUMBER": "GRL-C3-MP-2025152",
+          "CALIBRATIONDATE": "2025-12-03",
+          "CALIBRATIONEXPIRATIONDATE": "2026-12-02"
+        },
+        "TestingScopeAndResults": {
+          "PassedTests": [],
+          "FailedTests": [],
+          "InconclusiveTests": [],
+          "TestsNotRun": []
+        }
+      },
+      "JsonReferenceKeys": {
+        "TestSessionInformation": {
+          "PROJECTNAME": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "ProjectConfigurationModel",
+              "projectName"
+            ],
+            ["String", "String"]
+          ],
+          "OPTIMALPOSITIONREQUIREMENT": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "TesterConfigurationModel",
+              "isOptimumCoilEnable"
+            ],
+            ["String", "Boolean"]
+          ],
+          "TESTSESSIONID": [true, ["runCount"], ["String", "int"]]
+        },
+        "TestFacilityAndOperator": {
+          "LABORATORYNAME": [
+            false,
+            ["TestLab", "LabName"],
+            ["String", "String"]
+          ],
+          "LABORATORYLOCATION": [
+            false,
+            ["TestLab", "LabLocation"],
+            ["String", "String"]
+          ],
+          "LABORATORYMANAGER": [
+            false,
+            ["TestLab", "LabManager"],
+            ["String", "String"]
+          ],
+          "TESTENGINEER": [
+            false,
+            ["TestLab", "TestEngineer"],
+            ["String", "String"]
+          ],
+          "PHONENUMBER": [
+            true,
+            [
+              "testBkpProjectConfiguration",
+              "ReportConfigurationModel",
+              "phonenumber"
+            ],
+            ["String", "String"]
+          ],
+          "E-MAIL": [false, ["TestLab", "EMail"], ["String", "String"]],
+          "NOTES": [false, ["TestLab", "Remarks"], ["String", "String"]]
+        },
+        "Overview": {
+          "STARTED": {},
+          "FINISHED": {},
+          "TOTALNUMBEROFTESTS": [1, false],
+          "PASSED": [2, true],
+          "FAILED": [3, true],
+          "INCONCLUSIVE": [4, true],
+          "NOTRUN": [5, true]
+        },
+        "SpecificationsTested": {
+          "STANDARD": [true, ["testBkpAppModeString"], ["String", "String"]]
+        },
+        "DeviceUnderTest": {
+          "BRAND": [false, ["DutInfo", "BrandName"], ["String", "String"]],
+          "PRODUCTNAME": [
+            false,
+            ["DutInfo", "ProductName"],
+            ["String", "String"]
+          ],
+          "MANUFACTURERPARTNUMBER": [
+            false,
+            ["DutInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+
+          "QIID": [false, ["DutInfo", "QiId"], ["String", "String"]],
+          "SERIALNUMBER": [
+            false,
+            ["DutInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+          "MEMBERCODE": [
+            false,
+            ["DutInfo", "MemberCode"],
+            ["String", "String"]
+          ],
+          "DUTTYPE": [false, ["DutInfo", "DutType"], ["String", "String"]],
+
+          "POWERPROFILE": [
+            false,
+            ["DutInfo", "PowerProfile"],
+            ["String", "String"]
+          ],
+          "WPID": [
+            false,
+            ["DutInfo", "PRx", "WPIDSupport"],
+            ["String", "Boolean"]
+          ],
+          "AUTHENTICATION": [
+            false,
+            ["DutInfo", "PRx", "AuthenticationSupport"],
+            ["String", "Boolean"]
+          ],
+          "OUTOFBANDCOMMUNICATION": [
+            false,
+            ["DutInfo", "PRx", "OBSupport"],
+            ["String", "Boolean"]
+          ],
+          "DUPLEXSUPPORT": [
+            false,
+            ["DutInfo", "PRx", "DupSupport"],
+            ["String", "Boolean"]
+          ],
+          "NEGOTIATION": [
+            false,
+            ["DutInfo", "PRx", "NegotiationSupport"],
+            ["String", "Boolean"]
+          ],
+          "XIDDATAPACKET": [
+            false,
+            ["DutInfo", "PRx", "XIDDataPacketSupport"],
+            ["String", "Boolean"]
+          ],
+          "PCHDATAPACKET": [
+            false,
+            ["DutInfo", "PRx", "PCHDataPacketSupport"],
+            ["String", "Boolean"]
+          ],
+          "SUPPORTEDOPTIONALGETREQUESTS": [
+            false,
+            ["DutInfo", "PRx", "SupportedOptionalGetRequests"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDCLOAKREASONS": [
+            false,
+            ["DutInfo", "PRx", "SupportedCloakReasons"],
+            ["String", "List"]
+          ],
+          "SUPPORTEDOPTIONALPROTOCOLS": [
+            false,
+            ["DutInfo", "PRx", "SupportedOptionalProtocols"],
+            ["String", "List"]
+          ],
+          "GUARANTEEDLOADPOWER": [
+            false,
+            ["DutInfo", "PRx", "GuaranteedLoadPower"],
+            ["String", "int"]
+          ],
+          "RESTRICTEDMODE": [
+            false,
+            ["DutInfo", "PRx", "RestrictedModeSupport"],
+            ["String", "Boolean"]
+          ],
+          "RESTRICTEDTO-FULLMODE": [
+            false,
+            ["DutInfo", "PRx", "RestrictedToFullMode"],
+            ["String", "Boolean"]
+          ],
+          "CLOAK": [
+            false,
+            ["DutInfo", "PRx", "CloakSupport"],
+            ["String", "Boolean"]
+          ],
+          "CLOAKRETRYCOUNT": [
+            false,
+            ["DutInfo", "PRx", "CloakRetryCount"],
+            ["String", "int"]
+          ],
+          "DETECTPING": [
+            false,
+            ["DutInfo", "PRx", "DetectPingSupport"],
+            ["String", "Boolean"]
+          ],
+          "DPLOSSCALIBRATION": [
+            false,
+            ["DutInfo", "PRx", "DPLOSSCalibrationSupport"],
+            ["String", "Boolean"]
+          ],
+          "SRQVERSIONSELECT": [
+            false,
+            ["DutInfo", "PRx", "SRQVerSelSupport"],
+            ["String", "Boolean"]
+          ],
+          "SUPPORTEDPOWERMODES": [
+            false,
+            ["DutInfo", "PRx", "SupportedPowerModes"],
+            ["String", "String"]
+          ],
+          "SUPPORTEDPTxPROPDATAPACKETS": [
+            false,
+            ["DutInfo", "PRx", "SupportedPTxPROPDataPackets"],
+            ["String", "List"]
+          ]
+        },
+        "TestEquipment": {
+          "MODEL": [false, ["TestToolInfo", "ModelName"], ["String", "String"]],
+          "SERIALNUMBER": [
+            false,
+            ["TestToolInfo", "SerialNumber"],
+            ["String", "String"]
+          ],
+          "SOFTWAREVERSION": [
+            false,
+            ["TestToolInfo", "SoftwareVersion"],
+            ["String", "String"]
+          ],
+          "FIRMWAREVERSION": [
+            false,
+            ["TestToolInfo", "FirmwareVersion"],
+            ["String", "String"]
+          ],
+          "HARDWAREVERSION": [
+            false,
+            ["TestToolInfo", "HardwareVersion"],
+            ["String", "String"]
+          ],
+          "CALIBRATIONDATE": [
+            false,
+            ["TestToolInfo", "LastCalibrationDate"],
+            ["String", "String"]
+          ]
+        }
+      }
+    }
+  }
+}

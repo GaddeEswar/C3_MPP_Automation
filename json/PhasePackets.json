@@ -1,0 +1,552 @@
+{
+    "TPR":{
+        "Phases":
+        {
+            "General":
+            {
+                "descr":"General"
+            },
+            "Ping":
+            {
+                "descr":"Ping"
+            },
+            "ID&CFG":
+            {
+                "descr":"ID&CFG"
+            },
+            "Nego":
+            {
+                "descr":"Nego"
+            },
+            "ReNego":
+            {
+                "descr":"ReNego"
+            },
+            "Calib":
+            {
+                "descr":"Calib"
+            },
+            "PT":
+            {
+                "descr":"PT"
+            },
+            "Cloak":
+            {
+                "descr":"Cloak Phase"
+            }
+        }
+        ,
+        "Packets":{
+        "PD":
+            {
+                "Descr":"Ping Detected",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "FOP":{
+                "Descr":"FOP:",
+                "values":[[127.5,128.5],[359.46,360.54]],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SD": {
+                "Descr":"Shutdown",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SS":{
+                "Descr":"Signal strength",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"Ping",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "ID":{
+                "Descr":"Identification",
+                "values":[],
+                "Response":[],
+                "payload":{"Ext":["0x00","0x01"]},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            } ,
+            "ExID":{
+                "Descr":"MPP_Extended_Identification",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "CNF":{
+                "Descr":"Configuration",
+                "values":[],
+                "Response":["MPP:ACK"],
+                "payload":{"Restr":["0x00","0x01"]},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQexid":{
+                "Descr":"Get Request",
+                "values":["tended Identification"],
+                "Response":["Extended_Power_Transmitter_Identification"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQfqs":{
+                "Descr":"Specific Request",
+                "values":["Frequency Selection"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQrep":{
+                "Descr":"Specific Request",
+                "values":["Re ping delay"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQen":{
+                "Descr":"Specific Request",
+                "values":["End Negotiation"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRestK":{
+                "Descr":"Get Request",
+                "values":["PTx Estimated K"],
+                "Response":["Estimated_K"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "EPRcap":{
+                "Descr":"Extended_Power_Receiver_Capabilities",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQexcap":{
+                "Descr":"Get Request",
+                "values":["Extended Capabilities"],
+                "Response":["Extended_Power_Transmitter_Extended_Capabilities"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQplap":{
+                "Descr":"Get Request",
+                "values":["Power Loss Accounting Parameters"],
+                "Response":["Power_Loss_Accounting_Parameters"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "PLAP":{
+                "Descr":"Power_Loss_Accounting_Parameters",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SRQlp":{
+                "Descr":"Specific Request",
+                "values":["Load Power"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "XCE":{
+                "Descr":"Extended Control Error",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":5,
+                "Repeat":true
+            },
+            "PLA":{
+                "Descr":"Power Loss Accounting",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "CE":{
+                "Descr":"Control Error",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":5,
+                "Repeat":true
+            },
+            "RP8":{
+                "Descr":"8 bit Received Power",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "RP16":{
+                "Descr":"16 bit Received Power",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "EPT":{
+                "Descr":"End Power Transfer",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "CLK":{
+                "Descr":"Cloak",
+                "values":[],
+                "Response":["ACK"],
+                "payload":{},
+                "PhaseID":"Cloak",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }
+        }
+        ,
+        "PacketSeq":{
+            "Standard":["PD","SS","ID"],
+            "127_nego":["GRQexid","SRQfqs","SRQrep","SRQen","EPT"],
+            "360_nego":["GRQexid","GRestK","EPRcap","GRQexcap","GRQplap","PLAP","SRQlp","SRQen"],
+            "ExID":["ExID"],
+            "CNF":["CNF"],
+            "MPP_PT":["XCE","PLA"],
+            "BPP_PT":["CE","RP8"],
+            "EPP_PT":["CE","RP16"],
+            "Clk":["CLK"]
+        }
+    },
+    "TPT":{
+        "Phases":
+        {
+            "General":
+            {
+                "descr":"General"
+            },
+            "Ping":
+            {
+                "descr":"Ping"
+            },
+            "ID&CFG":
+            {
+                "descr":"ID&CFG"
+            },
+            "Nego":
+            {
+                "descr":"Nego"
+            },
+            "ReNego":
+            {
+                "descr":"ReNego"
+            },
+            "Calib":
+            {
+                "descr":"Calib"
+            },
+            "PT":
+            {
+                "descr":"PT"
+            },
+            "Cloak":
+            {
+                "descr":"Cloak Phase"
+            }
+        }
+        ,
+        "Packets":{
+        "PD":
+            {
+                "Descr":"Ping Detected",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "FOP":{
+                "Descr":"FOP:",
+                "values":[[127.5,128.5],[359.46,360.54]],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SD": {
+                "Descr":"Shutdown",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"General",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SS":{
+                "Descr":"Signal strength",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"Ping",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "ID":{
+                "Descr":"Identification",
+                "values":[],
+                "Response":[],
+                "payload":{"Ext":["0x00","0x01"]},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            } ,
+            "ExID":{
+                "Descr":"MPP_Extended_Identification",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "CNF":{
+                "Descr":"Configuration",
+                "values":[],
+                "Response":["MPP:ACK"],
+                "payload":{"Restr":["0x00","0x01"]},
+                "PhaseID":"ID&CFG",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQexid":{
+                "Descr":"Get Request",
+                "values":["tended Identification"],
+                "Response":["Extended_Power_Transmitter_Identification"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQfqs":{
+                "Descr":"Specific Request",
+                "values":["Frequency Selection"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQrep":{
+                "Descr":"Specific Request",
+                "values":["Re ping delay"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }, 
+            "SRQen":{
+                "Descr":"Specific Request",
+                "values":["End Negotiation"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRestK":{
+                "Descr":"Get Request",
+                "values":["PTx Estimated K"],
+                "Response":["Estimated_K"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "EPRcap":{
+                "Descr":"Extended_Power_Receiver_Capabilities",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQexcap":{
+                "Descr":"Get Request",
+                "values":["Extended Capabilities"],
+                "Response":["Extended_Power_Transmitter_Extended_Capabilities"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "GRQplap":{
+                "Descr":"Get Request",
+                "values":["Power Loss Accounting Parameters"],
+                "Response":["Power_Loss_Accounting_Parameters"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "PLAP":{
+                "Descr":"Power_Loss_Accounting_Parameters",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "SRQlp":{
+                "Descr":"Specific Request",
+                "values":["Load Power"],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"Nego",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "XCE":{
+                "Descr":"Extended Control Error",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":5,
+                "Repeat":true
+            },
+            "PLA":{
+                "Descr":"Power Loss Accounting",
+                "values":[],
+                "Response":["ACK","NAK"],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "CE":{
+                "Descr":"Control Error",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":5,
+                "Repeat":true
+            },
+            "RP8":{
+                "Descr":"8 bit Received Power",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "RP16":{
+                "Descr":"16 bit Received Power",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":true
+            },
+            "Rengo":{
+                "Descr":"Renegotiate",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "EPT":{
+                "Descr":"End Power Transfer",
+                "values":[],
+                "Response":[],
+                "payload":{},
+                "PhaseID":"PT",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            },
+            "CLK":{
+                "Descr":"Cloak",
+                "values":[],
+                "Response":["ACK"],
+                "payload":{},
+                "PhaseID":"Cloak",
+                "SeqRepeatCount":0,
+                "Repeat":false
+            }
+        }
+        ,
+        "PacketSeq":{
+            "Standard":["PD","SS","ID"],
+            "127_nego":["GRQexid","SRQfqs","SRQrep","SRQen","EPT"],
+            "360_nego":["GRQexid","EPRcap","GRQexcap","SRQen"],
+            "360_nego_opt":["GRQplap","PLAP","SRQlp","SRQrep"],
+            "ExID":["ExID"],
+            "CNF":["CNF"],
+            "MPP_PT":["XCE","PLA"],
+            "MPP_PT_opt":["Rengo",""],
+            "BPP_PT":["CE","RP8"],
+            "EPP_PT":["CE","RP16"],
+            "Clk":["CLK"]
+        }
+    }
+    
+}

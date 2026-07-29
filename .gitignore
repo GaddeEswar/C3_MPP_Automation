@@ -1,0 +1,85 @@
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ============================================
+# Virtual Environment
+# ============================================
+virtual/
+venv/
+env/
+.venv/
+
+# ============================================
+# IDE
+# ============================================
+.vscode/
+.idea/
+
+# ============================================
+# Build Files
+# ============================================
+build/
+dist/
+
+# ============================================
+# Logs
+# Keep folder, ignore generated log files
+# ============================================
+
+Logs/*
+!Logs/.gitkeep
+
+Offline_validation_Logs/
+*.log
+
+# ============================================
+# Python Cache
+# ============================================
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# ============================================
+# Generated Results
+# (Keep folder structure, ignore generated files)
+# ============================================
+
+# C3_MPP Excel Results
+Results/C3_MPP Excel Results/*
+!Results/C3_MPP Excel Results/.gitkeep
+
+# Consolidated
+Results/Consolidated/*
+!Results/Consolidated/.gitkeep
+
+# JsonReports
+Results/JsonReports/*
+!Results/JsonReports/.gitkeep
+
+# License Results
+Results/License Results/*
+!Results/License Results/.gitkeep
+
+# OptimumResults
+Results/OptimumResults/*
+!Results/OptimumResults/.gitkeep
+
+
+### Ignore Json Files ###
+
+json/AllMOIRun.json
+json/Debuglogs.json
+json/TestResults.json
+json/ESDF.json
+json/TPTSetPackets.json
+json/TestsComp.json
+json/QIconfig.json
+json/Dummy.json
+json/MOIJson.json
+json/Test_config_properties.json
+json/TestConfig.json

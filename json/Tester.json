@@ -1,0 +1,288 @@
+{
+  "MPP": {
+    "TPR": {
+      "TesterIP": "192.168.255.1",
+      "status": "Disconnected",
+      "port": 2002,
+      "BoardNo": "NA",
+      "FWversion": "NA",
+      "SWVersion": "NA",
+      "ReportPath": "C:\\GRL\\GRL-C3-MP-TPR\\Report",
+      "PropertyPath": "C:\\GRL\\GRL-C3-MP-TPR\\AppData\\AppProperty.json",
+      "ProcessName": "C3BrowserApp_MPP_TPR.exe",
+      "ExecutableLocation": "C:\\Program Files\\GRL\\GRL-C3-MP-TPR\\AppFiles",
+      "PropertyTags": [
+        "Enable_Calibration_Assertions"
+      ],
+      "licenseInfo": [
+        {
+          "moduleName": "MPP 2.1",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "APP 2.1",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - MPP 25W",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - MPP 15W",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - APP 15W & 25W",
+          "moduleStatus": "ACTIVE"
+        }
+      ]
+    },
+    "TPT": {
+      "TesterIP": "192.168.255.1",
+      "status": "Disconnected",
+      "port": 2004,
+      "BoardNo": "NA",
+      "FWversion": "NA",
+      "SWVersion": "NA",
+      "ReportPath": "C:\\GRL\\GRL-C3-MP-TPT\\Report",
+      "PropertyPath": "C:\\GRL\\GRL-C3-MP-TPT\\AppData\\AppProperty.json",
+      "ProcessName": "C3BrowserApp_C3_TPT.exe",
+      "ExecutableLocation": "C:\\Program Files\\GRL\\GRL-C3-MP-TPT\\AppFiles",
+      "PropertyTags": [
+        "Enable_Calibration_Assertions",
+        "DisplayMPPTPT_TTVAssertions"
+      ],
+      "licenseInfo": [
+        {
+          "moduleName": "1.3 BPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "1.3 EPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.0 BPP & 2.1 BPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.0 EPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.0 MPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.1 EPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.1 MPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.1 MC-MPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - MPP 25W",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - BPP ",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - EPP",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - MCPE&MCPM",
+          "moduleStatus": "ACTIVE"
+        },
+        {
+          "moduleName": "2.2 - MPP 15W",
+          "moduleStatus": "ACTIVE"
+        }
+      ]
+    }
+  },
+  "C3": {
+    "TPR": {
+      "TesterIP": "192.168.101.207",
+      "status": "Connected",
+      "port": 2002,
+      "BoardNo": "GRL-C3-2020029",
+      "FWversion": "7.0.2.1 / 2.7",
+      "SWVersion": "4.231.1.5",
+      "ReportPath": "C:\\GRL\\GRL-C3-MP-TPR\\Report",
+      "licenseInfo": [
+        {
+          "moduleName": "1.3 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "1.3 EPP5",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "1.3 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.0 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.0 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.1 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.1 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2.1 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2.1 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        }
+      ],
+      "PropertyPath": "C:\\GRL\\GRL-WP-TPR-C3\\AppData\\AppProperty.json",
+      "PropertyTags": [],
+      "ProcessName": "C3BrowserApp_C3_TPR.exe",
+      "ExecutableLocation": "C:\\Program Files\\GRL\\GRL-WP-TPR-C3\\AppFiles"
+    },
+    "TPT": {
+      "TesterIP": "192.168.255.1",
+      "status": "Disconnected",
+      "port": 2004,
+      "BoardNo": "NA",
+      "FWversion": "NA",
+      "SWVersion": "NA",
+      "licenseInfo": [
+        {
+          "moduleName": "1.3 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "1.3 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.0 BPP & 2.1 BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.0 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.0 MPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.1 EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.1 MPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.1 MC-MPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2 - MPP 25W",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2 - BPP ",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2 - EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2 - MCPE&MCPM",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.2 - MPP 15W",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 - MPP 25W",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 - EPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 - BPP",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 - MCPE&MCPM",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        },
+        {
+          "moduleName": "2.3 - MPP 15W",
+          "moduleStatus": "Permanent License Activated",
+          "licenseBackgroundColor": "#8dc63f"
+        }
+      ],
+      "PropertyTags": [],
+      "ReportPath": "C:\\GRL\\GRL-C3-MP-TPT\\Report",
+      "PropertyPath": "C:\\GRL\\GRL-C3-MP-TPT\\AppData\\AppProperty.json",
+      "ProcessName": "C3BrowserApp_C3_TPT.exe",
+      "ExecutableLocation": "C:\\Program Files\\GRL\\GRL-C3-MP-TPT\\AppFiles"
+    }
+  }
+}
