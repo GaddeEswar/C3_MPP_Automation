@@ -15,17 +15,13 @@
         "CTSChecks": {
           "Thermal_5W": [
             {
-              "Name":"Current",
-             
-              
-             
+              "Name": "Current",
               "Loads": [
                 16,
                 8,
                 3.5
               ],
-          
-               "LoadTolerance":1,
+              "LoadTolerance": 1,
               "unit": "A",
               "limit": [
                 1.14,
@@ -33,7 +29,6 @@
               ],
               "flow": 1,
               "Result_check": true,
-              
               "CheckSEQ": 1
             }
           ]
@@ -52,18 +47,14 @@
         "CTSChecks": {
           "Thermal_15W": [
             {
-              "Name":"Voltage",
+              "Name": "Voltage",
               "unit": "V",
-              
               "limit": [
                 11.4,
                 12.6
               ],
-
-             
               "flow": 1,
               "Result_check": true,
-             
               "CheckSEQ": 1
             }
           ]
@@ -108,7 +99,7 @@
                 8,
                 3.5
               ],
-              "LoadTolerance":1,
+              "LoadTolerance": 1,
               "flow": 1,
               "Result_check": true,
               "PTCheck": true,
@@ -9174,13 +9165,13 @@
         "CTSChecks": {
           "AttemptLoadVoltage": [
             {
-              "Voltage":7,
-              "VoltageTolerance":2,
-               "Load": 8.7,
-              "Power":5.6,
-              "PowerTolerance":5,
-              "LoadTolerance":1,
-              "limit":7.5,
+              "Voltage": 7,
+              "VoltageTolerance": 2,
+              "Load": 8.7,
+              "Power": 5.6,
+              "PowerTolerance": 5,
+              "LoadTolerance": 1,
+              "limit": 7.5,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -9200,14 +9191,14 @@
         ],
         "CTSChecks": {
           "AttemptLoadVoltage": [
-            {  
-               "Voltage":7,
-              "VoltageTolerance":2,
+            {
+              "Voltage": 7,
+              "VoltageTolerance": 2,
               "Load": 8.7,
-              "Power":5.6,
-              "PowerTolerance":5,
-              "LoadTolerance":1,
-              "limit":7.5,
+              "Power": 5.6,
+              "PowerTolerance": 5,
+              "LoadTolerance": 1,
+              "limit": 7.5,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -9228,14 +9219,13 @@
         "CTSChecks": {
           "AttemptLoadVoltage": [
             {
-             
-              "Voltage":12,
-              "VoltageTolerance":2,
-                "Load": 9.6,
-              "Power":15,
-              "PowerTolerance":5,
-              "LoadTolerance":1,
-              "limit":13.7,
+              "Voltage": 12,
+              "VoltageTolerance": 2,
+              "Load": 9.6,
+              "Power": 15,
+              "PowerTolerance": 5,
+              "LoadTolerance": 1,
+              "limit": 13.7,
               "flow": 1,
               "CheckSEQ": 2,
               "Result_check": true
@@ -22411,7 +22401,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-           "T_terminate": [
+          "T_terminate": [
             {
               "pkt": [
                 "8 bit Received Power",
@@ -22423,7 +22413,6 @@
                 28
               ],
               "CheckSEQ": 1,
-            
               "flow": 1,
               "Result_check": true,
               "Phase": "PT",
@@ -22434,7 +22423,6 @@
               ]
             }
           ]
-        
         }
       },
       "TEST_PTX_CPX_PNG_SXF_RST_001": {
@@ -24089,7 +24077,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-         
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -24376,7 +24363,6 @@
                           null,
                           false
                         ]
-                      
                       ],
                       "Result_check": true
                     }
@@ -24396,7 +24382,6 @@
               "flow": 1,
               "CheckSEQ": 1,
               "Phase": "Nego",
-             
               "Result_check": true
             }
           ]
@@ -24413,7 +24398,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -24801,7 +24785,6 @@
                           null,
                           false
                         ]
-                      
                       ],
                       "Result_check": true
                     }
@@ -24821,7 +24804,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 1,
-             
               "Result_check": true
             }
           ]
@@ -24838,7 +24820,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-         
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -25158,7 +25139,6 @@
                           null,
                           false
                         ]
-                       
                       ],
                       "Result_check": true
                     }
@@ -25178,7 +25158,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 1,
-             
               "Result_check": true
             }
           ]
@@ -25195,7 +25174,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-        
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -25534,7 +25512,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 1,
-             
               "Result_check": true
             }
           ]
@@ -25548,7 +25525,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-         
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -25930,7 +25906,6 @@
                   ]
                 ]
               ],
-             
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 1,
@@ -25941,7 +25916,6 @@
         "2.2.1": {
           "Notal": {
             "Notal_251215_1": {
-             
               "ResponseSequence": [
                 {
                   "StartPacket": [
@@ -26323,7 +26297,6 @@
                       ]
                     ]
                   ],
-                
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 2,
@@ -26369,7 +26342,6 @@
             }
           },
           "CTS": {
-            
             "ResponseSequence": [
               {
                 "StartPacket": [
@@ -26751,7 +26723,6 @@
                     ]
                   ]
                 ],
-               
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
@@ -26763,7 +26734,6 @@
         "2.1.0": {
           "Notal": {
             "Notal_251211_1": {
-             
               "ResponseSequence": [
                 {
                   "StartPacket": [
@@ -27145,7 +27115,6 @@
                       ]
                     ]
                   ],
-                
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 2,
@@ -27191,7 +27160,6 @@
             }
           },
           "CTS": {
-           
             "ResponseSequence": [
               {
                 "StartPacket": [
@@ -27573,7 +27541,6 @@
                     ]
                   ]
                 ],
-               
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
@@ -27591,7 +27558,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-         
           "PreviousPacket": [
             {
               "PreviousPacket": [
@@ -28019,7 +27985,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 2,
-            
               "Result_check": true
             }
           ]
@@ -28027,7 +27992,6 @@
         "2.2.1": {
           "Notal": {
             "Notal_251215_1": {
-             
               "PreviousPacket": [
                 {
                   "PreviousPacket": [
@@ -28455,7 +28419,6 @@
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 3,
-                 
                   "Result_check": true
                 }
               ],
@@ -28498,7 +28461,6 @@
             }
           },
           "CTS": {
-           
             "PreviousPacket": [
               {
                 "PreviousPacket": [
@@ -28926,7 +28888,6 @@
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
-              
                 "Result_check": true
               }
             ]
@@ -28935,7 +28896,6 @@
         "2.1.0": {
           "Notal": {
             "Notal_251211_1": {
-             
               "PreviousPacket": [
                 {
                   "PreviousPacket": [
@@ -29363,7 +29323,6 @@
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 3,
-                
                   "Result_check": true
                 }
               ],
@@ -29406,7 +29365,6 @@
             }
           },
           "CTS": {
-           
             "PreviousPacket": [
               {
                 "PreviousPacket": [
@@ -29815,7 +29773,6 @@
                             null,
                             false
                           ]
-                          
                         ],
                         "Result_check": true
                       }
@@ -29835,7 +29792,6 @@
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
-             
                 "Result_check": true
               }
             ]
@@ -29850,7 +29806,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-        
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -30234,7 +30189,6 @@
               ],
               "Phase": "Nego",
               "flow": 1,
-             
               "CheckSEQ": 2,
               "Result_check": true
             }
@@ -30243,7 +30197,6 @@
         "2.2.1": {
           "Notal": {
             "Notal_251215_1": {
-              
               "ResponseSequence": [
                 {
                   "StartPacket": [
@@ -30627,7 +30580,6 @@
                   ],
                   "Phase": "Nego",
                   "flow": 1,
-                 
                   "CheckSEQ": 2,
                   "Result_check": true
                 }
@@ -30671,7 +30623,6 @@
             }
           },
           "CTS": {
-           
             "ResponseSequence": [
               {
                 "StartPacket": [
@@ -31055,7 +31006,6 @@
                 ],
                 "Phase": "Nego",
                 "flow": 1,
-               
                 "CheckSEQ": 2,
                 "Result_check": true
               }
@@ -31065,7 +31015,6 @@
         "2.1.0": {
           "Notal": {
             "Notal_251211_1": {
-            
               "ResponseSequence": [
                 {
                   "StartPacket": [
@@ -31449,7 +31398,6 @@
                   ],
                   "Phase": "Nego",
                   "flow": 1,
-                 
                   "CheckSEQ": 2,
                   "Result_check": true
                 }
@@ -31493,7 +31441,6 @@
             }
           },
           "CTS": {
-           
             "ResponseSequence": [
               {
                 "StartPacket": [
@@ -31877,7 +31824,6 @@
                 ],
                 "Phase": "Nego",
                 "flow": 1,
-               
                 "CheckSEQ": 2,
                 "Result_check": true
               }
@@ -31949,7 +31895,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          
           "ResponseSequence": [
             {
               "StartPacket": [
@@ -32218,7 +32163,6 @@
                     {
                       "ResponseCheck": true,
                       "ExpResp": [
-                      
                         [
                           "NAK",
                           null,
@@ -32243,7 +32187,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 1,
-             
               "Result_check": true
             }
           ]
@@ -32374,7 +32317,6 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          
           "PreviousPacket": [
             {
               "PreviousPacket": [
@@ -32437,8 +32379,6 @@
                     "Result_check": false
                   }
                 ]
-               
-               
               ],
               "SeqPkts": [
                 [
@@ -32793,7 +32733,6 @@
                     {
                       "ResponseCheck": true,
                       "ExpResp": [
-                       
                         [
                           "NAK",
                           null,
@@ -32818,7 +32757,6 @@
               "Phase": "Nego",
               "flow": 1,
               "CheckSEQ": 2,
-             
               "Result_check": true
             }
           ]
@@ -32826,7 +32764,6 @@
         "2.2.1": {
           "Notal": {
             "Notal_251215_1": {
-             
               "PreviousPacket": [
                 {
                   "PreviousPacket": [
@@ -32889,8 +32826,6 @@
                         "Result_check": false
                       }
                     ]
-                   
-                    
                   ],
                   "SeqPkts": [
                     [
@@ -33245,7 +33180,6 @@
                         {
                           "ResponseCheck": true,
                           "ExpResp": [
-                           
                             [
                               "NAK",
                               null,
@@ -33270,7 +33204,6 @@
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 2,
-                 
                   "Result_check": true
                 }
               ],
@@ -33313,7 +33246,6 @@
             }
           },
           "CTS": {
-           
             "PreviousPacket": [
               {
                 "PreviousPacket": [
@@ -33376,8 +33308,6 @@
                       "Result_check": false
                     }
                   ]
-                
-                  
                 ],
                 "SeqPkts": [
                   [
@@ -33732,7 +33662,6 @@
                       {
                         "ResponseCheck": true,
                         "ExpResp": [
-                         
                           [
                             "NAK",
                             null,
@@ -33757,7 +33686,6 @@
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
-               
                 "Result_check": true
               }
             ]
@@ -33766,7 +33694,6 @@
         "2.1.0": {
           "Notal": {
             "Notal_251211_1": {
-             
               "PreviousPacket": [
                 {
                   "PreviousPacket": [
@@ -33829,7 +33756,6 @@
                         "Result_check": false
                       }
                     ]
-                   
                   ],
                   "SeqPkts": [
                     [
@@ -34184,7 +34110,6 @@
                         {
                           "ResponseCheck": true,
                           "ExpResp": [
-                           
                             [
                               "NAK",
                               null,
@@ -34209,7 +34134,6 @@
                   "Phase": "Nego",
                   "flow": 1,
                   "CheckSEQ": 2,
-                
                   "Result_check": true
                 }
               ],
@@ -34252,7 +34176,6 @@
             }
           },
           "CTS": {
-           
             "PreviousPacket": [
               {
                 "PreviousPacket": [
@@ -34315,8 +34238,6 @@
                       "Result_check": false
                     }
                   ]
-                 
-                 
                 ],
                 "SeqPkts": [
                   [
@@ -34671,7 +34592,6 @@
                       {
                         "ResponseCheck": true,
                         "ExpResp": [
-                         
                           [
                             "NAK",
                             null,
@@ -34696,7 +34616,6 @@
                 "Phase": "Nego",
                 "flow": 1,
                 "CheckSEQ": 2,
-               
                 "Result_check": true
               }
             ]
@@ -35207,7 +35126,6 @@
         "CTSChecks": {
           "SignalStrengthCheck": [
             {
-             
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -41797,60 +41715,12 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "SeqRespTimng": [
+          "Nego_SRQ_GPX": [
             {
-              "StartPacket": [
-                "General Request",
-                "PT-CAP",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        30
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
-              ],
               "flow": 1,
+              "Response": "ACK",
               "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
+              "Result_check": true
             }
           ]
         }
@@ -41866,60 +41736,12 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "SeqRespTimng": [
+          "Nego_SRQ_GPX": [
             {
-              "StartPacket": [
-                "General Request",
-                "PT-CAP",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        6
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
-              ],
               "flow": 1,
+              "Response": "ACK",
               "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
+              "Result_check": true
             }
           ]
         }
@@ -41935,96 +41757,11 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "SeqRespTimng": [
+          "Nego_SRQ_GPX": [
             {
-              "StartPacket": [
-                "General Request",
-                "PT-CAP",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        31
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
-              ],
               "flow": 1,
-              "CheckSEQ": 2,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
-            }
-          ],
-          "Pkt_PktComp": [
-            {
-              "Pkts": [
-                [
-                  "Power Transmitter Capability",
-                  null,
-                  [
-                    {
-                      "Name": "Potential_Power_Value",
-                      "Type": "DEC"
-                    }
-                  ],
-                  "Response"
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Type": "DEC",
-                      "Result_check": false
-                    }
-                  ],
-                  "Packet"
-                ]
-              ],
-              "Addval": [
-                true,
-                0,
-                10
-              ],
-              "Comp": "NEQ",
-              "flow": 1,
+              "Response": "NAK",
+              "0.5": true,
               "CheckSEQ": 1,
               "Result_check": true
             }
@@ -42042,2540 +41779,11 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "SeqRespTimng": [
+          "Nego_SRQ_GPX5": [
             {
-              "StartPacket": [
-                "General Request",
-                "PT-CAP",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        63
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        62
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        61
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        60
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        59
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        58
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        57
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        56
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        55
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        54
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        53
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        52
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        51
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        50
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        49
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        48
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        47
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        46
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        45
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        44
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        43
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        42
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        41
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        40
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        39
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        38
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        37
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        36
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        35
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        34
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        33
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        32
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        31
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        30
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        29
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        28
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        27
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        26
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        25
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        24
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        23
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        22
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        21
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        20
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        19
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        18
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        17
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        16
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        15
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        14
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        13
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        12
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        11
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        10
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        9
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        8
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        7
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        6
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        5
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        4
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        3
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        2
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "SRQ [0x20] ",
-                  "Guaranteed Load Power",
-                  true,
-                  [
-                    {
-                      "Name": "Guaranteed_Power_Value",
-                      "Byte": "B1",
-                      "Bit": "[5:0]",
-                      "Exp": [
-                        1
-                      ],
-                      "comp": "EQL",
-                      "Type": "DEC"
-                    }
-                  ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
-              ],
               "flow": 1,
               "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
+              "Result_check": true
             }
           ]
         }

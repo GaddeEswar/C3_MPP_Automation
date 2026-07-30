@@ -86,8 +86,114 @@ class CommonCTSChecks:
         else : res.append([f'PRx did not Entered PT Phase','Inconclusive'])
         return res
       
-    # ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#
+    #-----------------------------------------------------------Negotiation Phase Tests------------------------------------------------------------------------- #
+    
+    def Nego_SRQ_GPX(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        # find GRQ PT-Cap
+        GRQ_CAP=self.PktMethod.GetPacketDetails(packet="General Request",value='PT-CAP',limit=self.Flow_limit)
+        if len(GRQ_CAP)>2:
+            # Take the PT-CAP Response Power Value
+            PT_CAP=self.PktMethod.GetPacketDetails(packet="Power Transmitter Capability",Type="Response",limit=[GRQ_CAP[2]+1,self.Flow_limit[1]])
+            if len(PT_CAP)>2:
+                NPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(PT_CAP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
+                # Find SRQ/GP 
+                SRQ_GP=self.PktMethod.GetPacketDetails(packet="SRQ [0x20]",value="Guaranteed Load Power",limit=[PT_CAP[2]+1,self.Flow_limit[1]])
+                if len(SRQ_GP)>2:
+                    res.append([f'TPR sent SRQ/GP Packet at {{{SRQ_GP[2]}}}','Pass'])
+                    # Verify the Guranteed Load Power according to CTS
+                    GPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(SRQ_GP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
+                    if Check.get('0.5',False):
+                        res.append([f'TPR set Guranteed power Value to {GPower} W , which is { '' if GPower==NPower+0.5 else 'not'} equal to PT-CAP Negotaible Load Power ({NPower}) W + 0.5 W','Pass' if GPower==NPower+0.5 else 'Inconclusive'])
+                    else:
+                        if 'GPX_002' in self.Header['TestcaseID'] :
+                            res.append([f'TPR set Guranteed power Value to {GPower} W  in SRQ/GP Packet , Expected 3W','Pass' if GPower==3 else 'Inconclusive'])
+                        else:
+                            res.append([f'TPR set Guranteed power Value to {GPower} W , which is {'' if GPower==NPower else 'not'} equal to PT-CAP Negotaible Load Power ({NPower}) W','Pass' if GPower==NPower else 'Inconclusive'])
 
+                    # Verify SRQ/GP Response
+                    id= SRQ_GP[2]+1
+                    PF=[]
+                    while id < self.Flow_limit[1]:
+                        if self.PktMethod.GetPacketType(id)=='Packet':
+                            if self.file_list[SRQ_GP[2]]['pktType'] in self.file_list[id]['pktType'] and self.file_list[SRQ_GP[2]]['value'] in self.file_list[id]['value']:
+                                SRQ_GP=[self.file_list[id]['startTime'],self.file_list[id]['stopTime'],id]
+                                id+=1
+                                continue
+                            else:
+                                PF.append([f"TPR sent Packet {self.file_list[id]['pktType']}_{self.file_list[id]['value']} at {{{id}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",'Inconclusive'])
+                                break
+                        elif self.PktMethod.GetPacketType(id)=='Response':
+                            PF.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/GP Packet , Expected - {Check['Response']}','Pass' if Check['Response'] in self.file_list[id]['pktType'] else 'Fail'])
+                            break
+                        id+=1
+                        
+                    if PF==[]:PF.append([f'PTx did not sent Response for SRQ/GP Packet','Inconclusive'])
+                    res.extend(PF)
+
+                else: res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP','Inconclusive'])
+                    
+            else: res.append([f'Power Transmitter Capability response is not found','Inconclusive'])
+                    
+        else: res.append([f'TPR did not sent General Request PT-CAP packet in the Sequence ','Inconclusive'])
+                
+        return res
+
+    def Nego_SRQ_GPX5(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        # find GRQ PT-Cap
+        GRQ_CAP=self.PktMethod.GetPacketDetails(packet="General Request",value='PT-CAP',limit=self.Flow_limit)
+        if len(GRQ_CAP)>2:
+            # Take the PT-CAP Response Power Value
+            PT_CAP=self.PktMethod.GetPacketDetails(packet="Power Transmitter Capability",Type="Response",limit=[GRQ_CAP[2]+1,self.Flow_limit[1]])
+            if len(PT_CAP)>2:
+                NPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(PT_CAP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
+                GPowerStart=31.5
+                id=PT_CAP[2]+1
+                while id < self.Flow_limit[1]:
+                    SRQ_GP=self.PktMethod.GetPacketDetails(packet="SRQ [0x20]",value="Guaranteed Load Power",limit=[id,self.Flow_limit[1]])
+                    if len(SRQ_GP)>2:
+                        # Verify SRQ/GP Response
+                        iid= SRQ_GP[2]+1
+                        PF=[]
+                        while iid < self.Flow_limit[1]:
+                            if self.PktMethod.GetPacketType(iid)=='Packet':
+                                if self.file_list[SRQ_GP[2]]['pktType'] in self.file_list[iid]['pktType'] and self.file_list[SRQ_GP[2]]['value'] in self.file_list[iid]['value']:
+                                    SRQ_GP=[self.file_list[iid]['startTime'],self.file_list[iid]['stopTime'],iid]
+                                    iid+=1
+                                    continue
+                                else:
+                                    PF.append([f"TPR sent Packet {self.file_list[iid]['pktType']}_{self.file_list[iid]['value']} at {{{iid}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",'Inconclusive'])
+                                    break
+                            elif self.PktMethod.GetPacketType(iid)=='Response':
+                                ExpResponse= 'ACK' if GPowerStart <= NPower else 'NAK' 
+                                PF.append([f'TPR sent SRQ/GP Packet at {{{SRQ_GP[2]}}}','Pass'])
+                                 # Verify the Guranteed Load Power according to CTS
+                                GPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(SRQ_GP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
+                                PF.append([f'TPR set Guranteed power Value to {GPower} W , Expected - {GPowerStart} W','Pass' if GPower==GPowerStart else 'Inconclusive'])
+                                PF.append([f'PTx sent {self.file_list[iid]['pktType']} response for SRQ/GP Packet , Expected - {ExpResponse}','Pass' if ExpResponse in self.file_list[iid]['pktType'] else 'Fail'])
+                                break
+                            iid+=1
+                            
+                        if PF==[]:
+                            res.append([f'PTx did not sent Response for SRQ/GP Packet','Inconclusive'])
+                            break
+                        res.extend(PF)
+                        id=iid+1
+                        GPowerStart-=0.5
+                    else: 
+                        res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP','Inconclusive'])
+                        break
+                    if GPowerStart==0: break # Break the Loop if GP power reaches 0W
+            else: res.append([f'Power Transmitter Capability response is not found','Inconclusive'])
+        else: res.append([f'TPR did not sent General Request PT-CAP packet in the Sequence ','Inconclusive'])
+                
+        return res
+        
+        
+        
     
 
     def ADC(self,CTSCheck,Check,flows,flwID):
