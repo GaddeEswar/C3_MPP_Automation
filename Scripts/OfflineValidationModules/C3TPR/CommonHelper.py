@@ -192,8 +192,51 @@ class CommonCTSChecks:
                 
         return res
         
-        
-        
+    #-----------------------------------------------------------Power Transfer Phase Tests------------------------------------------------------------------------- #
+
+    def POW_RP8(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        phaseCheck=self.CheckPhase(self.Flow_limit[0],"Calib")
+        if phaseCheck is not None:
+            count=0
+            id=phaseCheck+1
+            RP8Check=False
+            last_RP8=None
+            while id < self.Flow_limit[1]:
+                if count%3==2:
+                    RP8=self.PktMethod.GetPacketDetails(packet="8 bit Received Power", limit=[id,self.Flow_limit[1]])
+                    if len(RP8)>2:
+                        res.append([f'TPR sent 8 bit Received Power Packet at {{{RP8[2]}}} after 3 RP Packets','Pass'])
+                        id=RP8[2]+1
+                        RP8Check=True
+                        last_RP8=RP8
+                        count=0 # Reset count to check the next sequence of RP packets
+                    else:
+                        res.append([f'TPR did not send RP8 packet after 3 RP Packets','Inconclusive'])
+                        break
+                else:
+                    RP=self.PktMethod.GetPacketDetails(packet="16 bit Received Power", limit=[id,self.Flow_limit[1]])
+                    if len(RP)>2:
+                        count+=1
+                        id=RP[2]+1
+                    else:break
+            # Check Tterminate
+            if RP8Check:
+                iid=last_RP8[2]+1
+                while iid< self.Flow_limit[1]:
+                    if self.PktMethod.GetPacketType(iid) in ["Response","Packet"]:
+                        res.append([f'PTx did not detach after the Last RP8 packet ','Inconclusive'])
+                    else:
+                        if 'shutdown' in self.file_list[iid]['pktType'] or 'CoilVoltpkpk' in self.file_list[iid]['pktType']:
+                            Timing=round((self.file_list[iid]['startTime']-last_RP8[1])*1000,3)
+                            res.append([f'Measured Tterminate from Last RP8 Packet at {{{last_RP8[2]}}} is {Timing} mS ,Limit : ≤ 28 ms','Pass' if Timing <=28 else 'Fail'])
+                        break
+                    iid+=1
+            else:res.append([f'TPR did not send RP8 packet or 3 RP Packets before RP8 packet','Inconclusive'])         
+        else:res.append([f'TPR did not enter into Power Transfer Phase','Inconclusive'])
+        return res
+  
     
 
     def ADC(self,CTSCheck,Check,flows,flwID):

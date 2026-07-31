@@ -22401,26 +22401,11 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "T_terminate": [
+          "POW_RP8": [
             {
-              "pkt": [
-                "8 bit Received Power",
-                null,
-                false
-              ],
-              "Tterminate": [
-                0,
-                28
-              ],
               "CheckSEQ": 1,
               "flow": 1,
-              "Result_check": true,
-              "Phase": "PT",
-              "sp": [
-                "Control Error",
-                null,
-                false
-              ]
+              "Result_check": true
             }
           ]
         }
