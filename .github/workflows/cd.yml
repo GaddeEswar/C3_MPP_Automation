@@ -38,7 +38,10 @@ jobs:
           xcopy json C3_MPP_Automation_Build\json /E /I /Y
           xcopy Results C3_MPP_Automation_Build\Results /E /I /Y
           xcopy Logs C3_MPP_Automation_Build\Logs /E /I /Y
-        
+      - name: Show Package Structure
+        shell: cmd
+        run: |
+          tree C3_MPP_Automation_Build /F
       - name: Verify Application Launch
         shell: powershell
         run: |
