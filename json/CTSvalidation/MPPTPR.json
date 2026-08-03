@@ -3425,7 +3425,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 3
             }
           ],
           "BitsCheck_New": [
@@ -3526,11 +3526,27 @@
                     }
                   },
                   "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Configuration",
+                    null
+                  ],
+                  "Checks": {},
+                  "refPrevious": false
                 }
               ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
             }
           ],
           "FOP": [
@@ -3555,7 +3571,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 4
             }
           ],
           "MPP_FSK_Pattern": [
@@ -3565,12 +3581,13 @@
                   "refpkt": [
                     "Control Error",
                     "Packet"
-                  ]
+                  ],
+                  "MPP_Pattern": false
                 }
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 5
             }
           ]
         }
@@ -4101,6 +4118,14 @@
               ],
               "flow": 2,
               "Result_check": true,
+              "CheckSEQ": 4
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
               "CheckSEQ": 2
             }
           ],
@@ -4210,6 +4235,22 @@
               "CheckSEQ": 1
             }
           ],
+          "MPP_FSK_Pattern": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Control Error",
+                    "Packet"
+                  ],
+                  "MPP_Pattern": true
+                }
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 3
+            }
+          ],
           "T_measures": [
             {
               "expected": [
@@ -4239,7 +4280,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 6
             }
           ],
           "RenegoCheck1": [
@@ -4275,7 +4316,7 @@
               "rms_pkt": "RMS_Data",
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -4421,7 +4462,7 @@
               "rms_pkt": "RMS_Data",
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -4467,6 +4508,14 @@
                   }
                 }
               ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 4
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -4578,6 +4627,22 @@
               "CheckSEQ": 1
             }
           ],
+          "MPP_FSK_Pattern": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Control Error",
+                    "Packet"
+                  ],
+                  "MPP_Pattern": true
+                }
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 3
+            }
+          ],
           "T_measures": [
             {
               "expected": [
@@ -4606,7 +4671,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ],
           "FOP": [
@@ -4633,7 +4698,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 6
             }
           ]
         }
@@ -5220,47 +5285,26 @@
             {
               "expected": [
                 {
-                  "PrectOffsetValue": -669,
+                  "PrectOffsetValue": 669,
                   "exp_resp1": "NAK",
                   "Prect_reduced": 5,
                   "removeoffset": true,
-                  "exp_resp2": "ATN"
+                  "exp_resp2": "ATN",
+                  "Tcapupdate": {
+                    "packet": [
+                      "Extended_Power_Transmitter_Extended_Capabilities",
+                      "Response"
+                    ],
+                    "exp": [
+                      1000
+                    ],
+                    "comp": "LTEQL"
+                  }
                 }
               ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
-            }
-          ],
-          "T_measures": [
-            {
-              "expected": [
-                {
-                  "refpkt": [
-                    "Power Loss Accounting",
-                    "Packet"
-                  ],
-                  "packet1": [
-                    "ATN",
-                    "Response"
-                  ],
-                  "packet2": [
-                    [
-                      "Extended_Power_Transmitter_Extended_Capabilities",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    1000
-                  ],
-                  "comp": "LTEQL",
-                  "chk": "Tcapudate",
-                  "cnt": 1
-                }
-              ],
-              "flow": 2,
-              "Result_check": true,
-              "CheckSEQ": 4
             }
           ],
           "RenegoCheck1": [
@@ -5283,35 +5327,30 @@
       },
       "2.3.1": {
         "CTSChecks": {
-          "T_measures": [
+          "Throttle": [
             {
               "expected": [
                 {
-                  "refpkt": [
-                    "Power Loss Accounting",
-                    "Packet"
-                  ],
-                  "packet1": [
-                    "ATN",
-                    "Response"
-                  ],
-                  "packet2": [
-                    [
+                  "PrectOffsetValue": 669,
+                  "exp_resp1": "NAK",
+                  "Prect_reduced": 5,
+                  "removeoffset": true,
+                  "exp_resp2": "ATN",
+                  "Tcapupdate": {
+                    "packet": [
                       "Power Transmitter Extended Capabilities",
                       "Response"
-                    ]
-                  ],
-                  "exp": [
-                    1000
-                  ],
-                  "comp": "LTEQL",
-                  "chk": "Tcapudate",
-                  "cnt": 1
+                    ],
+                    "exp": [
+                      1000
+                    ],
+                    "comp": "LTEQL"
+                  }
                 }
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 2
             }
           ]
         }
@@ -5402,6 +5441,10 @@
                   ],
                   "clk_reason": [
                     " Generic"
+                  ],
+                  "pings": [
+                    5,
+                    "GTEQL"
                   ]
                 }
               ],
@@ -5490,6 +5533,10 @@
                   ],
                   "clk_reason": [
                     " Thermally Constrained"
+                  ],
+                  "pings": [
+                    5,
+                    "GTEQL"
                   ]
                 }
               ],
@@ -5578,6 +5625,10 @@
                   ],
                   "clk_reason": [
                     " Insufficient Power"
+                  ],
+                  "pings": [
+                    5,
+                    "GTEQL"
                   ]
                 }
               ],
@@ -5666,6 +5717,10 @@
                   ],
                   "clk_reason": [
                     " Coex Mitigation"
+                  ],
+                  "pings": [
+                    5,
+                    "GTEQL"
                   ]
                 }
               ],
@@ -5754,6 +5809,10 @@
                   ],
                   "clk_reason": [
                     " End Of Charge"
+                  ],
+                  "pings": [
+                    5,
+                    "GTEQL"
                   ]
                 }
               ],
@@ -5803,6 +5862,10 @@
                   ],
                   "clk_reason": [
                     " Insufficient Power"
+                  ],
+                  "pings": [
+                    5,
+                    "EQL"
                   ]
                 }
               ],
@@ -6857,7 +6920,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 3
             }
           ],
           "Cloak": [
@@ -6865,7 +6928,8 @@
               "expected": [
                 {
                   "chks": [
-                    "2ndseq"
+                    "2ndseq",
+                    "Diable_ASK"
                   ],
                   "clk_reason": [
                     " Generic"
@@ -6875,19 +6939,6 @@
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
-            }
-          ],
-          "DisableASK": [
-            {
-              "expected": "DisableASK",
-              "expected_value": [
-                60
-              ],
-              "comp": "LTEQL",
-              "flow": 2,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 3
             }
           ]
         }
@@ -7095,7 +7146,11 @@
                   "clk_reason": [
                     " Insufficient Power"
                   ],
-                  "clk_cnt": 1
+                  "clk_cnt": 1,
+                  "pings": [
+                    1,
+                    "EQL"
+                  ]
                 }
               ],
               "flow": 2,
@@ -7274,7 +7329,10 @@
                   "clk_reason": [
                     " Insufficient Power"
                   ],
-                  "clk_cnt": 1
+                  "pings": [
+                    1,
+                    "EQL"
+                  ]
                 }
               ],
               "flow": 2,
@@ -7435,6 +7493,14 @@
               "CheckSEQ": 5
             }
           ],
+          "Detach_Reattach": [
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 6
+            }
+          ],
           "T_measures": [
             {
               "expected": [
@@ -7463,7 +7529,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 6
+              "CheckSEQ": 7
             }
           ],
           "FOP": [
@@ -7489,7 +7555,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 7
+              "CheckSEQ": 8
             }
           ],
           "PTPhase": [
@@ -12640,29 +12706,20 @@
                     }
                   },
                   "refPrevious": false
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "CheckSEQ": 1
-            }
-          ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
+                },
                 {
                   "packet": [
                     "Shutdown",
                     null
                   ],
-                  "phase": "",
-                  "Pkt_count": 1,
-                  "PktLimit": "Flow"
+                  "PacketType": "TesterMsg",
+                  "PktLimit": "refNextAll",
+                  "Checks": {}
                 }
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 1
             }
           ]
         }
@@ -12704,6 +12761,15 @@
                     }
                   },
                   "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Shutdown",
+                    null
+                  ],
+                  "PacketType": "TesterMsg",
+                  "PktLimit": "refNextAll",
+                  "Checks": {}
                 }
               ],
               "flow": 1,
@@ -12762,16 +12828,77 @@
                 },
                 {
                   "packet": [
-                    "Configuration",
+                    "Shutdown",
                     null
                   ],
-                  "Checks": {},
+                  "PacketType": "TesterMsg",
+                  "PktLimit": "refNextAll",
+                  "Checks": {}
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP_Extended_Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "XID_Selector": {
+                      "expected": "254",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    },
+                    "Restricted": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
                   "refPrevious": false
                 }
               ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
+            }
+          ],
+          "PacketCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Configuration",
+                    null
+                  ],
+                  "phase": "ID&CFG",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "NO"
+                  ]
+                }
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
             }
           ]
         }
@@ -12816,10 +12943,51 @@
                 },
                 {
                   "packet": [
-                    "Configuration",
+                    "Shutdown",
                     null
                   ],
-                  "Checks": {},
+                  "PacketType": "TesterMsg",
+                  "PktLimit": "refNextAll",
+                  "Checks": {}
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Extended Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "XID_Selector": {
+                      "expected": "254",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    },
+                    "Restricted": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
                   "refPrevious": false
                 }
               ],
@@ -12890,6 +13058,16 @@
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
+            }
+          ],
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
             }
           ]
         }
@@ -12965,6 +13143,55 @@
               "ChecksList": [
                 {
                   "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP_Extended_Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "XID_Selector": {
+                      "expected": "254",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    },
+                    "Restricted": {
+                      "expected": "0x00",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP:ACK",
+                    null
+                  ],
+                  "PacketType": "Response",
+                  "Checks": {},
+                  "refPrevious": false
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
                     "SRQ",
                     "Frequency Selection:"
                   ],
@@ -13023,6 +13250,24 @@
               "CheckSEQ": 1
             }
           ],
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 3
+            }
+          ],
           "PacketCheck_New": [
             {
               "ChecksList": [
@@ -13059,7 +13304,7 @@
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 3
             },
             {
               "ChecksList": [
@@ -13078,6 +13323,33 @@
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
+            }
+          ],
+          "FOP": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Shutdown",
+                    "TesterMsg"
+                  ],
+                  "packet1": [
+                    "",
+                    "TesterMsg",
+                    "FOP:"
+                  ],
+                  "PktLimit": "refNextAll",
+                  "chkname": "Repinged",
+                  "exp": [
+                    359.46,
+                    360.54
+                  ],
+                  "comp": 0
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
             }
           ],
           "T_measures": [
@@ -13110,7 +13382,7 @@
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -13118,6 +13390,55 @@
       "2.3.1": {
         "CTSChecks": {
           "BitsCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "0x01",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Extended Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "XID_Selector": {
+                      "expected": "254",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    },
+                    "Restricted": {
+                      "expected": "0x00",
+                      "flag": "sRawData",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP ACK",
+                    null
+                  ],
+                  "PacketType": "Response",
+                  "Checks": {},
+                  "refPrevious": false
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
             {
               "ChecksList": [
                 {
@@ -21233,12 +21554,122 @@
                   "refPrevious": false
                 }
               ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "1",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP_Extended_Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Restricted": {
+                      "expected": "0",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                }
+              ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
             }
           ],
           "Encoded": [
+            {
+              "expected": [
+                {
+                  "mergingdata": "response encoded in 128 cycles"
+                }
+              ],
+              "ChecksList": [
+                {
+                  "packet": [
+                    "General Request",
+                    "PT-ID"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "Power Transmitter Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "Get Request",
+                    "PTx Extended Identification"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "Extended_Power_Transmitter_Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Frequency Selection: 360 kHz"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Re ping delay:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "End Negotiation:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "End Power Transfe",
+                    null
+                  ],
+                  "phase": "PT",
+                  "PktLimit": "Flow"
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 3
+            },
             {
               "expected": [
                 {
@@ -21362,9 +21793,44 @@
               "expected": [
                 {}
               ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
+            {
+              "expected": [
+                {}
+              ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
+            }
+          ],
+          "FOP": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Shutdown",
+                    "TesterMsg"
+                  ],
+                  "packet1": [
+                    "",
+                    "TesterMsg",
+                    "FOP:"
+                  ],
+                  "PktLimit": "refNextAll",
+                  "chkname": "Repinged",
+                  "exp": [
+                    359.46,
+                    360.54
+                  ],
+                  "comp": 0
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
             }
           ]
         }
@@ -21403,12 +21869,122 @@
                   "refPrevious": false
                 }
               ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Ext": {
+                      "expected": "1",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Extended Identification",
+                    null
+                  ],
+                  "Checks": {
+                    "Restricted": {
+                      "expected": "0",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                }
+              ],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
             }
           ],
           "Encoded": [
+            {
+              "expected": [
+                {
+                  "mergingdata": "response encoded in 128 cycles"
+                }
+              ],
+              "ChecksList": [
+                {
+                  "packet": [
+                    "General Request",
+                    "PT-ID"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "Power Transmitter Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "Get Request",
+                    "PTx Extended Identification"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "Extended Power Transmitter Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Frequency Selection: 360 kHz"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Re ping delay:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "End Negotiation:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "End Power Transfe",
+                    null
+                  ],
+                  "phase": "PT",
+                  "PktLimit": "Flow"
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 3
+            },
             {
               "expected": [
                 {
@@ -21692,6 +22268,7 @@
             {
               "expected": [
                 {
+                  "PktLimit0": true,
                   "refpkt": [
                     "Get Request",
                     "Packet"
@@ -21718,6 +22295,33 @@
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 2
+            }
+          ],
+          "FOP": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Shutdown",
+                    "TesterMsg"
+                  ],
+                  "packet1": [
+                    "",
+                    "TesterMsg",
+                    "FOP:"
+                  ],
+                  "PktLimit": "refNextAll",
+                  "chkname": "Repinged",
+                  "exp": [
+                    359.46,
+                    360.54
+                  ],
+                  "comp": 0
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 5
             }
           ]
         }
@@ -21767,6 +22371,7 @@
             {
               "expected": [
                 {
+                  "PktLimit0": true,
                   "refpkt": [
                     "Get Request",
                     "Packet"
@@ -21900,6 +22505,43 @@
                     "Identification",
                     null
                   ],
+                  "PktLimit": "FromExncnt",
+                  "Checks": {
+                    "Ext": {
+                      "expected": "1",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "MPP_Extended_Identification",
+                    null
+                  ],
+                  "PktLimit": "FromExncnt",
+                  "Checks": {
+                    "Restricted": {
+                      "expected": "0",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
                   "Checks": {
                     "Ext": {
                       "expected": "1",
@@ -21929,7 +22571,84 @@
               "CheckSEQ": 1
             }
           ],
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "PacketCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Get Request",
+                    "PTx Extended Identification"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "FromExncnt",
+                  "Pkt_response": [
+                    "Extended_Power_Transmitter_Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Frequency Selection: 360 kHz"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Re ping delay:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "End Negotiation:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "End Power Transfe",
+                    null
+                  ],
+                  "phase": "PT",
+                  "PktLimit": "Flow"
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
+            },
             {
               "ChecksList": [
                 {
@@ -21994,6 +22713,29 @@
                     null
                   ],
                   "phase": "ID&CFG",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 5
+            },
+            {
+              "expected": [
+                {
+                  "mergingdata": "response encoded in 512 cycles"
+                }
+              ],
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Configuration",
+                    null
+                  ],
+                  "phase": "ID&CFG",
                   "PktLimit": "refNextAll",
                   "Pkt_response": [
                     "ACK"
@@ -22002,10 +22744,40 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 4
+              "CheckSEQ": 5
             }
           ],
           "T_measures": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Get Request",
+                    "Packet"
+                  ],
+                  "packet1": [
+                    "Extended_Power_Transmitter_Identification",
+                    "Response"
+                  ],
+                  "packet2": [
+                    [
+                      "Shutdown",
+                      "TesterMsg"
+                    ]
+                  ],
+                  "PktLimit": "FromExncnt",
+                  "exp": [
+                    600
+                  ],
+                  "comp": "LTEQL",
+                  "chk": "Tmute",
+                  "cnt": 1
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 3
+            },
             {
               "expected": [
                 {
@@ -22033,7 +22805,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 3
             }
           ]
         }
@@ -22041,6 +22813,43 @@
       "2.3.1": {
         "CTSChecks": {
           "BitsCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Identification",
+                    null
+                  ],
+                  "PktLimit": "FromExncnt",
+                  "Checks": {
+                    "Ext": {
+                      "expected": "1",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "Extended Identification",
+                    null
+                  ],
+                  "PktLimit": "FromExncnt",
+                  "Checks": {
+                    "Restricted": {
+                      "expected": "0",
+                      "flag": "sDescription",
+                      "comp": "str"
+                    }
+                  },
+                  "refPrevious": false
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
             {
               "ChecksList": [
                 {
@@ -22095,6 +22904,36 @@
                       "TesterMsg"
                     ]
                   ],
+                  "PktLimit": "FromExncnt",
+                  "exp": [
+                    600
+                  ],
+                  "comp": "LTEQL",
+                  "chk": "Tmute",
+                  "cnt": 1
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 3
+            },
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Get Request",
+                    "Packet"
+                  ],
+                  "packet1": [
+                    "Extended Power Transmitter Identification",
+                    "Response"
+                  ],
+                  "packet2": [
+                    [
+                      "Shutdown",
+                      "TesterMsg"
+                    ]
+                  ],
                   "exp": [
                     600
                   ],
@@ -22105,10 +22944,69 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 3
             }
           ],
           "PacketCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "Get Request",
+                    "PTx Extended Identification"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "FromExncnt",
+                  "Pkt_response": [
+                    "Extended Power Transmitter Identification"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Frequency Selection: 360 kHz"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Re ping delay:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "End Negotiation:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "End Power Transfe",
+                    null
+                  ],
+                  "phase": "PT",
+                  "PktLimit": "Flow"
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
+            },
             {
               "ChecksList": [
                 {
@@ -22121,14 +23019,7 @@
                   "Pkt_response": [
                     "Extended Power Transmitter Identification"
                   ]
-                }
-              ],
-              "flow": 2,
-              "Result_check": true,
-              "CheckSEQ": 3
-            },
-            {
-              "ChecksList": [
+                },
                 {
                   "packet": [
                     "Ping Detected",
@@ -22156,7 +23047,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 4
             }
           ]
         }
@@ -22510,6 +23401,10 @@
                   ],
                   "clk_reason": [
                     " Insufficient Power"
+                  ],
+                  "pings": [
+                    5,
+                    "EQL"
                   ]
                 }
               ],
@@ -25819,17 +26714,11 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PacketCheck_New": [
+          "First_Ping": [
             {
+              "expected": [],
+              "second_ping": true,
               "ChecksList": [
-                {
-                  "packet": [
-                    "Signal strength",
-                    null
-                  ],
-                  "phase": "Ping",
-                  "PktLimit": "FromExncnt"
-                },
                 {
                   "packet": [
                     "Identification",
@@ -25847,14 +26736,6 @@
                   "PktLimit": "FromExncnt"
                 }
               ],
-              "flow": 1,
-              "Result_check": true,
-              "CheckSEQ": 2
-            }
-          ],
-          "First_Ping": [
-            {
-              "expected": [],
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -25954,24 +26835,18 @@
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
       },
       "2.3.1": {
         "CTSChecks": {
-          "PacketCheck_New": [
+          "First_Ping": [
             {
+              "expected": [],
+              "second_ping": true,
               "ChecksList": [
-                {
-                  "packet": [
-                    "Signal strength",
-                    null
-                  ],
-                  "phase": "Ping",
-                  "PktLimit": "FromExncnt"
-                },
                 {
                   "packet": [
                     "Identification",
@@ -25991,7 +26866,7 @@
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 1
             }
           ],
           "PacketSeq": [
@@ -26088,7 +26963,7 @@
               ],
               "flow": 1,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -26139,6 +27014,7 @@
           "First_Ping": [
             {
               "expected": [],
+              "second_ping": true,
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -26203,6 +27079,7 @@
           "First_Ping": [
             {
               "expected": [],
+              "second_ping": true,
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -26269,6 +27146,7 @@
           "First_Ping": [
             {
               "expected": [],
+              "second_ping": true,
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -26324,6 +27202,7 @@
           "First_Ping": [
             {
               "expected": [],
+              "second_ping": true,
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -28221,7 +29100,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [3.61125,"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -28241,7 +29121,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [7.2225,"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -28261,7 +29142,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [7.226352,"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29910,56 +30792,7 @@
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 3
-            },
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "Ping Detected",
-                    null
-                  ],
-                  "phase": "",
-                  "PktLimit": "Flow"
-                }
-              ],
-              "flow": 2,
-              "Result_check": true,
-              "CheckSEQ": 4
-            }
-          ],
-          "T_measures": [
-            {
-              "expected": [
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet2": [
-                    [
-                      "Extended_Power_Transmitter_Identification",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "CheckSEQ": 2
-            }
+            } 
           ],
           "NegPhase": [
             {
@@ -29970,43 +30803,42 @@
               "Result_check": true,
               "CheckSEQ": 1
             }
-          ]
-        }
-      },
-      "2.3.1": {
-        "CTSChecks": {
-          "T_measures": [
+          ],
+          "FSK_Tresponse": [
             {
               "expected": [
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet2": [
-                    [
-                      "Extended Power Transmitter Identification",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                }
+                {}
               ],
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 2
+            }
+          ],
+          "FOP": [
+            {
+              "expected": [
+                {
+                  "refpkt": [
+                    "Shutdown",
+                    "TesterMsg"
+                  ],
+                  "packet1": [
+                    "",
+                    "TesterMsg",
+                    "FOP:"
+                  ],
+                  "PktLimit": "refNextAll",
+                  "chkname": "Repinged",
+                  "exp": [
+                    359.46,
+                    360.54
+                  ],
+                  "comp": 0
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
             }
           ]
         }
@@ -30239,7 +31071,8 @@
               "expected": [
                 {
                   "chks": [
-                    "PT"
+                    "PT",
+                    "t_atn"
                   ],
                   "clk_reason": [
                     " PTx Initiated"
@@ -31965,109 +32798,95 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "T_measures": [
+          "PacketCheck_New": [
+            {
+              "ChecksList": [
+                {
+                  "packet": [
+                    "SRQ",
+                    "Frequency Selection: 360 kHz"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "Re ping delay:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "SRQ",
+                    "End Negotiation:"
+                  ],
+                  "phase": "Nego",
+                  "PktLimit": "Flow",
+                  "Pkt_response": [
+                    "ACK"
+                  ]
+                },
+                {
+                  "packet": [
+                    "End Power Transfe",
+                    null
+                  ],
+                  "phase": "PT",
+                  "PktLimit": "Flow"
+                }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 3
+            } 
+          ],
+          "FOP": [
             {
               "expected": [
                 {
                   "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
+                    "Shutdown",
+                    "TesterMsg"
                   ],
                   "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
+                    "",
+                    "TesterMsg",
+                    "FOP:"
                   ],
-                  "packet2": [
-                    [
-                      "Extended_Power_Transmitter_Identification",
-                      "Response"
-                    ]
-                  ],
+                  "PktLimit": "refNextAll",
+                  "chkname": "Repinged",
                   "exp": [
-                    3,
-                    10
+                    359.46,
+                    360.54
                   ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Capabilities"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Capabilities"
-                  ],
-                  "packet2": [
-                    [
-                      "Extended_Power_Transmitter_Extended_Capabilities",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Estimated K"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Estimated K"
-                  ],
-                  "packet2": [
-                    [
-                      "Estimated_K",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Power Loss Accounting Parameters"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Power Loss Accounting Parameters"
-                  ],
-                  "packet2": [
-                    [
-                      "Power_Loss_Accounting_Parameters",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
+                  "comp": 0
                 }
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 4
+            }
+          ],
+          "FSK_Tresponse": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
+            {
+              "expected": [
+                {}
               ],
               "flow": 2,
               "Result_check": true,
@@ -32079,122 +32898,17 @@
               "expected": [
                 {}
               ],
-              "flow": 2,
+              "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
-            }
-          ]
-        }
-      },
-      "2.3.1": {
-        "CTSChecks": {
-          "T_measures": [
+            },
             {
               "expected": [
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Identification"
-                  ],
-                  "packet2": [
-                    [
-                      "Extended Power Transmitter Identification",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Capabilities"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Extended Capabilities"
-                  ],
-                  "packet2": [
-                    [
-                      "Power Transmitter Extended Capabilities",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Estimated K"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Estimated K"
-                  ],
-                  "packet2": [
-                    [
-                      "Estimated K",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                },
-                {
-                  "refpkt": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Power Loss Accounting Parameters"
-                  ],
-                  "packet1": [
-                    "Get Request",
-                    "Packet",
-                    "PTx Power Loss Accounting Parameters"
-                  ],
-                  "packet2": [
-                    [
-                      "Power Loss Accounting Parameters",
-                      "Response"
-                    ]
-                  ],
-                  "exp": [
-                    3,
-                    10
-                  ],
-                  "comp": 0,
-                  "chk": "Tresponse",
-                  "cnt": 1
-                }
+                {}
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 1
             }
           ]
         }
@@ -34802,6 +35516,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34830,6 +35554,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34858,6 +35592,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34886,6 +35630,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34914,6 +35668,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34942,6 +35706,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -34970,6 +35744,16 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "PROP": [
             {
               "expected": [
@@ -36798,33 +37582,9 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "NegPhase": [
+          "Entry_init": [
             {
-              "expected": [
-                {
-                  "refpkt": [
-                    "Configuration",
-                    "Packet"
-                  ],
-                  "packet1": [
-                    "Power Loss Accounting",
-                    "Packet"
-                  ],
-                  "packet2": [
-                    [
-                      "Shutdown",
-                      "TesterMsg"
-                    ]
-                  ],
-                  "exp": [
-                    28
-                  ],
-                  "comp": "LTEQL",
-                  "chk": [
-                    "SRQcnt"
-                  ]
-                }
-              ],
+              "expected": [],
               "flow": 1,
               "Result_check": true,
               "CheckSEQ": 1
@@ -46614,16 +47374,23 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
             }
           ],
+          
           "BitsCheck_New": [
             {
               "ChecksList": [
@@ -46666,7 +47433,7 @@
               "flow": 2,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 1
             }
           ],
           "PacketCheck_New": [
@@ -47468,6 +48235,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -47491,11 +48273,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -47779,6 +48566,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -47802,11 +48604,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -48090,6 +48897,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -48113,11 +48935,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -48967,6 +49794,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -48990,11 +49832,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -49844,6 +50691,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -49867,11 +50729,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -50721,6 +51588,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -50744,11 +51626,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -51598,6 +52485,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -51621,11 +52523,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -52475,6 +53382,21 @@
               "Result_check": true,
               "Inconclusive": false,
               "CheckSEQ": 2
+            }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
             }
           ]
         }
@@ -52498,11 +53420,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -53353,6 +54280,21 @@
               "Inconclusive": false,
               "CheckSEQ": 2
             }
+          ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
           ]
         }
       }
@@ -53375,11 +54317,16 @@
               "CheckSEQ": 4
             }
           ],
-          "NegPhase": [
+          "Transition_check": [
             {
-              "expected": [
-                {}
-              ],
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["MPP_Extended_Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 1
@@ -53810,6 +54757,21 @@
       },
       "2.3.1": {
         "CTSChecks": {
+          "Transition_check": [
+            {
+              "expected": [],
+              "bitscheck": {"ChecksList": [{"packet": ["Identification",null],"Checks": {"Major_Version": {"expected": "0x02","flag": "sRawData","comp": "str"},"Minor_Version": {"expected": "0x00","flag": "sRawData","comp": "str"}},"refPrevious": false},{"packet": ["Extended Identification",null],"Checks": {"Restricted": {"expected": "0x01","flag": "sRawData","comp": "str"}},"refPrevious": false}],"flow": 2,"Result_check": true,"CheckSEQ": 1},
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            },
+            {
+              "expected": [],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "BitsCheck_New": [
             {
               "ChecksList": [
@@ -54252,7 +55214,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -55129,7 +56107,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -55424,7 +56418,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -55719,7 +56729,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -56596,7 +57622,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -57473,7 +58515,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -58350,7 +59408,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -59227,7 +60301,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -60104,6 +61194,32 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "BitsCheck_New": [
             {
               "ChecksList": [
@@ -60971,7 +62087,23 @@
               "CheckSEQ": 4
             }
           ],
+          "Transition_check": [
+            {
+              "expected": [],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
           "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "flow": 1,
+              "Result_check": true,
+              "CheckSEQ": 2
+            },
             {
               "expected": [
                 {}
@@ -74601,26 +75733,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -74641,7 +75753,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -74680,26 +75792,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -74720,7 +75812,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -74759,26 +75851,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -74799,7 +75871,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -74838,26 +75910,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -74878,7 +75930,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -74917,26 +75969,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -74957,7 +75989,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -74996,26 +76028,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -75036,7 +76048,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -75075,26 +76087,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -75115,7 +76107,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -75154,26 +76146,6 @@
               "CheckSEQ": 1
             }
           ],
-          "PacketCheck_New": [
-            {
-              "ChecksList": [
-                {
-                  "packet": [
-                    "CRx_Status",
-                    "174nF"
-                  ],
-                  "phase": "",
-                  "PktType": "TesterMsg",
-                  "PktLimit": "refNextAll",
-                  "Pkt_count": 1
-                }
-              ],
-              "flow": 1,
-              "Result_check": true,
-              "Inconclusive": false,
-              "CheckSEQ": 2
-            }
-          ],
           "PacketPeak": [
             {
               "expected": [
@@ -75194,7 +76166,7 @@
               "flow": 1,
               "Result_check": true,
               "Inconclusive": false,
-              "CheckSEQ": 3
+              "CheckSEQ": 2
             }
           ]
         }
@@ -81688,7 +82660,8 @@
               "FixedOffsetValues": {
                 "Prect": 0.165,
                 "RP": 0.165
-              },"exp_resp": [
+              },
+              "exp_resp": [
                 "ACK",
                 "ATN"
               ],

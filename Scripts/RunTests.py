@@ -116,7 +116,9 @@ class RunTests():
             self.JsettingsData =self.Jsettings.read_file()
 
             if self.Product == "MPP":
+                print("Position tool in runtests1")
                 if self.filters['PositionTool']:
+                    print("Position tool in runtests2")
                     self.postool.Disconnection()
                     self.ArduinoCon = self.postool.Connection(port=self.JsettingsData['PositionTool']['Port'])
 
@@ -478,6 +480,7 @@ class RunTests():
                                         self.respondpopup(data)
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=False
                                         self.JAllMOI.update_file(self.JAllMOIData)
+                                        continue
                                  
                                 elif "power off" in str(data['message']).lower():
                                     print("condition2")
@@ -490,7 +493,7 @@ class RunTests():
                                         #self.postool.SendCommands(self.ArduinoCon,"SmartPlug ONOROFF")
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=False
                                         self.JAllMOI.update_file(self.JAllMOIData)
-                                    
+                                        continue
                                 elif "click ok, then power on" in str(data['message']).lower():
                                     print("condition3")
                                     if self.JAllMOIData['Run']['SmartSwitch_Mode']==False:
@@ -501,7 +504,7 @@ class RunTests():
                                         #self.postool.SendCommands(self.ArduinoCon,"SmartPlug ONOROFF")
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=True
                                         self.JAllMOI.update_file(self.JAllMOIData)
-                               
+                                        continue
                                 elif "power on the ptxdut with its surface clear" in str(data['message']).lower():
                                     print("condition4")
                                     if self.JAllMOIData['Run']['SmartSwitch_Mode']==False:
@@ -512,6 +515,7 @@ class RunTests():
                                         #self.postool.SendCommands(self.ArduinoCon,"SmartPlug ONOROFF")
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=True
                                         self.JAllMOI.update_file(self.JAllMOIData)
+                                        continue
                                 elif "power on the ptx and click ok" in str(data['message']).lower():
                                     print("condition5")
                                     if self.JAllMOIData['Run']['SmartSwitch_Mode']==False:
@@ -522,6 +526,7 @@ class RunTests():
                                         #self.postool.SendCommands(self.ArduinoCon,"SmartPlug ONOROFF")
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=True
                                         self.JAllMOI.update_file(self.JAllMOIData)
+                                        continue
                                 elif "power off and then power on the ptx-dut" in str(data['message']).lower():
                                     print("condition6")
                                     if self.JAllMOIData['Run']['SmartSwitch_Mode']==True:
@@ -532,6 +537,7 @@ class RunTests():
                                         self.respondpopup(data)
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=True
                                         self.JAllMOI.update_file(self.JAllMOIData)
+                                        continue
                                 elif "click ok, then remove power" in str(data['message']).lower():
                                     print("condition7")
                                     if self.JAllMOIData['Run']['SmartSwitch_Mode']==True:
@@ -542,6 +548,7 @@ class RunTests():
                                         #self.postool.SendCommands(self.ArduinoCon,"SmartPlug ONOROFF") #power off
                                         self.JAllMOIData['Run']['SmartSwitch_Mode']=False
                                         self.JAllMOI.update_file(self.JAllMOIData)
+                                        continue
                                       
                                 #self.respondpopup(data)
                         if self.filters['PositionTool']:
@@ -552,17 +559,20 @@ class RunTests():
                                 self.update_logs("UI",f"Moving position tool Z={self.JsettingsData['PositionTool']['MOVE_Z']} mm")
                                 self.postool.SendCommands(self.ArduinoCon,f"MOVE_Z {int(float(self.JsettingsData['PositionTool']['MOVE_Z'])*float(self.JsettingsData['PositionTool']['Motors']['StepsTomm']))}")
                                 self.respondpopup(data)
+                                continue
                             elif all(res in str(data['message']).lower() for res in ["place"]):
                                 if self.Product == "MPP" and self.mode == "TPR":
                                     self.respondpopup(data)
                                     time.sleep(1)
                                     self.update_logs("UI",f"Moving position tool Z to home")
                                     self.postool.SendCommands(self.ArduinoCon,f"MOVE_Z Home")
+                                    continue
                                 elif self.Product == "MPP" and self.mode == "TPT":
                                     self.update_logs("UI",f"Moving position tool Z to home")
                                     self.postool.SendCommands(self.ArduinoCon,f"MOVE_Z Home")
                                     time.sleep(2)
                                     self.respondpopup(data)
+                                    continue
 
                             # elif 'increase the radial position (r) of the tpr' in data['message']:
                             #     Xaxis = float(str(data['message']).split()[-5])
@@ -585,17 +595,22 @@ class RunTests():
                                 #Wait for sometime to user to place the slider
                                 time.sleep(3)
                                 self.postool.SendCommands(self.ArduinoCon,f"MOVE_Z Home")
+                                continue
                             # else:
                             #     self.postool.SendCommands(self.ArduinoCon,f"MOVE_Z Home")
                             print("Other POPUPs:",str(data['message']).lower())
                             self.update_logs("POPUP",f"{data['message']}:{time.time()}")
                             # print(data)
+                            time.sleep(2)
                             self.respondpopup(data)
+                            time.sleep(1)
 
                         print("Other POPUPs:",str(data['message']).lower())
                         self.update_logs("POPUP",f"{data['message']}:{time.time()}")
                         print(data)
+                        time.sleep(2)
                         self.respondpopup(data)
+                        time.sleep(1)
                         
                 # Force stop user I/p
                 if self.GetProcessStatus(): break
@@ -609,6 +624,7 @@ class RunTests():
             popupdata = {"userTextBoxInput":"","responseButton":"Ok","shouldTextBoxBeAdded":False,"isValid":True,"popID":data['index'],"displayPopUp":False,"isDisplayPopUpOpen":False,"title":data['title'],"message":data['message'],"button":"OK","image":None,"icon":"Asterisk","isFrontEndPopUp":False,"callBackMethod":None,"comboBoxEntries":None,"selectedComboBoxValue":"PASS","comboBoxEntriesFE":[],"selectedComboBoxValueFE":"","onlyDropdownAdded":False,"enableTimerOKButton":False,"enableCustomUserInputs":False,"customInputValues":{}}
         self.APIHandlePopup.url=self.JapiData[self.Product][self.mode]['PutMessageBoxResponse']
         self.APIHandlePopup.json=popupdata
+        print("Sendinging popup:",popupdata)
         resp = self.APIHandlePopup.PutRequest()
         print("APIHandlePopup:",resp)
         # self.APIHandlePopup.PutRequest()

@@ -14,7 +14,7 @@ class WiproPlug():
         self.JAllMOIData = self.JAllMOI.read_file()
         self.TConfig = JsonOperations("json/TestConfig.json")
         self.TConfigData = self.TConfig.read_file()
-        self.SmartDevices = {"SP-06:da":{'id':'d729910ffcbc171328sfqa','key':'U/`W9t-aF[G|:ryC','mac':'10:5a:17:a9:06:da'}, "SP-e6:21":{'id':'d783b78d53e430fe99dipz','key':'Cbxx59CtiZ]=H(E+','mac':'10:5a:17:a5:e6:21'}}#id,key
+        self.SmartDevices = {"SP-06:da":{'id':'d729910ffcbc171328sfqa','key':'U/`W9t-aF[G|:ryC','mac':'10:5a:17:a9:06:da'}, "SP-e6:21":{'id':'d783b78d53e430fe99dipz','key':'.uTYu~cGRU`EjzUQ','mac':'10:5a:17:a5:e6:21'}}#id,key
         # self.ssid = "GRLSmartPlug"#Hotspot"
         # self.password = "G%SPHotSpot%L"#"12345678" 
         # self.band = "2.4 GHz"
