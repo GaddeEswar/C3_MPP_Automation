@@ -28,16 +28,26 @@ jobs:
           pyinstaller MPPGUIform_New.spec
 
       - name: Create Package for GitHub Action
+        shell: cmd
         run: |
           mkdir C3_MPP_Automation_Build
 
           copy dist\C3_MPP_GUI.exe C3_MPP_Automation_Build\
 
-          xcopy Resources C3_MPP_Automation_Build\Resources /E /I /Y
-          xcopy Scripts C3_MPP_Automation_Build\Scripts /E /I /Y
-          xcopy json C3_MPP_Automation_Build\json /E /I /Y
-          xcopy Results C3_MPP_Automation_Build\Results /E /I /Y
-          xcopy Logs C3_MPP_Automation_Build\Logs /E /I /Y
+          robocopy Resources C3_MPP_Automation_Build\Resources /E
+          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
+
+          robocopy Scripts C3_MPP_Automation_Build\Scripts /E
+          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
+
+          robocopy json C3_MPP_Automation_Build\json /E
+          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
+
+          robocopy Results C3_MPP_Automation_Build\Results /E
+          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
+
+          robocopy Logs C3_MPP_Automation_Build\Logs /E
+          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
       - name: Show Package Structure
         shell: cmd
         run: |
