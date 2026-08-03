@@ -31,24 +31,18 @@ jobs:
         shell: cmd
         run: |
           mkdir C3_MPP_Automation_Build
-
           copy dist\C3_MPP_GUI.exe C3_MPP_Automation_Build\
-
-          robocopy Resources C3_MPP_Automation_Build\Resources /E
-          robocopy Scripts C3_MPP_Automation_Build\Scripts /E
-          robocopy json C3_MPP_Automation_Build\json /E
-          robocopy Results C3_MPP_Automation_Build\Results /E
-          robocopy Logs C3_MPP_Automation_Build\Logs /E
-
-          if %ERRORLEVEL% LEQ 7 (
-              exit /b 0
-          ) else (
-              exit /b %ERRORLEVEL%
-          ) 
-      - name: Show Package Structure
-        shell: cmd
-        run: |
-          tree C3_MPP_Automation_Build /F
+          xcopy Resources C3_MPP_Automation_Build\Resources /E /I /Y
+          xcopy Scripts C3_MPP_Automation_Build\Scripts /E /I /Y
+          xcopy json C3_MPP_Automation_Build\json /E /I /Y
+          mkdir C3_MPP_Automation_Build\Logs
+          mkdir C3_MPP_Automation_Build\Results
+          mkdir "C3_MPP_Automation_Build\Results\C3_MPP Excel Results"
+          mkdir C3_MPP_Automation_Build\Results\Consolidated
+          mkdir C3_MPP_Automation_Build\Results\JsonReports
+          mkdir "C3_MPP_Automation_Build\Results\License Results"
+          mkdir C3_MPP_Automation_Build\Results\OptimumResults
+          
       - name: Verify Application Launch
         shell: powershell
         run: |
