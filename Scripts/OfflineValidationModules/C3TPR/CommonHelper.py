@@ -1526,6 +1526,18 @@ class CommonCTSChecks:
     def Tstabilize(self,CTSCheck,Check,flows,flwID):
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
+        #Default Configuration Check
+        CFG=self.PktMethod.GetPacketDetails(packet="Configuration",limit=self.Flow_limit)
+        ID=self.PktMethod.GetPacketDetails(packet="Identification",limit=self.Flow_limit)
+        if len(CFG)>2 and len(ID)>2:
+            PCH=self.PktMethod.GetPacketDetails(packet="Power control hold off",limit=[ID[2]+1,CFG[2]])
+            if len(PCH)>2:
+                PCHTime=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(PCH[2],'Power_Control_Hold_Off_Time')[0]['sRawData']))
+                res.append([f'TPR sent PCH Packet at {{{PCH[2]}}} in Between Identification and Configuration Packets','Pass'])
+                res.append([f'TPR set PowerControlHold Off Time to {PCHTime} mS , Exp : 100 mS','Pass' if PCHTime==100 else 'Inconclusive'])
+                Count=int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(CFG[2],'Count')[0]['sRawData']))
+                res.append([f'TPR set Count field to {Count} in Configuration Packet , Exp : 1', 'Pass' if Count==1 else 'Inconclusive'])
+            else: res.append([f'TPR did not sent PCH Packet in between ID and  CFG','Inconclusive'])
         # Check the Final Load is Regulated or not
         Regulated=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=self.Flow_limit)
         self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
@@ -1534,16 +1546,16 @@ class CommonCTSChecks:
             CE=self.PktMethod.GetPacketDetails2(packet="Control Error",value="0" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
             if len(CE)>2:
                 vrect = self.CalculateVoltTwindow(CE[2],self.AllChannelData,at="end",measure="after")
-                res.append([f"Measured UL is {vrect[0]} V at  index @{CE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
+                res.append([f"Measured Regulated Voltage is {vrect[0]} V at  index @{CE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
                 CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[CE[2]+1,self.Flow_limit[1]])
                 if len(CE60)>2:
-                    vrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at="end",measure="after",winsize=[1,101])
-                    result="Fail" if vrect[0] > 7.2 else "Pass"
-                    res.append([f"Measured Tstabilize from end of Packet at  index @{CE60[2]} to Votlage crosses 7.2V is  {'Greater than 100 ms' if result =='Pass' else 'Less than 100 ms'} Limit >= 100 ms", result])
                     PktsCountBefore=self.CECount(Limit=[CE[2],CE60[2]],Packet=Check['Pkt'][0],value="0")
                     PktsCountAfter=self.CECount(Limit=[CE60[2],self.Flow_limit[1]],Packet="Control Error",value="0")
                     res.append([f'Prx sent {PktsCountBefore} CE +0 before {Check['Pkt'][0]} with Val {Check['Pkt'][1]} data packet.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
                     res.append([f'Prx sent {PktsCountAfter} CE +0 After {Check['Pkt'][0]} with Val {Check['Pkt'][1]} data packet.','Fail' if PktsCountAfter < Check['PktsCount'] else "Pass"])
+                    vrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at="end",measure="after",winsize=[1,101])
+                    result="Fail" if vrect[0] > 7.2 else "Pass"
+                    res.append([f"Measured Tstabilize from end of Packet at {{{CE60[2]}}} to Votlage crosses 7.2V is  {'Greater than 100 ms' if result =='Pass' else 'Less than 100 ms'} Limit >= 100 ms", result])
                 else:res.append([f'Prx did not sent CE {Check['Pkt'][1]}','Inconclusive'])
             else:res.append([f'Prx did not Regulated to its final Load','Inconclusive'])
         else:res.append([f'Prx did not Regulated to its final Load','Inconclusive'])
