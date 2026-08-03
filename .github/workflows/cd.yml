@@ -31,17 +31,29 @@ jobs:
         shell: cmd
         run: |
           mkdir C3_MPP_Automation_Build
+
           copy dist\C3_MPP_GUI.exe C3_MPP_Automation_Build\
           xcopy Resources C3_MPP_Automation_Build\Resources /E /I /Y
           xcopy Scripts C3_MPP_Automation_Build\Scripts /E /I /Y
-          xcopy json C3_MPP_Automation_Build\json /E /I /Y
+          xcopy Json C3_MPP_Automation_Build\Json /E /I /Y
+
           mkdir C3_MPP_Automation_Build\Logs
+          type nul > C3_MPP_Automation_Build\Logs\.gitkeep
+
           mkdir C3_MPP_Automation_Build\Results
-          mkdir "C3_MPP_Automation_Build\Results\C3_MPP Excel Results"
+          type nul > C3_MPP_Automation_Build\Results\.gitkeep
+
           mkdir C3_MPP_Automation_Build\Results\Consolidated
+          type nul > C3_MPP_Automation_Build\Results\Consolidated\.gitkeep
+
           mkdir C3_MPP_Automation_Build\Results\JsonReports
+          type nul > C3_MPP_Automation_Build\Results\JsonReports\.gitkeep
+
           mkdir "C3_MPP_Automation_Build\Results\License Results"
+          type nul > "C3_MPP_Automation_Build\Results\License Results\.gitkeep"
+
           mkdir C3_MPP_Automation_Build\Results\OptimumResults
+          type nul > C3_MPP_Automation_Build\Results\OptimumResults\.gitkeep
           
       - name: Verify Application Launch
         shell: powershell
