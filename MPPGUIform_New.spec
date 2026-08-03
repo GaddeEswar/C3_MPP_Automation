@@ -37,7 +37,7 @@ exe = EXE(
     a.datas,
     [],
     uac_admin=False,
-    name='MPPGUIform_New',
+    name='C3_MPP_GUI',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
