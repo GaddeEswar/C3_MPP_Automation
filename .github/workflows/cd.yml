@@ -35,19 +35,16 @@ jobs:
           copy dist\C3_MPP_GUI.exe C3_MPP_Automation_Build\
 
           robocopy Resources C3_MPP_Automation_Build\Resources /E
-          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
-
           robocopy Scripts C3_MPP_Automation_Build\Scripts /E
-          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
-
           robocopy json C3_MPP_Automation_Build\json /E
-          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
-
           robocopy Results C3_MPP_Automation_Build\Results /E
-          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
-
           robocopy Logs C3_MPP_Automation_Build\Logs /E
-          if %ERRORLEVEL% GEQ 8 exit /b %ERRORLEVEL%
+
+          if %ERRORLEVEL% LEQ 7 (
+              exit /b 0
+          ) else (
+              exit /b %ERRORLEVEL%
+          ) 
       - name: Show Package Structure
         shell: cmd
         run: |
