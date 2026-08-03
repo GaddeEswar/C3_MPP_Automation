@@ -1097,6 +1097,45 @@ class CommonCTSChecks():
             else: res.append([f"Kest_err < 0.06 for {passcnt} out of 10 sequences, Limit: >= 7 sequences", "Fail"])
         return res
 
+    def Transition_check(self, Flow_limit, Check):
+        res = []
+        if Check['flow'] == 1:
+            coil_place = self.PktMethod.GetPacketDetails(packet="Coil_Place_On_Base_Station", limit=[Flow_limit[0],0], Type="TesterMsg")
+            if len(coil_place)>2:
+                UA = self.PktMethod.GetPacketDetails(packet='User Action status',limit=[coil_place[2],Flow_limit[0]],Type = "TesterMsg")
+                if len(UA)>2:
+                    res.append([f"PTx DUT is mated to TPR at {round(UA[0],3)} sec", "Pass"])
+                    if "bitscheck" in Check:
+                        bits_resp = self.BitsCheck_New(Flow_limit,Check["bitscheck"])
+                        # print("bits_resp:",bits_resp)
+                        for temp_resp in bits_resp:
+                            res.append(temp_resp)
+                else:
+                    res.append([f"User Action status packet not found", "Fail"])
+            else: 
+                res.append([f"Coil Place On Base Station packet not found", "Fail"])
+
+        elif Check['flow'] == 2:
+            id = Flow_limit[0]
+            while id < Flow_limit[1]:
+                if self.file_list[id]['pktType'] in ["Extended Control Error","Control Error"]:
+                    res.append([f'PT Phase started from {round(self.file_list[id]['startTime'],3)} sec', "Pass"])
+                    nego = self.PktMethod.GetPacketDetails(packet='Renegotiate',limit=[id,Flow_limit[1]],Type = "Packet")
+                    if len(nego) > 2:
+                        tdiff = round(nego[0] - self.file_list[id]['startTime'],3)
+                        if tdiff >= 5:
+                            res.append([f"TPR sent Renegotiate Packet at {round(nego[0],3)} sec (within {tdiff} sec of PT Phase start), Expected: >= 5 sec", "Pass"])
+                        else:
+                            res.append([f"TPR sent Renegotiate Packet at {round(nego[0],3)} sec (within {tdiff} sec of PT Phase start), Expected: >= 5 sec", "Fail"])
+                    else: 
+                        res.append([f"Renegotiate packet not found", "Fail"])  
+                    break
+                id+=1
+            else: 
+                res.append([f'PT Phase not found.',"Inconclusive"])
+
+        return res
+
     def Eyetest(self,Flow_limit,Check):
         res = []
         # print('EyeTest')
@@ -1214,45 +1253,131 @@ class CommonCTSChecks():
 
     def PacketPeak(self,Flow_limit,Check):
         res = []
-        AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
-        #get vrect of 10cloak pings after 2nd flow
-        cnt = 0
-        if 'PktLimit' in Check:
-            tmplimit = self.PktMethod.GetLimits(Check['PktLimit'],Check,Flow_limit)
-        else: tmplimit = Flow_limit
-        print("tmplimit:",tmplimit)
+        ept =self.PktMethod.GetPacketDetails(packet="End Power Transfer",value="EPT/rep",limit=Flow_limit,Type="Packet")
+        if len(ept) > 2:
+            res.append([f"End Power Transfer/rep packet found in 128kHz PT phase at {round(ept[0],3)} sec", "Pass"])
+            sd = self.PktMethod.GetPacketDetails(packet="Shutdown",limit=[ept[2],Flow_limit[1]+1],Type="TesterMsg")
+            if len(sd) > 2:
+                res.append([f"Shutdown packet found at {round(sd[0],3)} sec", "Pass"])
+                AllChannelData3 = self.PlotMethod.GetAllChannelData('3',self.JapiData)
+                AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
+        
+                if 'PktLimit' in Check:
+                    tmplimit = self.PktMethod.GetLimits(Check['PktLimit'],Check,Flow_limit)
+                else: tmplimit = Flow_limit
+                # print("tmplimit:",tmplimit)
 
-        id = tmplimit[0]
-        TempPkt1 = self.PktMethod.GetPacketDetails(packet=Check['Packet1'][0],value=Check['Packet1'][1],limit=[id,tmplimit[1]],Type=Check['Packet1'][2])
-        print("TempPkt1:",TempPkt1)
-        if len(TempPkt1)>2:
-            TempPkt2 = self.PktMethod.GetPacketDetails(packet=Check['Packet2'][0],value=Check['Packet2'][1],limit=[TempPkt1[2]+1,tmplimit[1]],Type=Check['Packet2'][2])
-            print("TempPkt2:",TempPkt2)
-            if len(TempPkt2)>2:
-                sindex = int((TempPkt1[0]*1000)/AllChannelData['Interval'])
-                eindex = int((TempPkt2[1]*1000)/AllChannelData['Interval'])
-                id1 = sindex
-                Vrectpeak = 0
-                Tatpeak = 0
-                while id1 <= eindex:
-                    value = round(abs(AllChannelData['RV']['displayDataChunk'][id1]),3)
-                    # # print("value:",value,"id:",id)
-                    if value > Vrectpeak:
-                        Vrectpeak = value
-                        Tatpeak = (id1*AllChannelData['Interval'])/1000  #sec
-                    id1 += 1
-                # print("MaxValue:",Vrectpeak)
-                # print("Tatpeak:",Tatpeak)
-                results = CommonMethods.check_measure(Check['expected'],Vrectpeak,Check['comp'])
-                res.append([f"Found {Check['Packet1'][0]} packet at {round(TempPkt1[0],3)}sec with Vrect_peak {Vrectpeak}V measured at {round(Tatpeak,3)}sec, Limit :{results[2]}V ",results[1]])
-                #FOP
-                fop = self.PktMethod.GetPacketDetails(value='FOP:',limit=[id,tmplimit[1]],Type="TesterMsg")
-                if len(fop)>2:
-                    fopres = CommonMethods.check_measure([359.46,360.54],float(self.file_list[fop[2]]['value'].split(":")[1].split(" ")[0]),0)
-                    res.append([f"Found FOP: {fopres[3]}kHz packet at @{fop[2]}, Limit: {fopres[0]} kHz", fopres[1]])
-                else: res.append([f"FOP packet not found","Fail"])
-            else: res.append([f"{Check['Packet2'][0]} packet not found","Inconclusive"])
-        else: res.append([f"{Check['Packet1'][0]} packet not found","Fail"])
+                id = tmplimit[0]
+                TempPkt1 = self.PktMethod.GetPacketDetails(packet=Check['Packet1'][0],value=Check['Packet1'][1],limit=[id,tmplimit[1]],Type=Check['Packet1'][2])
+                # print("TempPkt1:",TempPkt1)
+                if len(TempPkt1)>2:
+                    crx = self.PktMethod.GetPacketDetails(packet="CRx_Status",value="_174nF: 1",limit=[ept[2],TempPkt1[2]],Type="TesterMsg")
+                    if len(crx) > 2:
+                        res.append([f"CRX: 174 nF found at {round(crx[0],3)} sec", "Pass"])
+                    else: res.append([f"CRX: 174 nF not found from {round(ept[1],3)} sec to {round(TempPkt1[0],3)} sec", "Fail"])
+
+
+                    sindex2 = int(((ept[1]*1000)+5)/AllChannelData3['Interval'])
+                    eindex2 = int(((TempPkt1[0])*1000)/AllChannelData3['Interval'])
+                    # cnt += 1
+
+                    # # print("irects2:",irects2)
+                    load_values = []
+                    x = sindex2
+                    while x <= eindex2:
+                        if 50 > AllChannelData3['RV']['displayDataChunk'][x]*1000 >= 0:
+                            # res.append([f"In ping_{cnt}, Irect: {round(AllChannelData3['RV']['displayDataChunk'][x]*1000,2)} mA is found at {self.PktMethod.ms_to_time(x*AllChannelData3['Interval'])}, Expected: {Check['Set_load']} mA", "Pass"])
+                            load_values.append(round(AllChannelData3['RV']['displayDataChunk'][x]*1000,3))
+                        else:
+                            res.append([f"Load current of {round(AllChannelData3['RV']['displayDataChunk'][x]*1000,3)} mA observed, Expected: 0 mA", "Fail"])
+                            break
+                        x += 1
+
+                    irect_max = max(load_values)
+                    if irect_max<50:
+                        res.append([f"Maximum load current observed from shutdown to ping detected is {irect_max} mA, Expected: 0 mA", "Pass"])
+                    # else:
+                    #     res.append([f"Maximum load current observed from shutdown to ping detected is {irect_max} mA, Expected: 0 mA", "Fail"])
+                 
+
+
+
+
+                    TempPkt2 = self.PktMethod.GetPacketDetails(packet=Check['Packet2'][0],value=Check['Packet2'][1],limit=[TempPkt1[2]+1,tmplimit[1]],Type=Check['Packet2'][2])
+                    # print("TempPkt2:",TempPkt2)
+                    if len(TempPkt2)>2:
+                        sindex = int((TempPkt1[0]*1000)/AllChannelData['Interval'])
+                        eindex = int((TempPkt2[1]*1000)/AllChannelData['Interval'])
+                        id1 = sindex
+                        Vrectpeak = 0
+                        Tatpeak = 0
+                        while id1 <= eindex:
+                            value = round(abs(AllChannelData['RV']['displayDataChunk'][id1]),3)
+                            # # print("value:",value,"id:",id)
+                            if value > Vrectpeak:
+                                Vrectpeak = value
+                                Tatpeak = (id1*AllChannelData['Interval'])/1000  #sec
+                            id1 += 1
+                        # print("MaxValue:",Vrectpeak)
+                        # print("Tatpeak:",Tatpeak)
+                        results = CommonMethods.check_measure(Check['expected'],Vrectpeak,Check['comp'])
+                        res.append([f"Found {Check['Packet1'][0]} packet at {round(TempPkt1[0],3)}sec with Vrect_peak {Vrectpeak}V measured at {round(Tatpeak,3)}sec, Limit :{results[2]}V ",results[1]])
+                        #FOP
+                        fop = self.PktMethod.GetPacketDetails(value='FOP:',limit=[id,tmplimit[1]],Type="TesterMsg")
+                        if len(fop)>2:
+                            fopres = CommonMethods.check_measure([359.46,360.54],float(self.file_list[fop[2]]['value'].split(":")[1].split(" ")[0]),0)
+                            res.append([f"Found FOP: {fopres[3]}kHz packet at @{fop[2]}, Limit: {fopres[0]} kHz", fopres[1]])
+                        else: res.append([f"FOP packet not found","Fail"])
+                    else: res.append([f"{Check['Packet2'][0]} packet not found","Inconclusive"])
+                else: res.append([f"{Check['Packet1'][0]} packet not found","Fail"])
+
+
+            else:
+                res.append([f"Shutdown packet not found", "Fail"])
+        else:
+            res.append([f"End Power Transfer/rep packet not found in 128kHz PT phase", "Fail"])
+
+
+
+
+        # AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
+        
+        # if 'PktLimit' in Check:
+        #     tmplimit = self.PktMethod.GetLimits(Check['PktLimit'],Check,Flow_limit)
+        # else: tmplimit = Flow_limit
+        # print("tmplimit:",tmplimit)
+
+        # id = tmplimit[0]
+        # TempPkt1 = self.PktMethod.GetPacketDetails(packet=Check['Packet1'][0],value=Check['Packet1'][1],limit=[id,tmplimit[1]],Type=Check['Packet1'][2])
+        # print("TempPkt1:",TempPkt1)
+        # if len(TempPkt1)>2:
+        #     TempPkt2 = self.PktMethod.GetPacketDetails(packet=Check['Packet2'][0],value=Check['Packet2'][1],limit=[TempPkt1[2]+1,tmplimit[1]],Type=Check['Packet2'][2])
+        #     print("TempPkt2:",TempPkt2)
+        #     if len(TempPkt2)>2:
+        #         sindex = int((TempPkt1[0]*1000)/AllChannelData['Interval'])
+        #         eindex = int((TempPkt2[1]*1000)/AllChannelData['Interval'])
+        #         id1 = sindex
+        #         Vrectpeak = 0
+        #         Tatpeak = 0
+        #         while id1 <= eindex:
+        #             value = round(abs(AllChannelData['RV']['displayDataChunk'][id1]),3)
+        #             # # print("value:",value,"id:",id)
+        #             if value > Vrectpeak:
+        #                 Vrectpeak = value
+        #                 Tatpeak = (id1*AllChannelData['Interval'])/1000  #sec
+        #             id1 += 1
+        #         # print("MaxValue:",Vrectpeak)
+        #         # print("Tatpeak:",Tatpeak)
+        #         results = CommonMethods.check_measure(Check['expected'],Vrectpeak,Check['comp'])
+        #         res.append([f"Found {Check['Packet1'][0]} packet at {round(TempPkt1[0],3)}sec with Vrect_peak {Vrectpeak}V measured at {round(Tatpeak,3)}sec, Limit :{results[2]}V ",results[1]])
+        #         #FOP
+        #         fop = self.PktMethod.GetPacketDetails(value='FOP:',limit=[id,tmplimit[1]],Type="TesterMsg")
+        #         if len(fop)>2:
+        #             fopres = CommonMethods.check_measure([359.46,360.54],float(self.file_list[fop[2]]['value'].split(":")[1].split(" ")[0]),0)
+        #             res.append([f"Found FOP: {fopres[3]}kHz packet at @{fop[2]}, Limit: {fopres[0]} kHz", fopres[1]])
+        #         else: res.append([f"FOP packet not found","Fail"])
+        #     else: res.append([f"{Check['Packet2'][0]} packet not found","Inconclusive"])
+        # else: res.append([f"{Check['Packet1'][0]} packet not found","Fail"])
         return res
         
     def VrectPing360(self,Flow_limit,Check):
@@ -5069,7 +5194,7 @@ class CommonCTSChecks():
             res.append([f"Get Request-PTx Power Modes Capabilities Packet found at {round(Ecapreq[0],3)} sec", 'Pass'])
             Ecapres = self.PktMethod.GetPacketDetails(packet="MODECAP",value="Active Main Mode:",limit=[Ecapreq[2],Flow_limit[1]],Type="Response")
             if len(Ecapres)> 2:
-                res.append([f"MODECAP {self.file_list[Ecapres[2]]['value']} Packet found at {round(Ecapres[0],3)} sec", 'Pass'])
+                res.append([f"MODECAP {self.file_list[Ecapres[2]]['value']} response found at {round(Ecapres[0],3)} sec with following values", 'Pass'])
                 ECAP = {"LPM":"","NPM":"","HPM":"","CPM":""}
                 for ck in ECAP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(Ecapres[2],ck)
@@ -5086,7 +5211,7 @@ class CommonCTSChecks():
             res.append([f"Get Request-PTx Power Modes Extended Capabilities Packet found at {round(Excapreq[0],3)} sec", 'Pass'])
             Excapres = self.PktMethod.GetPacketDetails(packet="MODEXCAP",limit=[Excapreq[2],Flow_limit[1]],Type="Response")
             if len(Excapres)> 2:
-                res.append([f"MODEXCAP {self.file_list[Excapres[2]]['value']} Packet found at {round(Excapres[0],3)} sec", 'Pass'])
+                res.append([f"MODEXCAP {self.file_list[Excapres[2]]['value']} response found at {round(Excapres[0],3)} sec with following values", 'Pass'])
                 EXCAP = {"LPMVoltage_Ref0":"","LPMVoltage_Ref1":"","Low_Power_Mode":"","NPMVoltage_Ref0":"","NPMVoltage_Ref1":"","Nominal_Power_Mode":"","HPMVoltage_Ref0":"","HPMVoltage_Ref1":"","High_Power_Mode":"","CPMVoltage_Ref0":"","CPMVoltage_Ref1":"","Continuous_Power_Mode":""}
                 for ck in EXCAP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(Excapres[2],ck)
@@ -5103,7 +5228,7 @@ class CommonCTSChecks():
             res.append([f"Get Request-PTx Gain Measurement Parameters Packet found at {round(GMPreq[0],3)} sec", 'Pass'])
             GMPres = self.PktMethod.GetPacketDetails(packet="GMP",limit=[Ecapreq[2],Flow_limit[1]],Type="Response")
             if len(GMPres)> 2:
-                res.append([f"GMP {self.file_list[GMPres[2]]['value']} Packet found at {round(GMPres[0],3)} sec", 'Pass'])
+                res.append([f"GMP {self.file_list[GMPres[2]]['value']} response found at {round(GMPres[0],3)} sec with following values", 'Pass'])
                 GMP = {"G_NPM_CO":"","G_HPM_CO":"","G_CPM_CO":""}
                 for ck in GMP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(GMPres[2],ck)
@@ -5113,6 +5238,8 @@ class CommonCTSChecks():
                 res.append([f"GMP values: {GMP}", 'Pass'])
             else: res.append([f"GMP Packet not found", 'Fail'])
         else: res.append([f"Get Request-PTx Gain Measurement Parameters Packet not found", 'Fail'])
+
+        res.append([f"Test results validation starts from here:", "Pass"])
 
 
         if ECAP == {'LPM': 1, 'NPM': 0, 'HPM': 0, 'CPM': 0}:

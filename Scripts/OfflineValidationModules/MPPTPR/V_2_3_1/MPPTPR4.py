@@ -878,14 +878,14 @@ class CTSChecks_MPP_TPR4():
             res.append([f"Get Request-PTx Power Modes Capabilities Packet found at {round(Ecapreq[0],3)} sec", 'Pass'])
             Ecapres = self.PktMethod.GetPacketDetails(packet="MODECAP",value="Active Main Mode:",limit=[Ecapreq[2],Flow_limit[1]],Type="Response")
             if len(Ecapres)> 2:
-                res.append([f"MODECAP {self.file_list[Ecapres[2]]['value']} Packet found at {round(Ecapres[0],3)} sec", 'Pass'])
+                res.append([f"MODECAP {self.file_list[Ecapres[2]]['value']} response found at {round(Ecapres[0],3)} sec with following values", 'Pass'])
                 ECAP = {"LPM":"","NPM":"","HPM":"","CPM":""}
                 for ck in ECAP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(Ecapres[2],ck)
                     # print(ck,":",self.PktMethod.hex_to_decimal(payloadDetails[0]['sRawData']))
                     ECAP[ck] = self.PktMethod.hex_to_decimal(payloadDetails[0]['sRawData'])
                 # print(ECAP)
-                res.append([f"ECAP values: {ECAP}", 'Pass'])
+                res.append([f"MODECAP values: {ECAP}", 'Pass'])
             else: res.append([f"MODECAP Packet not found", 'Fail'])
         else: res.append([f"Get Request-PTx Power Modes Capabilities Packet not found", 'Fail'])
 
@@ -895,14 +895,14 @@ class CTSChecks_MPP_TPR4():
             res.append([f"Get Request-PTx Power Modes Extended Capabilities Packet found at {round(Excapreq[0],3)} sec", 'Pass'])
             Excapres = self.PktMethod.GetPacketDetails(packet="MODEXCAP",limit=[Excapreq[2],Flow_limit[1]],Type="Response")
             if len(Excapres)> 2:
-                res.append([f"MODEXCAP {self.file_list[Excapres[2]]['value']} Packet found at {round(Excapres[0],3)} sec", 'Pass'])
+                res.append([f"MODEXCAP {self.file_list[Excapres[2]]['value']} response found at {round(Excapres[0],3)} sec with following values", 'Pass'])
                 EXCAP = {"LPMVoltage_Ref0":"","LPMVoltage_Ref1":"","Low_Power_Mode":"","NPMVoltage_Ref0":"","NPMVoltage_Ref1":"","Nominal_Power_Mode":"","HPMVoltage_Ref0":"","HPMVoltage_Ref1":"","High_Power_Mode":"","CPMVoltage_Ref0":"","CPMVoltage_Ref1":"","Continuous_Power_Mode":""}
                 for ck in EXCAP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(Excapres[2],ck)
                     # print(ck,":",float(re.split(r"[VW]",payloadDetails[0]['sDescription'].split(":")[1])[0].strip()))
                     EXCAP[ck] = float(re.split(r"[VW]",payloadDetails[0]['sDescription'].split(":")[1])[0].strip())
                 # print(EXCAP)
-                res.append([f"EXCAP values: {EXCAP}", 'Pass'])
+                res.append([f"MODEXCAP values: {EXCAP}", 'Pass'])
             else: res.append([f"MODEXCAP Packet not found", 'Fail'])
         else: res.append([f"Get Request-PTx Power Modes Extended Capabilities Packet not found", 'Fail'])
 
@@ -912,7 +912,7 @@ class CTSChecks_MPP_TPR4():
             res.append([f"Get Request-PTx Gain Measurement Parameters Packet found at {round(GMPreq[0],3)} sec", 'Pass'])
             GMPres = self.PktMethod.GetPacketDetails(packet="GMP",limit=[Ecapreq[2],Flow_limit[1]],Type="Response")
             if len(GMPres)> 2:
-                res.append([f"GMP {self.file_list[GMPres[2]]['value']} Packet found at {round(GMPres[0],3)} sec", 'Pass'])
+                res.append([f"GMP {self.file_list[GMPres[2]]['value']} response found at {round(GMPres[0],3)} sec with following values", 'Pass'])
                 GMP = {"G_NPM_CO":"","G_HPM_CO":"","G_CPM_CO":""}
                 for ck in GMP.keys():
                     payloadDetails = self.PktMethod.GetPayloadDetails(GMPres[2],ck)
@@ -945,6 +945,8 @@ class CTSChecks_MPP_TPR4():
         #     if all(GMP[key] == 0 for key in GMP):
         #         res.append([f'All values are equal to zero in GMP', "Pass"])
         #     else: res.append([f'All values are not equal to zero in GMP', "Fail"])
+
+        res.append([f"Test results validation starts from here:", "Pass"])
 
         if ECAP == {'LPM': 1, 'NPM': 1, 'HPM': 0, 'CPM': 0}:
             res.append([f"Power modes in MODECAP packet are {ECAP}", 'Pass'])

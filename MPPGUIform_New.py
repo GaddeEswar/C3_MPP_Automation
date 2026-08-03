@@ -727,9 +727,6 @@ class Run(MPPGUI):
             #testing
             # self.UpdateTesterConfig()
 
-
-
-
             VerifyESDF = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutVerifyEsdfData'])
             MainESDF = JsonOperations('json/ESDF.json')
             MainESDFData = MainESDF.read_file()
@@ -796,11 +793,32 @@ class Run(MPPGUI):
             messagebox.showerror("Pool data", "Enter proper pool data csv file")
 
     def SSCreateHS(self):
-        resp = messagebox.askokcancel("SmartPlug Setup","Please create and connect to following mobile hotspot in your laptop:\n Name:GRLSmartPlug\n Password:G%SPHotSpot%L\n Band:2.4Ghz")
-        print(resp)
-        if resp:
-            self.master.smartplug_obj.get_connected_devices(self.SelSmarSwitch.get())
-    
+        # resp = messagebox.askokcancel("SmartPlug Setup","Please create and connect to following mobile hotspot in your laptop:\n Name:GRLSmartPlug\n Password:G%SPHotSpot%L\n Band:2.4Ghz")
+        # print(resp)
+        # if resp:
+        #     self.master.smartplug_obj.get_connected_devices(self.SelSmarSwitch.get())
+
+        self.WIFI_details = {"SP-06:da":{'user_name':'GRLSmartPlug','password':'G%SPHotSpot%L',}, "SP-e6:21":{'user_name':'GRL_SP:e6:21','password':"G%GRL_sp%L"}}
+        self.sppopup = tk.Toplevel()
+        self.sppopup.geometry("300x120")
+        self.sppopup.title("SmartPlug Setup")
+        self.sppopup.resizable(False,False)
+        self.wifilbl = Texts(self.sppopup,text=f"Please create this mobile hotspot in your Laptop \nand plug-in smartplug then click 'OK'",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        # self.wifilbl = Texts(self.sppopup,text=f"Wi-fi Name       : {self.WIFI_details[self.SelSmarSwitch.get()]['user_name']}",x=0,y=40,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        # self.wifipwdlbl = Texts(self.sppopup,text=f"Wi-fi Password : {self.WIFI_details[self.SelSmarSwitch.get()]['password']}",x=0,y=60,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        # self.wifilbl = Texts(self.sppopup,text=f"Band                   : 2.4 GHz",x=0,y=80,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        self.wifi1lbl = Texts(self.sppopup,text=f"{'Wi-fi Name':<19}: {self.WIFI_details[self.SelSmarSwitch.get()]['user_name']}",x=0, y=40,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        self.wifipwdlbl = Texts(self.sppopup,text=f"{'Wi-fi Password':<17}: {self.WIFI_details[self.SelSmarSwitch.get()]['password']}",x=0, y=60,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        self.bandlbl = Texts(self.sppopup,text=f"{'Band':<25}: 2.4 GHz",x=0, y=80,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        print(self.SelSmarSwitch.get())
+        Buttons(self.sppopup,text='OK',x=200,y=90,width=8,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.Connect_to_SP)
+        
+
+    def Connect_to_SP(self):
+        self.master.smartplug_obj.get_connected_devices(self.SelSmarSwitch.get())
+        self.sppopup.withdraw()
+        
+
     def LicenseUI(self):
         if self.master.Product == 'MPP' and self.master.Mode == 'TPR':
             self.master.ClearFrame(self.RN_FR8)
@@ -2165,11 +2183,11 @@ class Run(MPPGUI):
 
     def OfflineValidation(self):
         try:
-            # self.master.SQLConn.ExecutebyQuery("DELETE FROM Header")
-            # self.master.SQLConn.ExecutebyQuery("DELETE FROM PayLoadDetails")
-            # self.master.SQLConn.ExecutebyQuery("DELETE FROM ChecksHeader")
-            # self.master.SQLConn.ExecutebyQuery("DELETE FROM ChecksDetails")
-            # self.master.SQLConn.ExecutebyQuery("VACUUM")
+            self.master.SQLConn.ExecutebyQuery("DELETE FROM Header")
+            self.master.SQLConn.ExecutebyQuery("DELETE FROM PayLoadDetails")
+            self.master.SQLConn.ExecutebyQuery("DELETE FROM ChecksHeader")
+            self.master.SQLConn.ExecutebyQuery("DELETE FROM ChecksDetails")
+            self.master.SQLConn.ExecutebyQuery("VACUUM")
             self.master.TestData['TestResults']={}
             self.master.TestData['FileList_Data']={}
             self.master.TestResultsjson.update_file(self.master.TestData)
@@ -2234,7 +2252,7 @@ class Run(MPPGUI):
                                 if self.master.JAllMOIData['Switch']=='Offline':self.Disable_Frames(self.RN_FR4_2)
                                 for tests in AllTests:
                                     try:
-                                        print("tests:",tests)
+                                        # print("tests:",tests)
                                         if os.path.exists(tests[2]):
                                             APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutClearCapture']).PutRequest()
                                             if self.master.Product=='MPP' and self.master.Mode=='TPT':
@@ -3658,6 +3676,38 @@ class Labels(tk.Label):
         if grid is not None:
             self.grid(row=x,column=y)
         else:self.place(x=x,y=y)
+class Texts(tk.Text):
+    def __init__(self,master,x=0,y=0,width=None,height=None,bg=None,fg=None,font=None,grid=None,wrap=None,state=None,text='',scrollbar=False):
+        super().__init__(master,width=width,height=height,relief="flat",bd=0,highlightthickness=0)
+
+        if bg is not None:
+            self['bg'] = bg
+        if fg is not None:
+            self['fg'] = fg
+        if font is not None:
+            self['font'] = font
+        if wrap is not None:
+            self['wrap'] = wrap
+        if state is not None:
+            self['state'] = state
+        if width is not None: self['width']=width
+
+        if text:
+            self.insert("1.0", text)
+
+         # Make it read-only
+        self.config(state="disabled")
+
+        if grid is not None:
+            self.grid(row=x, column=y)
+        else:
+            self.place(x=x, y=y)
+
+        # # Optional scrollbar
+        # if scrollbar:
+        #     sb = tk.Scrollbar(master, command=self.yview)
+        #     sb.place(x=x + (width * 7) + 2, y=y, height=height * 18)
+        #     self.config(yscrollcommand=sb.set)
 class Entries(tk.Entry):
     def __init__(self, master,width=10,x=0,y=0,font=None,textvar=None,grid=None,bg=None,fg=None,name=None):
         super().__init__(master,width=width,name=name)

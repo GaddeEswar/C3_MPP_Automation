@@ -48,6 +48,17 @@ class PacketMethods:
                 elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
         return None
+
+    def NextOcuurance(self,Type,limit):
+        id = limit[0]
+        while id != limit[1]:
+            if self.GetPacketType(id)==Type:
+                return id
+            if limit[0]<limit[1]:
+                id+=1
+            else: id-=1
+        return None
+        
     
     #2 To search a given packet in the given limit, if packet found return the packet details  [starttime,endtime,index]
     def GetPacketDetails(self,packet='',value=None,limit=[],timelimit=None,Type="Packet"):
@@ -326,6 +337,13 @@ class PacketMethods:
             TempLimit = [FlowLimit[1],FlowLimit[0]]
         elif Limittype == "refNextAll":
             TempLimit = [FlowLimit[1],len(self.file_list)-1]
+        elif Limittype == 'FromExncnt':
+            excnt = self.GetPacketDetails(packet="Execution_count_no",limit=[0,FlowLimit[0]-1],Type="TesterMsg")
+            print("excnt:",excnt)
+            TempLimit=[excnt[2],FlowLimit[1]] if len(excnt)>2 else FlowLimit
+            print("FromExncnt:",TempLimit)
+        elif Limittype == "FlowToEnd":
+            TempLimit = [FlowLimit[0],len(self.file_list)-1]
         elif Limittype == "refAllFromBack":
             TempLimit = [len(self.file_list)-1,0]
         elif Limittype == "PacketWithResponse":
