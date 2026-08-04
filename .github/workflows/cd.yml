@@ -1,0 +1,68 @@
+name: Build Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build EXE
+        run: |
+          pyinstaller MPPGUIform_New.spec
+
+      - name: Create Package for GitHub Action
+        shell: cmd
+        run: |
+          mkdir C3_MPP_Automation_Build
+
+          copy dist\C3_MPP_GUI.exe C3_MPP_Automation_Build\
+
+          xcopy Resources C3_MPP_Automation_Build\Resources /E /I /Y
+          xcopy Scripts C3_MPP_Automation_Build\Scripts /E /I /Y
+          xcopy Json C3_MPP_Automation_Build\Json /E /I /Y
+          xcopy Logs C3_MPP_Automation_Build\Logs /E /I /Y
+          xcopy Results C3_MPP_Automation_Build\Results /E /I /Y
+          
+      - name: Verify Application Launch
+        shell: powershell
+        run: |
+          $exe = ".\C3_MPP_Automation_Build\C3_MPP_GUI.exe"
+
+          Write-Host "Launching application..."
+
+          $process = Start-Process -FilePath $exe -PassThru
+
+          # Wait up to 15 seconds
+          $finished = $process.WaitForExit(15000)
+
+          if ($finished) {
+            throw "Application terminated unexpectedly. Exit Code: $($process.ExitCode)"
+          }
+
+          Write-Host "Application launched successfully."
+
+          # Stop the application
+          Stop-Process -Id $process.Id -Force 
+
+      - name: Upload Build Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: C3_MPP_Automation_Build
+          path: C3_MPP_Automation_Build/  
