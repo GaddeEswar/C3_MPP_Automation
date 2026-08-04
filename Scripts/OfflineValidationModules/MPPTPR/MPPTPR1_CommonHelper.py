@@ -400,6 +400,31 @@ class CommonCTSChecks():
             id += 1
         else:
             res.append([f"Negotiation phase not observed", "Fail"])
+        
+        if "EDS_pkts" in Check:
+            EDS_TPR = self.PktMethod.GetPacketDetails(packet="Enabled Data Streams", limit=Flow_limit, Type="Packet")
+            if len(EDS_TPR) > 2:
+                res.append([f"Enabled Data Streams packet found at {round(EDS_TPR[0], 3)} sec with following data:", "Pass"])
+
+                QI_desc = self.PktMethod.GetPayloadDetails(EDS_TPR[2], "Streams_Bitmask")[0]['sDescription'].strip()
+                QI_value = self.PktMethod.GetPayloadDetails(EDS_TPR[2], "Streams_Bitmask")[0]['sRawData'].strip()
+
+                if QI_desc == "QI Authentication" and QI_value == "0x02":
+                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", "Pass"])
+                else:
+                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", "Fail"])
+
+                if "resp_check" in Check['EDS_pkts']:
+                    respid = self.PktMethod.GetPacketResponse2(EDS_TPR[2], [EDS_TPR[2]+1, Flow_limit[1]])
+                    if respid is not None:
+                        if "Enabled Data Streams" in self.file_list[respid]['pktType']:
+                            res.append([f"PTx responded with Enabled Data Streams response at {round(self.file_list[respid]['startTime'],3)} sec", "Pass"])
+                        else:
+                            res.append([f"PTx responded with {self.file_list[respid]['pktType']} at {round(self.file_list[respid]['startTime'],3)} sec", "Fail"])
+                    else:
+                        res.append([f"PTx not responded", 'Fail'])
+            else:
+                res.append([f"TPR not sent Enabled Data Streams packet", 'Fail'])
 
         if Check['expected'][0].get('chk'):
             if "Illegal" in Check['expected'][0]['chk']:
@@ -419,81 +444,8 @@ class CommonCTSChecks():
                         else:
                             res.append([f"{nxt_pkt[0]} packet not found", "Fail"])
                 else:
-                    res.append(
-                        [f"Illegal {Check['expected'][0]['packet1'][0]} packet not found", "Fail"])
+                    res.append([f"Illegal {Check['expected'][0]['packet1'][0]} packet not found", "Fail"])
 
-            # if "SRQcnt" in Check['expected'][0]['chk']:
-            #     id = 0
-            #     end = len(self.file_list)
-            #     while id < end:
-            #         execnt = self.PktMethod.GetPacketDetails(packet="Execution_count_no", limit=[id, end], Type="TesterMsg")
-            #         if len(execnt) > 2:
-            #             id = execnt[2]
-            #             finalexecnt = execnt
-            #         id += 1
-            #     if len(finalexecnt) > 2:
-            #         cnt = 1
-            #         seqcnt_val = []
-            #         start = finalexecnt[2]
-            #         while cnt < 3:
-                        
-            #             ss = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[start, end], Type="Packet")
-            #             if len(ss) > 2:
-            #                 pd = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[ss[2], start], Type="TesterMsg")
-            #                 if len(pd) > 2:
-            #                     res.append([f"Digital ping found at {round(self.file_list[pd[2]]['startTime'], 3)}sec", "Pass"])
-            #                 # data = self.DigitalPing_response([start, end])
-            #                 # for tempdata in data:
-            #                 #     res.append(tempdata)
-            #                 fop = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[ss[2], 0], Type="TesterMsg")
-            #                 if len(fop) > 2:
-            #                     fopval = float(self.file_list[fop[2]]['value'].split(":")[1].split(" ")[0])
-            #                     fopchk = CommonMethods.check_measure([127.5, 128.5], fopval, 0)
-            #                     sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[ss[2], end], Type="TesterMsg")
-            #                     if len(sd) > 2:
-
-            #                         # Neg phase
-            #                         x = ss[2]
-            #                         y = sd[2]
-            #                         while x < y:
-            #                             if "Nego" in self.file_list[x]['description']:
-            #                                 res.append([f"Entered to Negotiation phase at {round(self.file_list[x]['startTime'], 3)} sec", "Pass"])
-            #                                 break
-            #                             x += 1
-            #                         else:
-            #                             res.append([f"Negotiation phase not observed", "Fail"])
-
-            #                         srqen = self.PktMethod.GetPacketDetails(packet="SRQ", value="End Negotiation", limit=[ss[2], sd[2]], Type="Packet")
-            #                         if len(srqen) > 2:
-            #                             srqvalue = int(self.file_list[srqen[2]]['value'].split(":")[1].split("}")[0])
-            #                             res.append([f"SRQ Count {cnt}: SRQ - End Negotiation packet with SRQ/en : {srqvalue} found at {round(srqen[0], 3)} sec", "Pass"])
-            #                             seqcnt_val.append(srqvalue)
-            #                             coilre = self.PktMethod.GetPacketDetails(packet="Coil_Remove_From_Base_Station", limit=[srqen[2], end], Type="TesterMsg")
-            #                             if len(coilre) > 2:
-            #                                 useract1 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coilre[2], end], Type="TesterMsg")
-            #                                 if len(useract1) > 2:
-            #                                     res.append([f"TPR removed from PTx surface at {round(useract1[0],3)} sec", "Pass"])
-            #                                     t1 = self.file_list[useract1[2]]['stopTime']
-            #                                     coilpl = self.PktMethod.GetPacketDetails(packet="Coil_Place_On_Base_Station", limit=[useract1[2], end], Type="TesterMsg")
-            #                                     if len(coilpl) > 2:
-            #                                         useract2 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coilpl[2], end], Type="TesterMsg")
-            #                                         if len(useract2) > 2:
-            #                                             res.append([f"TPR placed on PTx surface at {round(useract2[0],3)} sec", "Pass"])
-            #                                             t2 = self.file_list[useract2[2]]['startTime']
-            #                                             Trpchk = CommonMethods.check_measure([5, 10], round(t2 - t1, 3), 0)
-            #                                             res.append([f"Tremoveplace is: {Trpchk[3]} sec, limit: {Trpchk[2]} sec", Trpchk[1]])
-            #                             start = sd[2]
-            #                         else:
-            #                             res.append([f"SRQ - End Negotiation packet not found", "Fail"])
-            #             else:
-            #                 res.append([f"Signal strength packet not found", "Fail"])
-            #             cnt += 1
-            #         if seqcnt_val[0] == seqcnt_val[1]:
-            #             res.append([f"SRQ count 1 is matching with SRQ count 2", "Pass"])
-            #         else:
-            #             res.append([f"Mismatch in SRQ/en count values, SRQ/en count1:{seqcnt_val[0]}, SRQ/en count2:{seqcnt_val[1]}", "Pass"])
-            #     else:
-            #         print("No execution cnt")
 
             if "PWRmatch" in Check['expected'][0]['chk']:
                 SDFppwr = self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['PotentialLoadPower']
@@ -2339,16 +2291,20 @@ class CommonCTSChecks():
                 print("TempPkt1:",TempPkt1)
                 if len(TempPkt1) > 2:
                     self.GetInitailVoltage(2, start=TempPkt1[2],end=conditions[cond][1])
-                    res.append([f"{self.file_list[TempPkt1[2]]['pktType']} found at {self.PktMethod.Timeconvert(TempPkt1[2])}", "Pass"])
-                    irect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData3)
-                    # ChkRes1 = CommonMethods.check_measure([1.080, 1.090], irect[0], 0)
-                    res.append([f"Measured Irect is {irect[0]} A", "Pass"])
-                    vrect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData)
-                    ChkRes2 = CommonMethods.check_measure([13.86, 14.14], vrect[0], 0)
-                    res.append([f"Measured Vrect is {ChkRes2[3]} V, Limit: {ChkRes2[2]} V", ChkRes2[1]])
-                    power = round(vrect[0] * irect[0], 3)
-                    ChkRes3 = CommonMethods.check_measure([15], power, "GTEQL")
-                    res.append([f"Measured Prect is {power} W, Limit: {ChkRes3[2]} W", ChkRes3[1]])
+                    res.append([f"{self.file_list[TempPkt1[2]]['pktType']} found at {self.PktMethod.Timeconvert(TempPkt1[0])}", "Pass"])
+                    if self.XCEV_Ideal is not None:
+                        res.append([f"Power transfer stabilized at {self.PktMethod.Timeconvert(self.file_list[self.XCEV_Ideal]['startTime'])}", "Pass"])
+                        irect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData3)
+                        # ChkRes1 = CommonMethods.check_measure([1.080, 1.090], irect[0], 0)
+                        res.append([f"Measured Irect is {irect[0]} A", "Pass"])
+                        vrect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData)
+                        ChkRes2 = CommonMethods.check_measure([13.86, 14.14], vrect[0], 0)
+                        res.append([f"Measured Vrect is {ChkRes2[3]} V, Limit: {ChkRes2[2]} V", ChkRes2[1]])
+                        power = round(vrect[0] * irect[0], 3)
+                        ChkRes3 = CommonMethods.check_measure([15], power, "GTEQL")
+                        res.append([f"Measured Prect is {power} W, Limit: {ChkRes3[2]} W", ChkRes3[1]])
+                    else:
+                        res.append([f"Power transfer not stabilized", "Fail"])
                 else:
                     res.append([f"Set_Load 1500mW assertion not found", "Fail"])
                 nak_chk = False
