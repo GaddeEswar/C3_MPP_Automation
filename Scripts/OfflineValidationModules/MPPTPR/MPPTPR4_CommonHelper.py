@@ -3839,6 +3839,14 @@ class CommonCTSChecks():
                                                                     res.append([f"Renegotiate Load is {negpwr2}W found at index@{renegload[2]}, Expected: 15W", "Pass"])
                                                                 else: res.append([f"Renegotiate Load is {negpwr2}W found at index@{renegload[2]}, Expected: 15W", "Fail"])
                                                                 
+                                                                if 'Remove_offset' in Check:
+                                                                    # Remove applied offsets
+                                                                    offset_pkt = self.PktMethod.GetPacketDetails(packet="Power Offset",limit=[renegload[2],end],Type="TesterMsg")
+                                                                    # print("offset_pkt:",offset_pkt)
+                                                                    if len(offset_pkt)<2:
+                                                                        res.append([f"Offset is removed and TPR set PPR,est = PPR and Prect,est = Prect", "Pass"])
+                                                                    else: res.append([f"Offset is not removed", "Fail"])
+                                                                
                                                                 pkt_DPM = self.PktMethod.GetPacketDetails(packet="DPCAL_PARAM",limit=[renegload[2],end],Type="Response")
                                                                 if len(pkt_DPM)>2:
                                                                     alpha = GeneralMethods.GetFloatFromStr(self.file_list[pkt_DPM[2]]['header_Payload']['childelement'][1]['childelement'][0]['sDescription'])[0]
@@ -3849,6 +3857,10 @@ class CommonCTSChecks():
                                     
                                                             else: res.append([f"Set_Load {int(negpwr2*1000)}mW not found", "Fail"])
                     else: res.append(["Renegotiation sequence was not observed, after power stabilize", "Inconclusive"])
+
+                    
+                        
+
         return res
 
     

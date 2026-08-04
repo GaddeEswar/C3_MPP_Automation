@@ -9824,6 +9824,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -9856,7 +9875,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -9948,7 +9967,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10006,7 +10025,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -10022,6 +10041,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10054,7 +10092,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -10111,7 +10149,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10146,7 +10184,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -10162,6 +10200,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10194,7 +10251,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -10351,7 +10408,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10381,7 +10438,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -10395,6 +10452,25 @@
           "2.2.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10427,7 +10503,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -10484,7 +10560,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10515,7 +10591,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ],
           "Cloak": [
@@ -10530,19 +10606,38 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ]
         }
       },
       "2.3.1": {
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Cloak_Compatibility": [
             {
               "expected": [],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ]
         }
@@ -10554,12 +10649,31 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Cloak_Compatibility2": [
             {
               "expected": [],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ]
         }
@@ -10575,6 +10689,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10607,7 +10740,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -10694,7 +10827,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10750,7 +10883,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -10766,6 +10899,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10798,7 +10950,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 3
             }
           ],
           "BitsCheck_New": [
@@ -10885,7 +11037,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -10941,7 +11093,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -10957,6 +11109,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -10989,7 +11160,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -11104,7 +11275,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "EDSCheck": [
@@ -11134,7 +11305,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ]
         }
@@ -11150,6 +11321,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -11182,7 +11372,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 3
+              "CheckSEQ": 5
             }
           ],
           "BitsCheck_New": [
@@ -11261,7 +11451,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ],
           "PacketCheck_New": [
@@ -11314,7 +11504,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ]
         }
@@ -11330,6 +11520,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -11362,7 +11571,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -11453,7 +11662,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ]
         }
@@ -11469,6 +11678,25 @@
           "2.3.1"
         ],
         "CTSChecks": {
+          "NegPhase": [
+            {
+              "expected": [
+                {}
+              ],
+              "EDS_pkts": "resp_check",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 1
+            }
+          ],
+          "PTPhase": [
+            {
+              "expected": "PTphaseCheck",
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 2
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -11501,7 +11729,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 4
             }
           ],
           "BitsCheck_New": [
@@ -11592,7 +11820,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 1
+              "CheckSEQ": 3
             }
           ]
         }
@@ -81734,6 +81962,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81751,6 +81980,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81789,6 +82019,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81806,6 +82037,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81844,6 +82076,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81861,6 +82094,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81899,6 +82133,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81916,6 +82151,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81954,6 +82190,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -81971,6 +82208,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82009,6 +82247,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82026,6 +82265,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82064,6 +82304,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82081,6 +82322,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82119,6 +82361,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82136,6 +82379,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82174,6 +82418,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82191,6 +82436,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82229,6 +82475,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82246,6 +82493,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 100,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82284,6 +82532,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82301,6 +82550,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 80,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82339,6 +82589,7 @@
                 "RP": 0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
@@ -82356,6 +82607,7 @@
                 "RP": -0.77
               },
               "TargetLoadPercent": 60,
+              "Remove_offset": true,
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
