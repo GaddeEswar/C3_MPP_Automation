@@ -40,7 +40,7 @@ class CommonCTSChecks:
             VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(VR)>2:
                 Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="start",measure="before")
-                res.append([f'Measured voltage is {Loadvrect[0]}V Limits [4.116 V - 4.284 V]', 
+                res.append([f'while TPR Regulating to its Operating Voltage Measured Voltage is : {Loadvrect[0]} V -> Limits : 4.116 V ~ 4.284 V', 
                             'Pass' if Loadvrect[0] >= 4.116 and Loadvrect[0] <= 4.284 else 'Inconclusive'])
                 self.id =VR[2]+1
                 # Check Loads are applied or not
@@ -64,7 +64,7 @@ class CommonCTSChecks:
             VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(VR)>2:
                 Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData,at="start",measure="before")
-                res.append([f'Measured voltage is {Loadvrect[0]}_V, Limits [11.4 V ~ 12.6 V]', 'Pass' if Loadvrect[0] >= 11.4 and Loadvrect[0] <= 12.6 else 'Inconclusive'])
+                res.append([f'while TPR Regulating to its Operating Voltage , Measured Voltage is {Loadvrect[0]} V -> Limits : 11.4 V ~ 12.6 V', 'Pass' if Loadvrect[0] >= 11.4 and Loadvrect[0] <= 12.6 else 'Inconclusive'])
                 id =VR[2]+1
                 LoadFlag=False
                 # Check Negotiable Load Power Reached or not
@@ -74,7 +74,7 @@ class CommonCTSChecks:
                     Current=(self.CalculateVoltTwindow(VR[2],self.AllChannelData_Current,at="start",measure="before"))
                     Power=round(Loadvrect[0]*Current[0],3)
                     NPLimit=[round((NPower - ((NPower*5)/100)),2), round((NPower +((NPower*5)/100)),2)]
-                    res.append([f'Measured load power is {Power}_W, Limits [{NPLimit[0]} W ~ {NPLimit[1]} W]',
+                    res.append([f'While regulating to Load Voltage (12 ± 5%) V, Measured Load power is {Power} W -> Limits : {NPLimit[0]} W ~ {NPLimit[1]} W',
                                     'Pass' if Power >= NPLimit[0] and Power <= NPLimit[1] else 'Inconclusive'])
 
                 else:
@@ -1918,7 +1918,7 @@ class CommonCTSChecks:
             templist = []
             self.AllChannelData11= self.PlotMethod.GetAllChannelData2('12',self.JapiData)
             for temp in self.AllChannelData11['RV']['displayDataChunk']: templist.append(temp)  
-            res.append([f"Measured coil temperature is {max(templist)} °C,\nMeasured ambient temperature is :{templist[0]} °C", "Pass"]) 
+            res.append([f"Measured coil temperature is {max(templist)} °C,Measured ambient temperature is :{templist[0]} °C", "Pass"]) 
             res.append([f"Difference in temperature is {round((max(templist)-templist[2]),2)} °C", "Pass" if round((max(templist)-templist[2]),2) <12 else 'Fail']) 
             # Find Tc execution Timing
             Timing=round(((self.file_list[self.Flow_limit[1]]['stopTime']-self.file_list[self.Flow_limit[0]]['startTime'])*1000)/60000,3)
@@ -3835,7 +3835,7 @@ class CommonCTSChecks:
             id+=1
         # print("Vrectmax:",Vrectmax)
         # print(VRlist)
-        return [Vrectmax] if max else [round((sum(VRlist)/len(VRlist)),5), id-1]       
+        return [Vrectmax] if max else [round((sum(VRlist)/len(VRlist)),3), id-1]       
     
     def GetAuthPayloadDetails(self,index,name,Byte,Bit):
         try:
@@ -3923,7 +3923,7 @@ class CommonCTSChecks:
                     startid=Sp
                 else:break
             else:break
-        return [MaxIndex,MaxValue]
+        return [MaxIndex,MaxValue,MinIndex,MinValue]
 
     def GetAuthSeqStatus(self):
        # Check the Bytes seq proper or not by check the FW Assertion
