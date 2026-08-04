@@ -28,6 +28,7 @@ jobs:
           pyinstaller MPPGUIform_New.spec
 
       - name: Create Package for GitHub Action
+        shell: cmd
         run: |
           mkdir C3_MPP_Automation_Build
 
@@ -35,13 +36,10 @@ jobs:
 
           xcopy Resources C3_MPP_Automation_Build\Resources /E /I /Y
           xcopy Scripts C3_MPP_Automation_Build\Scripts /E /I /Y
-          xcopy json C3_MPP_Automation_Build\json /E /I /Y
-          xcopy Results C3_MPP_Automation_Build\Results /E /I /Y
+          xcopy Json C3_MPP_Automation_Build\Json /E /I /Y
           xcopy Logs C3_MPP_Automation_Build\Logs /E /I /Y
-      - name: Show Package Structure
-        shell: cmd
-        run: |
-          tree C3_MPP_Automation_Build /F
+          xcopy Results C3_MPP_Automation_Build\Results /E /I /Y
+          
       - name: Verify Application Launch
         shell: powershell
         run: |

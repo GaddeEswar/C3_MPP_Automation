@@ -29,6 +29,6 @@ jobs:
         run: |
           python -m compileall .
 
-      # - name: Run Main File  # Implement in future
+      # - name: Run Main File  # Implement Later
       #   run: |
       #     python MPPGUIform_New.py
