@@ -584,8 +584,8 @@ class CommonCTSChecks:
             # check signal Strength Packet
             SS = self.PktMethod.GetPacketDetails(packet='Signal strength',limit=[ST[2]+1,SP[2]])
             if len(SS)>2:
-                res.append([f'Tester sent Signal_strength packet at index@ {{{SS[2]}}}','Fail'])
-            else:res.append([f'Tester did not sent Signal_strength packet','Pass'])
+                res.append([f'TPR sent Signal_strength packet at index@ {{{SS[2]}}}','Fail'])
+            else:res.append([f'TPR did not sent Signal_strength packet','Pass'])
 
         else:res.append([f'test_stop [or] test_start is missing','Inconclusive'])
         
@@ -1164,7 +1164,7 @@ class CommonCTSChecks:
                 NextPing_details=self.PktMethod.GetPacketDetails(packet="Ping", Type="TesterMsg",limit=[Shutdown_details[2]+1, len(self.file_list)-1])
                 if len(NextPing_details)>2:
                     tnopower=round((NextPing_details[0]-Shutdown_details[1])*1000,3)
-                    res.append([f'Measured t_nopower from {round(NextPing_details[1],3)}Sec to {round(Shutdown_details[1],3)}Sec   is {tnopower} mS', 'Pass' if  tnopower > Check['expected'][1] else 'Fail'])
+                    res.append([f'Measured t_nopower from {round(NextPing_details[1],3)}Sec to {round(Shutdown_details[1],3)}Sec   is {tnopower} mS , Limit ≥ 32 mS', 'Pass' if  tnopower > Check['expected'][1] else 'Fail'])
                 else:
                     Time=round((self.file_list[len(self.file_list)-1]['startTime']-Shutdown_details[1])*1000,3)
                     if Time > Check['expected'][1]:res.append([f'Measured t_nopower is greater than {Check['expected'][1]} mS','Pass'])
@@ -2200,7 +2200,8 @@ class CommonCTSChecks:
                 Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[ILL[2]+1,SP[2]])
                 if len(Coilpk)>2:
                     TterminateVal=round((Coilpk[1] - ILL[1]) * 1000, 3)
-                    res.append([f'Measured t_terminate value for packet: {Packet} is {TterminateVal} mS at {{{ILL[2]}}} ,Limit [<=28 mS] ','Fail' if TterminateVal > 28 else 'Pass'])  
+                    res.append([f'TPR sent {Packet} packet at index@ {{{ILL[2]}}}' ,'Pass'])
+                    res.append([f'Measured t_terminate value is {TterminateVal} mS , Limit [<=28 mS] ','Fail' if TterminateVal > 28 else 'Pass'])  
 
                     # Validate Remaining Ping Measurements
                     rem=self.ValidTterminate([ILL[2]+1,SP[2]],Check,Packet)
@@ -2210,7 +2211,7 @@ class CommonCTSChecks:
                     res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
 
             else:
-                res.append([f'voltage drops below 200mV[pk=pk] level before reaching the end of the {Packet} data packet.','Pass'])
+                res.append([f'voltage drops below 200mV[pk-pk] level before reaching the end of the {Packet} data packet.','Pass'])
                 res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
             # Check TrestartIllegal and VRECT
             if Trestart:
@@ -3495,7 +3496,9 @@ class CommonCTSChecks:
         while id < limit[1]:
             ILL = self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1], limit=[id,limit[1]])
             if len(ILL)>2:
-                if Check['pkt'][2] : res.extend(self.Payload_Details(PacketName=DataPacketName,Index=ILL[2],PayLoads= Check['pkt'][3])) 
+                if Check['pkt'][2] : 
+                    res.append([f'TPR sent {DataPacketName} Packet at index@ {{{ILL[2]}}}','Pass'])
+                    res.extend(self.Payload_Details(PacketName=DataPacketName,Index=ILL[2],PayLoads= Check['pkt'][3])) 
                 Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[ILL[2]+1,limit[1]])
                 if len(Coilpk)>2:
                     TterminateVal=round((Coilpk[1] - ILL[1]) * 1000, 3)
@@ -3506,8 +3509,8 @@ class CommonCTSChecks:
         if TterminateList:
             min_item = min(TterminateList, key=lambda x: x[-1])
             max_item = max(TterminateList, key=lambda x: x[-1])
-            res.append([f"Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec for the {DataPacketName} packet at index@ {{{max_item[2]}}} is {max_item[-1]}mS , Limit: <= {Check['Tterminate'][1]}", 'Fail' if  max_item[-1] > Check['Tterminate'][1] else 'Pass'])
-            res.append([f"Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec for the {DataPacketName} packet at index@ {{{min_item[2]}}} is {min_item[-1]}mS , Limit:<= {Check['Tterminate'][1]}", 'Fail' if  min_item[-1] > Check['Tterminate'][1] else 'Pass'])
+            res.append([f"Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec at index@ {{{max_item[2]}}} is {max_item[-1]}mS , Limit: <= {Check['Tterminate'][1]} mS", 'Fail' if  max_item[-1] > Check['Tterminate'][1] else 'Pass'])
+            res.append([f"Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec at index@ {{{min_item[2]}}} is {min_item[-1]}mS , Limit:<= {Check['Tterminate'][1]} mS", 'Fail' if  min_item[-1] > Check['Tterminate'][1] else 'Pass'])
 
         return res
 
@@ -3528,18 +3531,18 @@ class CommonCTSChecks:
                     if len(Coilpk)>2:
                         Timing=round(( NP[0] - Coilpk[1]) * 1000, 3)
                         TrestartList.append([round(Coilpk[1],3),round(NP[0],3),FP[2],Timing])
-                        # Check the VRECT value of the ping if there is only an SS packet [other than Ping phases]
+                        # Check the VRECT value of the ping if there is only an SS packet [other than Ping phases] 
                         if CTSCheck=='T_terminate' :
                             SS = self.PktMethod.GetPacketDetails(packet='Signal strength',limit=[NP[2]+1,len(self.file_list)])
                             if len(SS)>2:
                                 SSNP=self.PktMethod.GetPacketDetails(packet="Ping Detected", Type="TesterMsg",limit=[SS[2]-1,NP[2]-1])
-                                vrect = self.CalculateVoltTwindow(SSNP[2],self.AllChannelData,at="start",measure="after",winsize=[22,33])
+                                vrect = self.CalculateVoltTwindow(SSNP[2],self.AllChannelData,at="start",measure="after",winsize=[5,30],max=True)
                                 Vrectlist.append([SSNP[2],vrect[0]])   
                             else:
-                                vrect = self.CalculateVoltTwindow(NP[2],self.AllChannelData,at="start",measure="after",winsize=[22,33])
+                                vrect = self.CalculateVoltTwindow(NP[2],self.AllChannelData,at="start",measure="after",winsize=[5,30],max=True)
                                 Vrectlist.append([NP[2],vrect[0]])
                         else:
-                            vrect = self.CalculateVoltTwindow(NP[2],self.AllChannelData,at="start",measure="after",winsize=[22,33])
+                            vrect = self.CalculateVoltTwindow(NP[2],self.AllChannelData,at="start",measure="after",winsize=[5,30],max=True)
                             Vrectlist.append([NP[2],vrect[0]])
                     id=NP[2]
                 else:break
@@ -3547,14 +3550,12 @@ class CommonCTSChecks:
         if len(TrestartList)>1 :
             min_item = min(TrestartList, key=lambda x: x[-1])
             max_item = max(TrestartList, key=lambda x: x[-1])
-            min_Vrect= min(Vrectlist, key=lambda x: x[-1])
             max_Vrect= max(Vrectlist, key=lambda x: x[-1])
-            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec for the {DataPacketName} packet is {max_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  max_item[-1] > 500 else 'Pass'])
-            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec for the {DataPacketName} packet is {min_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  min_item[-1] > 500 else 'Pass'])
+            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec is {max_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  max_item[-1] > 500 else 'Pass'])
+            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec is {min_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  min_item[-1] > 500 else 'Pass'])
             res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at ping {{{max_Vrect[0]}}}, Limit[≤ 19V]", "Fail" if max_Vrect[-1] > 19 else "Pass"])
-            res.append([f"Measured min V_RECT is {min_Vrect[-1]}V at ping {{{min_Vrect[0]}}}, Limit[≤ 19V]", "Fail" if min_Vrect[-1] > 19 else "Pass"])
         elif len(TrestartList)==1:
-            res.append([f'Measured t_restart_after_illegal from {TrestartList[0][0]}Sec to {TrestartList[0][1]}Sec for the {DataPacketName} packet is {TrestartList[0][-1]}mS, Limit[≤ 500mS] ', 'Fail' if  TrestartList[0][-1] > 500 else 'Pass'])
+            res.append([f'Measured t_restart_after_illegal from {TrestartList[0][0]}Sec to {TrestartList[0][1]}Sec is {TrestartList[0][-1]}mS, Limit[≤ 500mS] ', 'Fail' if  TrestartList[0][-1] > 500 else 'Pass'])
             res.append([f"Measured V_RECT is {Vrectlist[0][-1]}V at ping {{{Vrectlist[0][0]}}}, Limit[≤ 19V]", "Fail" if Vrectlist[0][-1] > 19 else "Pass"])
         else:res.append([f'Test did not found any t_restart_after_illegal or V_RECT measurements','Inconclusive'])
 
@@ -3599,12 +3600,10 @@ class CommonCTSChecks:
         if TrestartList and Trestart:
             min_item = min(TrestartList, key=lambda x: x[-1])
             max_item = max(TrestartList, key=lambda x: x[-1])
-            min_Vrect= min(Vrectlist, key=lambda x: x[-1])
             max_Vrect= max(Vrectlist, key=lambda x: x[-1])
-            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec for the {DataPacketName} packet at index@ {max_item[2]} is {max_item[-1]}mS , Limit <=500', 'Fail' if  max_item[-1] > 500 else 'Pass'])
-            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec for the {DataPacketName} packet at index@ {min_item[2]} is {min_item[-1]}mS , Limit <=500', 'Fail' if  min_item[-1] > 500 else 'Pass'])
+            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec at index@ {max_item[2]} is {max_item[-1]}mS , Limit <=500', 'Fail' if  max_item[-1] > 500 else 'Pass'])
+            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec at index@ {min_item[2]} is {min_item[-1]}mS , Limit <=500', 'Fail' if  min_item[-1] > 500 else 'Pass'])
             res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at  index @ {max_Vrect[0]}, Limit <=19V", "Fail" if max_Vrect[-1] > 19 else "Pass"])
-            res.append([f"Measured min V_RECT is {min_Vrect[-1]}V at  index @ {min_Vrect[0]}, Limit <=19V", "Fail" if min_Vrect[-1] > 19 else "Pass"])
 
         return TterminateList,res
     
