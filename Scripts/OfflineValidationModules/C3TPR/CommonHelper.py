@@ -1618,6 +1618,14 @@ class CommonCTSChecks:
                 # Find the Power level 
                 Prect=round(vrect[0]*(self.CalculateVoltTwindow(CE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
                 res.append([f"Measured regualated Load power is {Prect}W at index@ {CE[2]}", "Fail" if Prect < Check['PowerLimit'][1][0] or Prect > Check['PowerLimit'][1][1] else "Pass"])
+                #Check CE packets and voltage regulation if there is no Load  assertion for Test_ID= "Guaranteed_Load_Power_23d_2"
+            elif self.Header['TestcaseID'] in ['Guaranteed_Load_Power_23d_2']:
+                pkt = self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
+                if len(pkt)>2:
+                    PktsCountBefore=self.CECount(Limit=[Regulated[2],pkt[2]],value=["+1","0","-1"])
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
+                    res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
+
             # Check the Appropriate Loads applied or not
             id=Regulated[2]+1
             for Load in Check['Loads']:
