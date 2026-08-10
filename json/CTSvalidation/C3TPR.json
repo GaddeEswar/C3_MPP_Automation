@@ -22656,25 +22656,14 @@
                 "16 bit Received Power",
                 "Mode:4"
               ],
+              "PktsCount":15,
               "response": null,
               "Timing": false,
               "flow": 1,
               "CheckSEQ": 2,
               "Result_check": true
             }
-          ],
-          "NotPackets": [
-            {
-              "ExpectedPacket": [
-                "16 bit Received Power",
-                "Mode:0"
-              ],
-              "PktsCount": 1,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ]
+            ]
         }
       },
       "TEST_PTX_CPX_POW_S13_RP0_001": {
@@ -23343,6 +23332,17 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
+          ],
+          "ReplaceRP":[
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:3"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
           ]
         }
       },
@@ -23368,6 +23368,17 @@
                 "ND"
               ],
               "Timing": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "ReplaceRP":[
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:5"
+              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -23401,6 +23412,17 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
+          ],
+          "ReplaceRP":[
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:6"
+              ],
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
           ]
         }
       },
@@ -23426,6 +23448,17 @@
                 "ND"
               ],
               "Timing": false,
+              "flow": 1,
+              "CheckSEQ": 1,
+              "Result_check": true
+            }
+          ],
+          "ReplaceRP":[
+            {
+              "Pkt": [
+                "16 bit Received Power",
+                "Mode:7"
+              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -35185,7 +35218,7 @@
                 "16 bit Received Power",
                 "Mode:4"
               ],
-              "PktsCount": 2,
+              "PktsCount": 1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
