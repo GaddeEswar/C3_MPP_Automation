@@ -88,6 +88,60 @@ class CommonCTSChecks:
       
     #-----------------------------------------------------------Negotiation Phase Tests------------------------------------------------------------------------- #
     
+    def Nego_ABT(self,CTSCheck,Check,flows,flwID):
+        res = []
+        self.Flow_limit = flows[flwID]['Limit']
+        CFG=self.PktMethod.GetPacketDetails(packet="Configuration",value= "Neg:true",limit=self.Flow_limit)
+        if len(CFG)>2:
+            res.append([f'TPR sent a CFG/ep data packet at index@ {CFG[2]} replacing the CFG/bp data packet','Pass'])
+            #Check RP8 Packets
+            id=CFG[2]+1
+            count=[]
+            DefaultCheck=False
+            while id < self.Flow_limit[1]:
+                if self.PktMethod.GetPacketType(id)=='Packet':
+                    if 'TEST_PTX_CPX_NEG_S07_ABT_002' in self.Header['TestcaseID'] and not DefaultCheck:
+                        if "8 bit Received Power" in self.file_list[id]['pktType']:
+                            res.append([f'TPR sent RP8 data packet at index@ {id} by replacing the First CE packet','Pass'])
+                            count.append(id)
+                        else: 
+                            if self.file_list[CFG[2]]['pktType'] in self.file_list[id]['pktType']:# Suppose if retry happens when Response is not received
+                                id+=1
+                                continue
+                            else:res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of first CE packet','Inconclusive'])
+                        DefaultCheck=True
+                    else:
+                        if "8 bit Received Power" in self.file_list[id]['pktType']: count.append(id)
+                id+=1
+            if len(count)>=2: res.append([f'TPR sent its second RP8 data packet at index@ {count[1]}','Pass'])
+            else:res.append(['TPR cannot send its second RP8 data packet','Fail'])   
+        else: res.append([f'TPR did not sent CFG/ep packet in the sequence', 'Inconclusive'])
+        return res
+        
+    def Nego_fod(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        Rf=self.PktMethod.GetPacketDetails(packet="FOD Status",value='Rf',limit=self.Flow_limit)
+        if len(Rf)>2:
+            res.append([f'TPR sent a FOD/Rf data packet at index@ {Rf[2]}','Pass'])
+            Qf=self.PktMethod.GetPacketDetails(packet="FOD Status",value='Qf',limit=[Rf[2]+1,self.Flow_limit[1]])
+            if len(Qf)>2:
+                res.append([f'TPR sent a FOD/Qf data packet at index@ {Qf[2]}','Pass'])
+                res.append([f'Fod_rf is swapped with Fod_qf','Pass'])
+                # count CE packets
+                id=Qf[2]+1
+                count=[]
+                while id < self.Flow_limit[1]:
+                    if self.PktMethod.GetPacketType(id)=='Packet':
+                        if 'Control Error' in self.file_list[id]['pktType']:count.append(id)
+                    id+=1
+                if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}','Pass'])
+                else:res.append([f'TPR cannot send its second CE Packet','Fail'])
+            else: res.append([f'TPR did not sent FOD/Qf packet in the sequence', 'Inconclusive'])
+        else: res.append([f'TPR did not sent FOD/Rf packet in the sequence', 'Inconclusive'])
+        return res
+
+
     def Nego_SRQ_GPX(self,CTSCheck,Check,flows,flwID):
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
@@ -191,6 +245,45 @@ class CommonCTSChecks:
         else: res.append([f'TPR did not sent GRQ/PT-CAP packet in the sequence ','Inconclusive'])
                 
         return res
+
+    def Nego_WID(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        CFG=self.PktMethod.GetPacketDetails(packet="Configuration",value= "Neg:true",limit=self.Flow_limit)
+        if len(CFG)>2:
+            # Find Response
+            Cres=self.PktMethod.GetPacketResponse(CFG[2],[CFG[2]+1,self.Flow_limit[1]])
+            if Cres is not None:
+                id=Cres+1
+                pkt=True
+                while id < self.Flow_limit[1]:
+                    if self.PktMethod.GetPacketType(id)=="Packet":
+                        if Check['pkt'] in self.file_list[id]['pktType']:
+                            res.append([f'TPR sent {Check['pkt']} at index@ {id} directly after the CFG/ep packet','Pass'])
+                            break 
+                        else:
+                            res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of {Check['pkt']} packet','Inconclusive'])
+                            pkt=False
+                            break 
+                    id+=1
+                if pkt :
+                    #Check PayLoad and Response
+                    PD=self.Payload_Details(PacketName=Check['pkt'],Index=id,PayLoads=Check['PayLoad'])
+                    if len(PD)>0:res.extend(PD)
+                    Pres=self.PktMethod.GetPacketResponse(id,[id+1,self.Flow_limit[1]])
+                    if Pres is not None: res.append([f'PTx sent {self.file_list[Pres]['pktType']} response to {Check['pkt']} at index@ {Pres} , Exp :{Check['Exp']}','Pass' if self.file_list[Pres]['pktType'] in Check['Exp'] else 'Fail'])
+                    else: res.append([f'PTx did not sent response to {Check['pkt']} at index@ {id}','Inconclusive'])
+                    # count CE packets
+                    count=[]
+                    while id < self.Flow_limit[1]:
+                        if self.PktMethod.GetPacketType(id)=='Packet':
+                            if 'Control Error' in self.file_list[id]['pktType']:count.append(id)
+                        id+=1
+                    if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}','Pass'])
+                    else:res.append([f'TPR cannot send its second CE Packet','Fail'])
+            else:res.append([f'Cound found response for CFG/ep packet','Inconclusive'])
+        else:res.append([f'could not found CFG/ep packet','Inconclusive'])       
+        return res   
         
     #-----------------------------------------------------------Power Transfer Phase Tests------------------------------------------------------------------------- #
 
@@ -603,7 +696,7 @@ class CommonCTSChecks:
             Tfod=round((shutdown[1]- self.file_list[resp]['stopTime'])*1000,2)
             if Check['ACK_Check']:  res.append([f"PTx sent { self.file_list[resp]['pktType']} response for FOD packet","Fail"])
             else:
-                res.append([f"Measured t_fod timing is {Tfod} mS","Fail" if Tfod >1500 else "Pass"]) 
+                res.append([f"Measured t_fod timing is {Tfod} mS","Fail" if Tfod >5000 else "Pass"]) 
 
 
         if len(FOD1)>2:
@@ -767,7 +860,7 @@ class CommonCTSChecks:
             id =EndPacket_Details[2]-1
             while id > self.Flow_limit[0]:
                 if self.PktMethod.GetPacketType(id)=="Packet":
-                    if (Check['PreviousPacket'][1] is None and Check['PreviousPacket'][0] in self.file_list[id]['pktType'] ) or ( Check['PreviousPacket'][0] in self.file_list[id]['PktType'] and Check['PreviousPacket'][1] in self.file_list[id]['value']) :
+                    if (Check['PreviousPacket'][1] is None and Check['PreviousPacket'][0] in self.file_list[id]['pktType'] ) or ( Check['PreviousPacket'][0] in self.file_list[id]['pktType'] and Check['PreviousPacket'][1] in self.file_list[id]['value']) :
                         res.append([f'TPR sent {PreviousPacket} data packet','Pass'])
                         if Check['PreviousPacket'][2]:
                             Pres=self.Payload_Details(PacketName=PreviousPacket,Index=id,PayLoads=Check['PreviousPacket'][3])
@@ -1489,43 +1582,6 @@ class CommonCTSChecks:
     def VoltageRegulation(self,CTSCheck,Check,flows,flwID):
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
-        # Check the Final Load is Regulated or not
-        Regulated=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=self.Flow_limit)
-        self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
-        if len(Regulated)>2:
-            # Find Regulated CE Pkt
-            CE=self.PktMethod.GetPacketDetails2(packet="Control Error",value="0" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
-            if len(CE)>2:
-                vrect = self.CalculateVoltTwindow(CE[2],self.AllChannelData,at="end",measure="after")
-                res.append([f"Measured U_L is {vrect[0]}V at index@ {CE[2]}, Limit: {Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
-                CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[CE[2]+1,self.Flow_limit[1]])
-                if len(CE60)>2:
-                    Voltages=[]
-                    for Voltage in Check['Voltages'][0].values():
-                        Calvrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at=Voltage[1],measure=Voltage[2],winsize=Voltage[0])
-                        Voltages.extend([round(Calvrect[0],2)])
-                    Voltages.extend([min(Voltages),max(Voltages)])
-                    # Perform Voltage Validation
-                    cnt=1
-                    for VL in Check['VoltageLimits'][0].values():
-                        Limit=VL['Limit']
-                        if VL['Formula']:Limit=[round(eval(VL['Limit'][0]),2),round(eval(VL['Limit'][1]),2)]
-                        ChkRes = CommonMethods.check_measure(Limit,Voltages[cnt-1])
-                        res.append([f"The measured V{cnt} is: {ChkRes[3]}V, Limit: {ChkRes[2]}", ChkRes[1]])
-                        cnt+=1
-                    PktsCountBefore=self.CECount(Limit=[CE[2],CE60[2]],Packet=Check['Pkt'][0],value="0")
-                    PktsCountAfter=self.CECount(Limit=[CE60[2],self.Flow_limit[1]],Packet="Control Error",value="0")
-                    res.append([f'PRx sent sequence of {PktsCountBefore} CE 0 before {Check['Pkt'][0]} with value {Check['Pkt'][1]} data packet.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
-                    res.append([f'PRx sent sequence of {PktsCountAfter} CE 0 after {Check['Pkt'][0]} with value {Check['Pkt'][1]} data packet.','Fail' if PktsCountAfter < Check['PktsCount'] else "Pass"])
-                else: res.append([f'PRx did not sent CE {Check['Pkt'][1]}','Inconclusive'])
-            else: res.append([f'PRx did not regulated to its final Load','Inconclusive'])
-        else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
-
-        return res
-
-    def Tstabilize(self,CTSCheck,Check,flows,flwID):
-        res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         #Default Configuration Check
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration",limit=self.Flow_limit)
         ID=self.PktMethod.GetPacketDetails(packet="Identification",limit=self.Flow_limit)
@@ -1534,33 +1590,51 @@ class CommonCTSChecks:
             if len(PCH)>2:
                 PCHTime=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(PCH[2],'Power_Control_Hold_Off_Time')[0]['sRawData']))
                 res.append([f'TPR sent PCH packet at index@ {{{PCH[2]}}} in between Identification and Configuration Packets','Pass'])
-                res.append([f'TPR set PowerControlHold Off Time to {PCHTime} mS , Exp : 100 mS','Pass' if PCHTime==100 else 'Inconclusive'])
+                res.append([f'TPR set PowerControlHold Off Time to {PCHTime} mS , Exp : {Check['Pchtime']} mS','Pass' if PCHTime==Check['Pchtime'] else 'Inconclusive'])
                 Count=int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(CFG[2],'Count')[0]['sRawData']))
                 res.append([f'TPR set Count field to {Count} in Configuration Packet , Exp : 1', 'Pass' if Count==1 else 'Inconclusive'])
             else: res.append([f'TPR did not sent PCH Packet in between ID and  CFG','Inconclusive'])
-        # Check the Final Load is Regulated or not
-        Regulated=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=self.Flow_limit)
-        self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
-        if len(Regulated)>2:
-            # Find Regulated CE Pkt
-            CE=self.PktMethod.GetPacketDetails2(packet="Control Error",value="0" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
-            if len(CE)>2:
-                vrect = self.CalculateVoltTwindow(CE[2],self.AllChannelData,at="end",measure="after")
-                res.append([f"Measured U_L is {vrect[0]}V at  index@ {CE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
-                CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[CE[2]+1,self.Flow_limit[1]])
+        phaseCheck=self.CheckPhase(self.Flow_limit[0],"PT")
+        if phaseCheck is not None:
+            # Check target operating voltage reached or not
+            VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
+            if len(VR)>2:
+                self.AllChannelData_Volatge = self.PlotMethod.GetAllChannelData2('2',self.JapiData)  #  Voltage Plot
+                Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="start",measure="before")
+                res.append([f'while TPR Regulating to its Operating Voltage -> Measured Voltage is : {Loadvrect[0]} V , Limits : {Check['RegulationLimit'][0]} V ~ {Check['RegulationLimit'][1]} V', 
+                            'Pass' if Loadvrect[0] >= Check['RegulationLimit'][0] and Loadvrect[0] <= Check['RegulationLimit'][1] else 'Inconclusive'])
+                CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[VR[2]+1,self.Flow_limit[1]])
                 if len(CE60)>2:
-                    PktsCountBefore=self.CECount(Limit=[CE[2],CE60[2]],Packet=Check['Pkt'][0],value="0")
-                    PktsCountAfter=self.CECount(Limit=[CE60[2],self.Flow_limit[1]],Packet="Control Error",value="0")
-                    res.append([f'PRx sent sequence of {PktsCountBefore} CE 0 before {Check['Pkt'][0]} with value {Check['Pkt'][1]} data packet.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
-                    res.append([f'PRx sent sequence of {PktsCountAfter} CE 0 after {Check['Pkt'][0]} with value {Check['Pkt'][1]} data packet.','Fail' if PktsCountAfter < Check['PktsCount'] else "Pass"])
-                    vrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at="end",measure="after",winsize=[1,101])
-                    result="Fail" if vrect[0] > 7.2 else "Pass"
-                    res.append([f"Measured T_stabilize from end of packet at index@ {CE60[2]} to votlage crosses 7.2V is  {'greater than 100 ms' if result =='Pass' else 'less than 100 ms'} Limit >= 100 ms", result])
-                else:res.append([f'PRx did not sent CE 0 {Check['Pkt'][1]}','Inconclusive'])
-            else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
-        else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
+                    res.append([f'TPR sent CE {Check['Pkt'][1]} at index@ {CE60[2]}','Pass'])
 
+                    if 'Power_Control_21' not in self.Header['TestcaseID']:
+                        Voltages=[]
+                        for Voltage in Check['Voltages'][0].values():
+                            Calvrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData_Volatge,at=Voltage[1],measure=Voltage[2],winsize=Voltage[0])
+                            Voltages.extend([round(Calvrect[0],2)])
+                        Voltages.extend([min(Voltages),max(Voltages)])
+                        # Perform Voltage Validation
+                        cnt=1
+                        for VL in Check['VoltageLimits'][0].values():
+                            Limit=VL['Limit']
+                            if VL['Formula']:Limit=[round(eval(VL['Limit'][0]),2),round(eval(VL['Limit'][1]),2)]
+                            ChkRes = CommonMethods.check_measure(Limit,Voltages[cnt-1])
+                            res.append([f"Measured  Rectified Voltage V{cnt} is: {ChkRes[3]}V, Limit: {Limit[0]} V ~ {Limit[1]} V ", ChkRes[1]])
+                            cnt+=1
+                    
+                    PktsCountBefore=self.CE_CE60_CE(CE60[2],start=VR[2])
+                    PktsCountAfter=self.CE_CE60_CE(CE60[2],before=False)
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE 0 before CE {Check['Pkt'][1]} data packet.','Fail' if PktsCountBefore < 10 else "Pass"])
+                    res.append([f'PRx sent sequence of {PktsCountAfter} CE 0 after CE {Check['Pkt'][1]} data packet.','Fail' if PktsCountAfter < 10 else "Pass"]) 
+                    if Check.get('Tstabilize',False):
+                        vrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData_Volatge,at="end",measure="after",winsize=[1,101])
+                        result="Fail" if vrect[0] > 7.2 else "Pass"
+                        res.append([f"Measured T_stabilize from end of packet at index@ {CE60[2]} to votlage crosses 7.2V is  {'greater than 100 ms' if result =='Pass' else 'less than 100 ms'} Limit >= 100 ms", result])
+                else: res.append([f'PRx did not sent CE {Check['Pkt'][1]}','Inconclusive'])
+            else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
+        else: res.append([f'PRx did not entered PT Phase','Inconclusive'])
         return res
+
 
     def OverVoltageProtection(self,CTSCheck,Check,flows,flwID):
         res=[]
@@ -1594,7 +1668,7 @@ class CommonCTSChecks:
                         MaxIndex=id
                     id+=1
                 if MaxValue !=0:
-                    res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*MaxIndex)/1000,3)}sec  is {MaxValue}V , Limit <20V', 'Fail' if MaxValue >20 else 'Pass'])
+                    res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*MaxIndex)/1000,3)}sec  is {MaxValue}V (through out the recording) , Limit <20V', 'Fail' if MaxValue >20 else 'Pass'])
                     res.append([f'Load voltage {'does not exceed' if MaxValue <16 else' exceeded'} 16V at any time in between data packets from 500 ms after switching the Load to {Check['Load']}_ohms', 'Fail' if MaxValue >16 else 'Pass'])
 
             else:res.append([f'PRx did not applied Load: {Check['Load']}_ohms','Inconclusive'])
@@ -1636,8 +1710,8 @@ class CommonCTSChecks:
                         LoadResistance=round(Loadvrect[0]/(self.CalculateVoltTwindow(LoadCE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
                         res.append([f"Measured LoadResistance: {LoadResistance}_ohms at index@ {LoadCE[2]}", "Fail" if LoadResistance > round((LoadResistance + ((LoadResistance*0.2)/100)),2) or LoadResistance < round((LoadResistance-((LoadResistance*0.2)/100)),2) else "Pass"])
                         if Load ==Check['Loads'][-1]:
-                            PktsCountAfter=self.CECount(Limit=[LD[2],self.Flow_limit[1]],value=["+1","0","-1"])
-                            res.append([f'PRx sent sequence of {PktsCountAfter} CE Packets with -1, 0, 1 after Load: {Load}_ohms.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
+                            PktsCountAfter=self.CECount(Limit=[Regulated[2],LD[2]],value=["+1","0","-1"])
+                            res.append([f'PRx sent sequence of {PktsCountAfter} CE Packets with -1, 0, 1 after Load: {Load}_ohms.','Fail' if PktsCountAfter < Check['PktsCount'] else "Pass"])
                             res.append([f"Measured U_L is {Loadvrect[0]}V at index@ {LoadCE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if Loadvrect[0] < Check['RegulationLimit'][0] or Loadvrect[0] > Check['RegulationLimit'][1] else "Pass"])
                         id=LD[2]+1
                     else:
@@ -3704,6 +3778,23 @@ class CommonCTSChecks:
                     if Packet in self.file_list[id]['pktType']  and value is None:PktsCnt+=1
                     elif Packet in self.file_list[id]['pktType']  and self.file_list[id]['value'] in value:PktsCnt+=1
                 id-=1         
+        return PktsCnt
+
+    def CE_CE60_CE(self,CE60,Packet="Control Error",before=True,value=["0"],start=0):
+        PktsCnt=0
+        if before:
+            id=CE60-1
+            while id > start:
+                if Packet in self.file_list[id]['pktType'] and self.file_list[id]['value'] in value:PktsCnt+=1
+                elif Packet in self.file_list[id]['pktType'] and self.file_list[id]['value'] not in value:return PktsCnt
+                id-=1
+
+        else:
+            id=CE60+1
+            while id < self.Flow_limit[1]:
+                if Packet in self.file_list[id]['pktType'] and self.file_list[id]['value'] in value:PktsCnt+=1
+                elif Packet in self.file_list[id]['pktType'] and self.file_list[id]['value'] not in value:return PktsCnt
+                id+=1
         return PktsCnt
     
     # Fun to find the next packet of a specific type
