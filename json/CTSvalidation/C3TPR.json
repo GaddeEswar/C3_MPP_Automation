@@ -10957,11 +10957,107 @@
                 true,
                 [
                   {
+                    "Name": "Power_Class",
+                    "Byte": "B0",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
                     "Name": "Maximum_Power_Value",
                     "Byte": "B0",
                     "Bit": "[5:0]",
                     "Exp": [
                       10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Zero",
+                    "Byte": "B2",
+                    "Bit": "[7:7]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Authentication",
+                    "Byte": "B2",
+                    "Bit": "[6:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B2",
+                    "Bit": "[5:5]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "OutofBand",
+                    "Byte": "B2",
+                    "Bit": "[4:4]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Zero",
+                    "Byte": "B2",
+                    "Bit": "[3:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Count",
+                    "Byte": "B2",
+                    "Bit": "[2:0]",
+                    "Exp": [
+                      0
                     ],
                     "comp": "EQL",
                     "Type": "DEC",
@@ -11003,6 +11099,54 @@
                     "Type": "DEC",
                     "Inconclusive_Check": true,
                     "Result_check": true
+                  },
+                  {
+                    "Name": "Polarity",
+                    "Byte": "B4",
+                    "Bit": "[6:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Depth",
+                    "Byte": "B4",
+                    "Bit": "[5:4]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Buffer Size",
+                    "Byte": "B4",
+                    "Bit": "[3:1]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Dup",
+                    "Byte": "B4",
+                    "Bit": "[0:0]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
                   }
                 ]
               ],
@@ -11033,7 +11177,33 @@
               "pkt": [
                 "WPID(0x54)",
                 null,
-                false
+                true,
+                [
+                  {
+                    "Name": "WPID",
+                    "Byte": "B0_B2",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x238EA1"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "CRC",
+                    "Byte": "B3_B4",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x53C6"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  }
+                ]
               ],
               "Tterminate": [
                 0,
@@ -11062,7 +11232,33 @@
               "pkt": [
                 "WPID(0x55)",
                 null,
-                false
+                true,
+                [
+                  {
+                    "Name": "WPID",
+                    "Byte": "B0_B2",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x238EA1"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "CRC",
+                    "Byte": "B3_B4",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x53C6"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  }
+                ]
               ],
               "Tterminate": [
                 0,
