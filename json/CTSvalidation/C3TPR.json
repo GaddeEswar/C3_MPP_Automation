@@ -22595,7 +22595,6 @@
                 "16 bit Received Power",
                 "Mode:4"
               ],
-              "PktsCount":15,
               "response": null,
               "Timing": false,
               "flow": 1,

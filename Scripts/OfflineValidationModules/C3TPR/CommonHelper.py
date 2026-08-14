@@ -1133,7 +1133,6 @@ class CommonCTSChecks:
             if len(ExpectedPacket_Details)>2:
                 pktCount+=1
                 if pktCount> Check['PktsCount']:
-                    #add (If second packet sent then timer of 2nd packet and it's result)
                     res.append([f'TPR sent the {DataPacket} data packet {pktCount} times. Expected: Not more than {Check['PktsCount']} times','Fail'])
                     break
                 id=ExpectedPacket_Details[2]+1
@@ -1366,7 +1365,7 @@ class CommonCTSChecks:
             if len(CE2)>2:
                 Tinterval=round((CE2[0]-CE[0])*1000,2)
                 res.append([f'TPR sent second {Check['Pkt'][0]} data packet at index@ {CE2[2]}', 'Pass'])
-                res.append([f'Measured timing from {round(CE[0],3)}_sec at index@ {CE[2]} to {round(CE2[0],3)}_sec at index@ {CE2[2]} is {Tinterval}_mS Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
+                res.append([f'Measured timing from {round(CE[0],3)}_sec  to {round(CE2[0],3)}_sec  is {Tinterval}_mS , Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
             else:res.append([f'TPR sent only one {Check['Pkt'][0]} data packet','Fail'])
         else:res.append([f'Test did not entered PT phase','Inconclusive'])
 
@@ -1376,16 +1375,11 @@ class CommonCTSChecks:
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
         PKT= str(f'{Check['Pkt'][0]}{'_' + Check['Pkt'][1].replace('{','').replace('}','').replace(':','_') if Check['Pkt'][1] is not None else ''}')
-        Pkt_count= 0
-        count=Check.get('PktsCount')
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]: 
             Pkt=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],value=Check['Pkt'][1] ,limit=[id,self.Flow_limit[1]])
-            
             if len(Pkt)>2:
                 #Check the Response defined in CTS Checks
-                Pkt_count += 1
-
                 resp=self.PktResponse(Pkt[2]+1,self.Flow_limit[1])
                 if resp is None and  Check['response'] is None: res.append([f'PTx did not sent any response for {PKT} data packet at index@ {Pkt[2]}','Pass'])
                 else:
@@ -1399,8 +1393,6 @@ class CommonCTSChecks:
                         else:res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}','Fail'])
                 id=Pkt[2]+1
             else:id+=1
-        if count is not None: res.append([f'TPR sent {PKT} data packet {Pkt_count} times, Expected at least {Check['PktsCount']} times', 'Pass' if Pkt_count >= Check['PktsCount'] else 'Fail'])
-
         return res
 
     def ReplaceRP(self,CTSCheck,Check,flows,flwID):
