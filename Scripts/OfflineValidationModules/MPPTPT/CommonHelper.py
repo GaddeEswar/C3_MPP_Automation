@@ -729,7 +729,8 @@ class CommonCTSChecks:
     
     def ProtocolVersion(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
+        self.Flow_limit = flows[flwID]['Limit'] 
+        random_data = Check.get('random',False)
         PhaseLimit=self.FindPhase(self.Flow_limit[0],"Nego")
         if PhaseLimit is not None:
             PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
@@ -739,10 +740,14 @@ class CommonCTSChecks:
                     res.append([f'PRx stabilized to Negotaible Load Power at {{{Stable[2]}}} ','Pass'])
                     PTID=self.PktMethod.GetexactPacketDetails(packet="Power Transmitter Identification", Type="Response",limit=self.Flow_limit)
                     if len(PTID)>2:
-                        res.append([f'TPT sent Power Transmitter Identification Pkt at {{{PTID[2]}}}','Pass'])
-                        result=self.Payload_Details(PacketName="Power Transmitter Identification",Index=PTID[2],PayLoads=Check['PT-ID'],Receiver=False)
-                        if len(result)>0:res.extend(result)
-                    else:res.append([f'TPT did not  sent Power Transmitter Identification Pkt ','Inconclusive' ])
+                        res.append([f'TPT sent Power Transmitter Identification Pkt at {{{PTID[2]}}}','Pass'])   
+                        if not random_data:
+                            result=self.Payload_Details(PacketName="Power Transmitter Identification",Index=PTID[2],PayLoads=Check['PT-ID'],Receiver=False)
+                            if len(result)>0:res.extend(result)
+                        else:
+                            major_minor = f"{self.PktMethod.GetPayloadDetails(PTID[2], 'Major_Version')[0]['sRawData'].split('x')[1][-1]}.{self.PktMethod.GetPayloadDetails(PTID[2], 'Minor_Version')[0]['sRawData'].split('x')[1][-1]}"
+                            res.append([f'PTx Sent Major_Version: {major_minor.split('.')[0]} and Minor_Version: {major_minor.split('.')[1]} for the Power Transmitter Identification data packet, Exp: 2.2 or Higher[Random Generated]', 'Pass' if float(major_minor) >= 2.2 else 'Inconclusive'])
+                    # else:res.append([f'TPT did not  sent Power Transmitter Identification Pkt ','Inconclusive'])
                     # Version select pkt
                     SRQ_VS=self.PktMethod.GetPacketDetails(packet="SRQ [0x20] ",value="Version select", limit=PhaseLimit)
                     if len(SRQ_VS)>2:
