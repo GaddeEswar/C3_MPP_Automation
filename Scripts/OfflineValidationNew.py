@@ -845,12 +845,16 @@ class TestValidation():
                                         for PacketDetails in self.JPayLoadCheckData[self.Product][self.mode][str(flwID)][phase][f'{packet} @{Type}']['PayLoadCheck']:
                                             # print("Name:",PacketDetails['Name'])
                                             expected = PacketDetails.get("Exp", []) 
+                                            comp=PacketDetails.get("comp", "EQL")
+                                            CompType=PacketDetails.get("Type", "DEC")
                                             count=0
-                                            for ExempetedTc in PacketDetails['ExemeptedTC']:
-                                                if self.Header['TestcaseName'] == ExempetedTc:
-                                                    expected=PacketDetails['ExemeptedTC'][count]['Exp']
-                                                    count+=1
-                                            # print("Name2:",self.PktMethod.GetGeneralPayloadDetails(name=PacketDetails.get("Name"),index=id,Byte=PacketDetails.get("Byte"),Bit=PacketDetails.get("Bit")))
+                                            while count < len(PacketDetails['ExemeptedTC']):
+                                                if self.Header['TestcaseID'] in PacketDetails['ExemeptedTC'][count]['TestCase']:
+                                                    expected=PacketDetails['ExemeptedTC'][count].get('Exp',[])
+                                                    comp=PacketDetails['ExemeptedTC'][count].get("comp", "EQL")
+                                                    CompType=PacketDetails['ExemeptedTC'][count].get("Type", "DEC")
+                                                    break
+                                                count+=1
 
                                             for payload in self.PktMethod.GetGeneralPayloadDetails(name=PacketDetails.get("Name"),index=id,Byte=PacketDetails.get("Byte"),Bit=PacketDetails.get("Bit")):
                                                 # print("payload:",payload)
@@ -864,10 +868,14 @@ class TestValidation():
                                                     # print("raw_data:",raw_data)
 
                                                 if raw_data:
-                                                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_data, expected, PacketDetails.get("comp", "EQL"),Type=PacketDetails.get("Type","DEC"))
-                                                    
-                                                    status = "PASS" if result else "FAIL"
-                                                    Expected=f'Should be in {expected}' if status=='FAIL' or PacketDetails.get("comp", "EQL") in ["BTW","IN"] else actual_val
+                                                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_data, expected, comp,CompType)
+                                                    status = "PASS" if result else "FAIL" 
+                                                    Expected= ''
+                                                    if  comp in ["BTW"] : Expected=f'Range of {str(expected).replace('{','(').replace('}',')')}'
+                                                    elif comp in ['IN']: Expected =f'Must be only either {str(expected).replace('{','(').replace('}',')')}'
+                                                    elif comp in ['ANY']: Expected =f'Should be any value'
+                                                    else:Expected=actual_val
+                                                    # Expected=f'Should be in {expected}' if status=='FAIL' or PacketDetails.get("comp", "EQL") in ["BTW","IN","ANY"] else actual_val
                                                     self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['PayLoadCheck'].append({'CheckName': PacketDetails.get("Name"), 'Byte': PacketDetails.get("Byte"),'Bit': PacketDetails.get("Bit"),'Expected': {Expected},'Received': actual_val,'Result': status })
                                                     self.SQLConn.ExecutebyQuery("INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.Header['UID'], flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, PacketDetails.get('Name'), PacketDetails.get('Byte'), PacketDetails.get('Bit'), str(Expected), actual_val, status, None))
                                     else: self.SQLConn.ExecutebyQuery( "INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.Header['UID'], flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, '--', '--', '--', '--', '--', '--', None))
