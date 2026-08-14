@@ -6708,21 +6708,6 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "Control Error",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
           ]
         }
       },
@@ -6750,21 +6735,6 @@
               "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "16 bit Received Power",
-                  "Mode:0",
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
               "Result_check": true
             }
           ]
@@ -6796,21 +6766,6 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "16 bit Received Power",
-                  "Mode:4",
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
           ]
         }
       },
@@ -6840,23 +6795,7 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "8 bit Received Power",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
-          ]
-        }
+          ]        }
       },
       "TEST_PTX_CPX_POW_S15_ADC_001": {
         "Certifications": [
@@ -23317,7 +23256,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23327,18 +23266,8 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ReplaceRP":[
-            {
-              "Pkt": [
-                "16 bit Received Power",
-                "Mode:3"
-              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -23357,7 +23286,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23367,18 +23296,8 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ReplaceRP":[
-            {
-              "Pkt": [
-                "16 bit Received Power",
-                "Mode:5"
-              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -23397,7 +23316,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23407,18 +23326,8 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ReplaceRP":[
-            {
-              "Pkt": [
-                "16 bit Received Power",
-                "Mode:6"
-              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -23437,7 +23346,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23447,18 +23356,8 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ReplaceRP":[
-            {
-              "Pkt": [
-                "16 bit Received Power",
-                "Mode:7"
-              ],
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
