@@ -1435,12 +1435,16 @@
           "C:/Users/Eswar/Downloads/SW26_MPP25_V221_010726_182203/SW26_MPP25_V221_010726_182203"
         ],
         "TPT": [
-          "C:/Users/Eswar/Downloads/MPP25-MCPM_18SW_V231_270726_103708/MPP25-MCPM_18SW_V231_270726_103708"
+          "D:/sw19_MPP25_V231_310726_101846/sw19_MPP25_V231_310726_101846",
+          "D:/MPP25_sw19_V231_030826_104724/MPP25_sw19_V231_030826_104724",
+          "C:/Users/Eswar/Downloads/20_Tpr_V231_120826_123527 1\\20_Tpr_V231_120826_123527"
         ]
       },
       "C3": {
         "TPR": [],
-        "TPT": []
+        "TPT": [
+          "C:/GRL/GRL-C3-MP-TPT/Report/118B_S24_V231_050826_155618"
+        ]
       }
     },
     "Offline": 1,
@@ -1460,7 +1464,7 @@
     "StartBtnClick": "12:35:37",
     "TCstatus": "Done"
   },
-  "SWversion": "3.45",
+  "SWversion": "3.46",
   "Switch": "online",
   "Runall": 0,
   "RunEx": false,
@@ -1497,5 +1501,5 @@
     "AutoSync": 0,
     "Status": true
   },
-  "Validation_logs_path": "Offline_validation_Logs/MPP/TPT/MPP25-MCPM_18SW_V231_270726_103708_20260729_105811.log"
+  "Validation_logs_path": "Offline_validation_Logs/C3/TPT/118B_S24_V231_050826_155618_20260814_164000.log"
 }
