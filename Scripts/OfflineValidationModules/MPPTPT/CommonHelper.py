@@ -742,7 +742,7 @@ class CommonCTSChecks:
                         res.append([f'TPT sent Power Transmitter Identification Pkt at {{{PTID[2]}}}','Pass'])
                         result=self.Payload_Details(PacketName="Power Transmitter Identification",Index=PTID[2],PayLoads=Check['PT-ID'],Receiver=False)
                         if len(result)>0:res.extend(result)
-                    else:res.append([f'TPT did not  sent Power Transmitter Identification Pkt ','Inconclusive' ])
+                    # else:res.append([f'TPT did not  sent Power Transmitter Identification Pkt ','Inconclusive' ])
                     # Version select pkt
                     SRQ_VS=self.PktMethod.GetPacketDetails(packet="SRQ [0x20] ",value="Version select", limit=PhaseLimit)
                     if len(SRQ_VS)>2:

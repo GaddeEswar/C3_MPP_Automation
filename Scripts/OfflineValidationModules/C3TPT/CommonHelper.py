@@ -33,8 +33,8 @@ class CommonCTSChecks:
             if TypeCheck=='Packet':
                 count+=1
                 if Check['PktCount']== count:
-                    if self.file_list[id]['pktType'] in Check['ExpPkt']:res.append([f'Prx sent the  {self.file_list[id]['pktType']} as {Check['PktCount']} datapacket.', "Pass"])
-                    else: res.append([f'Prx sent the  {self.file_list[id]['pktType']} as {Check['PktCount']} datapacket.', "Fail"])
+                    if self.file_list[id]['pktType'] in Check['ExpPkt']:res.append([f'Prx sent the  {self.file_list[id]['pktType']} pkt as {Check['desc']} datapacket.', "Pass"])
+                    else: res.append([f'Prx sent the  {self.file_list[id]['pktType']} pkt as {Check['desc']} datapacket.', "Fail"])
                     break
             id+=1
         return res
@@ -63,9 +63,9 @@ class CommonCTSChecks:
             Comb=False
             for exp in Check['comb']:
                 if MajorVersion in exp['Major']:
-                    res.append([f'Prx sent the Major Version as {MajorVersion}  for the Identification datapacket ,Expcted :{','.join(str(i) for i in exp['Major'])}', "Pass"])
+                    res.append([f'Prx sent the Major Version as {MajorVersion}  for the Identification datapacket ,Expected :{','.join(str(i) for i in exp['Major'])}', "Pass"])
                     if MinorVersion in exp['Minor']:
-                        res.append([f'Prx sent the Minor Version as {MinorVersion}  for the Identification datapacket, Expcted :should be in {','.join(str(i) for i in exp['Minor'])}', "Pass"])
+                        res.append([f'Prx sent the Minor Version as {MinorVersion}  for the Identification datapacket, Expected :should be in {','.join(str(i) for i in exp['Minor'])}', "Pass"])
                         Comb=True
                         Pkt_val1=self.PktMethod.hex_to_decimal(self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['MemberCode'])
                         Pkt_val2=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Exp[2],'Manufacturer_Code')[0]['sRawData'])
@@ -428,7 +428,6 @@ class CommonCTSChecks:
     def S18_S20(self, CTSCheck, Check, flows, flwID):
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
-        res=[]
         def checks(id,limit,Vlimit,ping='S18'):
             # find detach time
             self.AllChannelData = self.PlotMethod.GetAllChannelData('2',self.JapiData)
@@ -452,7 +451,6 @@ class CommonCTSChecks:
                
             else:res.append([f'PTx did not Initiated S18 Ping', 'Inconclusive'])
         else:res.append([f'PTx did not Initiated S20 Ping', 'Inconclusive'])
-        res=res
         return res
 
     def ADC_Auth(self, CTSCheck, Check, flows, flwID):
@@ -676,6 +674,98 @@ class CommonCTSChecks:
             id+=1
         if len(DevID)>1: res.append([f'PRx sent the Basic -Device Identifiers {DevID} for the Identification Packets.','Pass' if DevID[0]== DevID[1] else 'Fail'])
         else: res.append([f'Prx did not sent the sufficient Identification packets' ,'Inconclusive'])
+        return res
+
+    def CFG_S06_BPX(self, CTSCheck, Check, flows, flwID):
+
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        CFG=self.PktMethod.GetPacketDetails(packet="Configuration", value="Neg:true",limit=self.Flow_limit)
+        if len(CFG)>2:
+            Response=self.PktResponse(CFG[2]+1,self.Flow_limit[1])
+            if Response is not None:
+                if Response[0] in Check['Response']:
+                    res.append([f'TPT sent {Response[0]} response for the CFG/ep Packet, Expected: {Check["Response"]} ', 'Pass'])
+                    if self.RP8_2nd([Response[1]+1,self.Flow_limit[1]]):
+                        id=Response[1]+1
+                        pkts=" , ".join(Check['Expkts'])
+                        PktsCheck=True
+                        while id < self.Flow_limit[1]:
+                            if self.PktMethod.GetPacketType(id)=='Packet':
+                                pktfound=False
+                                for pkt in Check['Expkts']:
+                                    if pkt in self.file_list[id]['pktType']:
+                                        pktfound=True
+                                        break
+                                if not pktfound : 
+                                    PktsCheck=False
+                                    res.append ([f'PRx sent {self.file_list[id]['pktType']} pkt at index@ {id} which is not in the set {{{pkts}}}','Fail'])
+                            id+=1
+                        if PktsCheck: res.append([f'PRx sent all the Packets which are in the set {{{pkts}}}', 'Pass'])
+                    else:  res.append([f'PRx did not sent second RP8 packet after the CFG/ep Packet', 'Inconclusive'])
+                else:  res.append([f'TPT sent {Response[0]} response for the CFG/ep Packet, Expected:{Check["Response"]}', 'Inconclusive'])
+            else:res.append([f'TPT did not sent Response for the CFG Packet', 'Inconclusive'])  
+        else:res.append([f'Prx did not sent CFG/ep Packet', 'Inconclusive'])
+        return res
+
+    def NEG_S07_BPX(self, CTSCheck, Check, flows, flwID):
+
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        pkt=f'{Check['pkt'][0]}_{Check['pkt'][1]}'
+        FOD=self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1],limit=self.Flow_limit)
+        if len(FOD)>2:
+            res.append([f'PRx sent {pkt} packet at {{{FOD[2]}}}', 'Pass'])
+            Response=self.PktResponse(FOD[2]+1,self.Flow_limit[1])
+            if Response is not None:
+                if Response[0] in Check['Response']:
+                    res.append([f'TPT sent {Response[0]} response for the {pkt} Packet, Expected: {Check["Response"]} ', 'Pass'])
+                    if self.RP8_2nd([Response[1]+1,self.Flow_limit[1]]):
+                        # check if there any other FOD Packets
+                        id=Response[1]+1
+                        Fi=[]
+                        while id <  self.Flow_limit[1]:
+                            NFOD=self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1],limit=[id,self.Flow_limit[1]])
+                            if len(NFOD)>2: 
+                                Fi.append(NFOD[2])
+                                if Check['pkt'][1] in self.file_list[NFOD[2]]['value']:
+                                    res.append([f'PRx sent {pkt} packet at {{{NFOD[2]}}}', 'Pass'])
+                                    Response=self.PktResponse(NFOD[2]+1,self.Flow_limit[1])
+                                    if Response is not None:  res.append([f'TPT sent {Response[0]} response for the {pkt} Packet, Expected: {Check["Response"]} ', 'Pass' if Response[0] in Check['Response'] else 'Inconclusive' ])
+                                    else:res.append([f'TPT did not sent Response for the {pkt} Packet', 'Inconclusive'])
+                                id=NFOD[2]+1
+                            else:break    
+                        iid =FOD[2] + 1
+                        pkts = " , ".join(Check['Expkts'])
+                        PktsCheck = True
+                        pktfound=False
+                        count=0
+                        while iid < self.Flow_limit[1]:
+                            if self.PktMethod.GetPacketType(iid) == 'Packet':
+                                count+=1
+                                # Check whether current packet is a FOD packet
+                                if iid in Fi:
+                                    if pktfound: 
+                                        PktsCheck =False
+                                        res.append([f'PRx sent FOD packet at index@ {iid} after a packet from the set {{{pkts}}} was already received', 'Fail'])
+                                else:
+                                    # Check that it belongs to the allowed packet set.
+                                    pktfound = True
+                                    setpkt=False
+                                    for pkt in Check['Expkts']:
+                                        if pkt in  self.file_list[iid]['pktType']:
+                                            setpkt = True
+                                            break
+                                    if not setpkt:
+                                        PktsCheck = False
+                                        res.append([f'PRx sent {self.file_list[iid]['pktType']} pkt at index@ {iid} which is not in the set {{{pkts}}}', 'Fail'])    
+                            iid += 1
+                        if count <0:res.append([f'PRx did not sent any packets', 'Inconclusive'])
+                        elif PktsCheck:res.append([f'PRx sent all the Packets which are in the set {{{pkts}}}', 'Pass'])
+                    else:  res.append([f'PRx did not sent second RP8 packet after the {pkt} Packet', 'Inconclusive'])
+                else:  res.append([f'TPT sent {Response[0]} response for the {pkt} Packet, Expected:{Check["Response"]}', 'Inconclusive'])
+            else:res.append([f'TPT did not sent Response for the {pkt}  Packet', 'Inconclusive'])  
+        else:res.append([f'PRx did not sent {pkt} Packet', 'Inconclusive'])
         return res
      
     def DataPktsCheck(self, CTSCheck, Check, flows, flwID):
