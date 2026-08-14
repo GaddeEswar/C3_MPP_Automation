@@ -6708,21 +6708,6 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "Control Error",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
           ]
         }
       },
@@ -6750,21 +6735,6 @@
               "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "16 bit Received Power",
-                  "Mode:0",
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
               "Result_check": true
             }
           ]
@@ -6796,21 +6766,6 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "16 bit Received Power",
-                  "Mode:4",
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
           ]
         }
       },
@@ -6840,23 +6795,7 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "8 bit Received Power",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
-          ]
-        }
+          ]        }
       },
       "TEST_PTX_CPX_POW_S15_ADC_001": {
         "Certifications": [
@@ -8141,53 +8080,10 @@
                   }
                 }
               ],
-              "PktsCount": 10,
+              "Pchtime": 50,
               "RegulationLimit": [
                 6.86,
                 7.14
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Result_check": true
-            }
-          ],
-          "PreviousPacket": [
-            {
-              "PreviousPacket": [
-                "Power control hold off",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Power_Control_Hold_Off_Time",
-                    "Byte": "B0",
-                    "Bit": "[7:0]",
-                    "Exp": [
-                      50
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
-              ],
-              "EndPacket": [
-                "Configuration",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Count",
-                    "Byte": "B2",
-                    "Bit": "[2:0]",
-                    "Exp": [
-                      1
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
               ],
               "flow": 1,
               "CheckSEQ": 1,
@@ -8280,53 +8176,10 @@
                   }
                 }
               ],
-              "PktsCount": 10,
+              "Pchtime": 50,
               "RegulationLimit": [
                 6.86,
                 7.14
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Result_check": true
-            }
-          ],
-          "PreviousPacket": [
-            {
-              "PreviousPacket": [
-                "Power control hold off",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Power_Control_Hold_Off_Time",
-                    "Byte": "B0",
-                    "Bit": "[7:0]",
-                    "Exp": [
-                      50
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
-              ],
-              "EndPacket": [
-                "Configuration",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Count",
-                    "Byte": "B2",
-                    "Bit": "[2:0]",
-                    "Exp": [
-                      1
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
               ],
               "flow": 1,
               "CheckSEQ": 1,
@@ -8419,53 +8272,10 @@
                   }
                 }
               ],
-              "PktsCount": 10,
+              "Pchtime": 50,
               "RegulationLimit": [
                 6.86,
                 7.14
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Result_check": true
-            }
-          ],
-          "PreviousPacket": [
-            {
-              "PreviousPacket": [
-                "Power control hold off",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Power_Control_Hold_Off_Time",
-                    "Byte": "B0",
-                    "Bit": "[7:0]",
-                    "Exp": [
-                      50
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
-              ],
-              "EndPacket": [
-                "Configuration",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Count",
-                    "Byte": "B2",
-                    "Bit": "[2:0]",
-                    "Exp": [
-                      1
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
               ],
               "flow": 1,
               "CheckSEQ": 1,
@@ -8558,53 +8368,10 @@
                   }
                 }
               ],
-              "PktsCount": 10,
+              "Pchtime": 50,
               "RegulationLimit": [
                 11.76,
                 12.24
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Result_check": true
-            }
-          ],
-          "PreviousPacket": [
-            {
-              "PreviousPacket": [
-                "Power control hold off",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Power_Control_Hold_Off_Time",
-                    "Byte": "B0",
-                    "Bit": "[7:0]",
-                    "Exp": [
-                      50
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
-              ],
-              "EndPacket": [
-                "Configuration",
-                null,
-                true,
-                [
-                  {
-                    "Name": "Count",
-                    "Byte": "B2",
-                    "Bit": "[2:0]",
-                    "Exp": [
-                      1
-                    ],
-                    "comp": "EQL",
-                    "Type": "DEC",
-                    "Result_check": true
-                  }
-                ]
               ],
               "flow": 1,
               "CheckSEQ": 1,
@@ -8869,17 +8636,18 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "Tstabilize": [
+          "VoltageRegulation": [
             {
               "Pkt": [
                 "Control Error",
                 "+60"
               ],
-              "PktsCount": 10,
+              "Pchtime": 100,
               "RegulationLimit": [
                 6.86,
                 7.14
               ],
+              "Tstabilize": true,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -10957,11 +10725,107 @@
                 true,
                 [
                   {
+                    "Name": "Power_Class",
+                    "Byte": "B0",
+                    "Bit": "[7:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
                     "Name": "Maximum_Power_Value",
                     "Byte": "B0",
                     "Bit": "[5:0]",
                     "Exp": [
                       10
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B1",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Zero",
+                    "Byte": "B2",
+                    "Bit": "[7:7]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Authentication",
+                    "Byte": "B2",
+                    "Bit": "[6:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Reserved",
+                    "Byte": "B2",
+                    "Bit": "[5:5]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "OutofBand",
+                    "Byte": "B2",
+                    "Bit": "[4:4]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Zero",
+                    "Byte": "B2",
+                    "Bit": "[3:3]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Count",
+                    "Byte": "B2",
+                    "Bit": "[2:0]",
+                    "Exp": [
+                      0
                     ],
                     "comp": "EQL",
                     "Type": "DEC",
@@ -11003,6 +10867,54 @@
                     "Type": "DEC",
                     "Inconclusive_Check": true,
                     "Result_check": true
+                  },
+                  {
+                    "Name": "Polarity",
+                    "Byte": "B4",
+                    "Bit": "[6:6]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Depth",
+                    "Byte": "B4",
+                    "Bit": "[5:4]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Buffer Size",
+                    "Byte": "B4",
+                    "Bit": "[3:1]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "Dup",
+                    "Byte": "B4",
+                    "Bit": "[0:0]",
+                    "Exp": [
+                      0
+                    ],
+                    "comp": "EQL",
+                    "Type": "DEC",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
                   }
                 ]
               ],
@@ -11033,7 +10945,33 @@
               "pkt": [
                 "WPID(0x54)",
                 null,
-                false
+                true,
+                [
+                  {
+                    "Name": "WPID",
+                    "Byte": "B0_B2",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x238EA1"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "CRC",
+                    "Byte": "B3_B4",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x53C6"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  }
+                ]
               ],
               "Tterminate": [
                 0,
@@ -11062,7 +11000,33 @@
               "pkt": [
                 "WPID(0x55)",
                 null,
-                false
+                true,
+                [
+                  {
+                    "Name": "WPID",
+                    "Byte": "B0_B2",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x238EA1"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  },
+                  {
+                    "Name": "CRC",
+                    "Byte": "B3_B4",
+                    "Bit": "[7:0]",
+                    "Exp": [
+                      "0x53C6"
+                    ],
+                    "comp": "EQL",
+                    "Type": "String",
+                    "Inconclusive_Check": true,
+                    "Result_check": true
+                  }
+                ]
               ],
               "Tterminate": [
                 0,
@@ -22566,32 +22530,10 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "ReplacedPkt": [
+          "Nego_ABT": [
             {
-              "ExpectedPacket": [
-                "Configuration",
-                "Neg:true"
-              ],
-              "ReplacedPktCount": [
-                2
-              ],
               "flow": 1,
               "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "8 bit Received Power",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
               "Result_check": true
             }
           ]
@@ -22608,32 +22550,10 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "ReplacedPkt": [
+          "Nego_ABT": [
             {
-              "ExpectedPacket": [
-                "Configuration",
-                "Neg:true"
-              ],
-              "ReplacedPktCount": [
-                2
-              ],
               "flow": 1,
               "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ],
-          "ExpectedPackets": [
-            {
-              "ExpectedPacket": [
-                [
-                  "8 bit Received Power",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
               "Result_check": true
             }
           ]
@@ -22662,19 +22582,7 @@
               "CheckSEQ": 2,
               "Result_check": true
             }
-          ],
-          "NotPackets": [
-            {
-              "ExpectedPacket": [
-                "16 bit Received Power",
-                "Mode:0"
-              ],
-              "PktsCount": 1,
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Result_check": true
-            }
-          ]
+            ]
         }
       },
       "TEST_PTX_CPX_POW_S13_RP0_001": {
@@ -23328,7 +23236,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23338,6 +23246,7 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
               "flow": 1,
               "CheckSEQ": 1,
@@ -23357,7 +23266,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23367,6 +23276,7 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
               "flow": 1,
               "CheckSEQ": 1,
@@ -23386,7 +23296,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23396,6 +23306,7 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
               "flow": 1,
               "CheckSEQ": 1,
@@ -23415,7 +23326,7 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "PktReponses": [
+          "ReplaceRP": [
             {
               "Pkt": [
                 "16 bit Received Power",
@@ -23425,6 +23336,7 @@
                 "ATN",
                 "ND"
               ],
+              "pktcount": 5,
               "Timing": false,
               "flow": 1,
               "CheckSEQ": 1,
@@ -35185,7 +35097,7 @@
                 "16 bit Received Power",
                 "Mode:4"
               ],
-              "PktsCount": 2,
+              "PktsCount": 1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -39561,101 +39473,12 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "ExpectedPackets": [
+          "Nego_fod": [
             {
-              "ExpectedPacket": [
-                [
-                  "Control Error",
-                  null,
-                  2
-                ]
-              ],
               "flow": 1,
               "CheckSEQ": 2,
               "Inconclusive": false,
               "Result_check": true
-            }
-          ],
-          "SeqRespTimng": [
-            {
-              "StartPacket": [
-                "Configuration",
-                "Neg:true",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "FOD Status",
-                  "Rf",
-                  false,
-                  [
-                    {
-                      "ResponseCheck": false,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ],
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ],
-                [
-                  "FOD Status",
-                  "Qf",
-                  false,
-                  [
-                    {
-                      "ResponseCheck": false,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ],
-                        [
-                          "NAK",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
-                  ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
             }
           ]
         }
@@ -39671,90 +39494,35 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "ExpectedPackets": [
+          "Nego_WID": [
             {
-              "ExpectedPacket": [
-                [
-                  "Control Error",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
-          ],
-          "SeqRespTimng": [
-            {
-              "StartPacket": [
-                "Configuration",
-                "Neg:true",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "WPID(0x54)",
-                  null,
-                  true,
-                  [
-                    {
-                      "Name": "WPID",
-                      "Byte": "B0_B2",
-                      "Bit": "[7:0]",
-                      "Exp": [
-                        "0x5EF83A"
-                      ],
-                      "comp": "EQL",
-                      "Type": "String"
-                    },
-                    {
-                      "Name": "CRC",
-                      "Byte": "B3_B4",
-                      "Bit": "[7:0]",
-                      "Exp": [
-                        "0x59B2"
-                      ],
-                      "comp": "EQL",
-                      "Type": "String"
-                    }
+              "pkt": "WPID(0x54)",
+              "PayLoad": [
+                {
+                  "Name": "WPID",
+                  "Byte": "B0_B2",
+                  "Bit": "[7:0]",
+                  "Exp": [
+                    "0x5EF83A"
                   ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ],
-                        [
-                          "ND",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
+                  "comp": "EQL",
+                  "Type": "String"
+                },
+                {
+                  "Name": "CRC",
+                  "Byte": "B3_B4",
+                  "Bit": "[7:0]",
+                  "Exp": [
+                    "0x59B2"
                   ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
+                  "comp": "EQL",
+                  "Type": "String"
+                }
               ],
+              "Exp": "ACK or ND",
               "flow": 1,
               "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
+              "Result_check": true
             }
           ]
         }
@@ -39770,90 +39538,35 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "ExpectedPackets": [
+          "Nego_WID": [
             {
-              "ExpectedPacket": [
-                [
-                  "Control Error",
-                  null,
-                  2
-                ]
-              ],
-              "flow": 1,
-              "CheckSEQ": 2,
-              "Inconclusive": false,
-              "Result_check": true
-            }
-          ],
-          "SeqRespTimng": [
-            {
-              "StartPacket": [
-                "Configuration",
-                "Neg:true",
-                false
-              ],
-              "ExpectedPacket": [
-                [
-                  "WPID(0x55)",
-                  null,
-                  true,
-                  [
-                    {
-                      "Name": "WPID",
-                      "Byte": "B0_B2",
-                      "Bit": "[7:0]",
-                      "Exp": [
-                        "0x34E631"
-                      ],
-                      "comp": "EQL",
-                      "Type": "String"
-                    },
-                    {
-                      "Name": "CRC",
-                      "Byte": "B3_B4",
-                      "Bit": "[7:0]",
-                      "Exp": [
-                        "0x940F"
-                      ],
-                      "comp": "EQL",
-                      "Type": "String"
-                    }
+              "pkt": "WPID(0x55)",
+              "PayLoad": [
+                {
+                  "Name": "WPID",
+                  "Byte": "B0_B2",
+                  "Bit": "[7:0]",
+                  "Exp": [
+                    "0x34E631"
                   ],
-                  [
-                    {
-                      "ResponseCheck": true,
-                      "ExpResp": [
-                        [
-                          "ACK",
-                          null,
-                          false
-                        ],
-                        [
-                          "ND",
-                          null,
-                          false
-                        ]
-                      ],
-                      "Result_check": true
-                    }
+                  "comp": "EQL",
+                  "Type": "String"
+                },
+                {
+                  "Name": "CRC",
+                  "Byte": "B3_B4",
+                  "Bit": "[7:0]",
+                  "Exp": [
+                    "0x940F"
                   ],
-                  [
-                    {
-                      "TimingCheck": false,
-                      "ExpTime": [
-                        6.5,
-                        3.5
-                      ],
-                      "Result_check": true
-                    }
-                  ]
-                ]
+                  "comp": "EQL",
+                  "Type": "String"
+                }
               ],
+              "Exp": "ACK or ND",
               "flow": 1,
               "CheckSEQ": 1,
-              "Phase": "Nego",
-              "Result_check": true,
-              "Pktretry": true
+              "Result_check": true
             }
           ]
         }
@@ -47886,7 +47599,7 @@
                       "ResponseCheck": true,
                       "ExpResp": [
                         [
-                          "Extended capabilities",
+                          "Power Transmitter Extended Capability",
                           null,
                           false
                         ]

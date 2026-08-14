@@ -276,7 +276,7 @@ class TestValidation():
                                 index = self.Findflow([start,end]) if self.Product=='MPP' else 1
                                 packets[cnt]={"Limit":[start,end],"Flow":index}
                             else: # Eswar 
-                                if self.mode=='TPR' and self.Product=='C3' and self.Header['ChapterName'] in ['In_Power_Transfer_Tests']:
+                                if self.mode=='TPR' and self.Product=='C3' and (self.Header['ChapterName'] in ['In_Power_Transfer_Tests'] or self.TestID in ['TEST_PTX_CPX_PNG_S01_TIM_001','TEST_PTX_CPX_PNG_S01_SIG_001']):
                                     if end-start >1:
                                         cnt +=1
                                         packets[cnt]={"Limit":[start,end],"Flow":1}
