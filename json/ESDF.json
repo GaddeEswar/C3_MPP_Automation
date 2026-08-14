@@ -158,138 +158,63 @@
       "Esdf_Elements": [
         {
           "Field": "SchemaVersion",
-          "unit": "",
-          "Value": "1.0"
+          "Value": "3.0",
+          "unit": ""
         },
         {
-          "Field": "ApplicantName",
-          "unit": "",
-          "Value": ""
+          "Field": "DutInfo",
+          "Value": {
+            "DutType": "PRx",
+            "BrandName": "",
+            "MemberCode": "0x010E",
+            "ProductName": "",
+            "PartNumber": "",
+            "QiId": "",
+            "SerialNumber": "",
+            "PowerProfile": "MPP25",
+            "SpecificationSupported": "2.3.1",
+            "PRx": {
+              "AuthenticationSupport": false,
+              "OBSupport": false,
+              "DupSupport": false,
+              "NegotiationSupport": false,
+              "WPIDSupport": false,
+              "SupportedPTxPROPDataPackets": [
+                "None"
+              ],
+              "XIDDataPacketSupport": false,
+              "PCHDataPacketSupport": false,
+              "SupportedOptionalProtocols": [
+                "None"
+              ],
+              "GuaranteedLoadPower": 15.0,
+              "RestrictedModeSupport": false,
+              "RestrictedToFullMode": false,
+              "CloakSupport": false,
+              "SupportedCloakReasons": [
+                "None"
+              ],
+              "CloakRetryCount": 1,
+              "DetectPingSupport": false,
+              "SupportedOptionalGetRequests": [
+                "None"
+              ],
+              "SRQVerSelSupport": false,
+              "DPLOSSCalibrationSupport": false,
+              "SupportedPowerModes": "None",
+              "MagneticCoverType": "N/A"
+            }
+          },
+          "unit": ""
         },
         {
-          "Field": "ProductName",
-          "unit": "",
-          "Value": ""
-        },
-        {
-          "Field": "PartNumber",
-          "unit": "",
-          "Value": ""
-        },
-        {
-          "Field": "QIID",
-          "unit": "",
-          "Value": ""
-        },
-        {
-          "Field": "SupportedSpecification",
-          "unit": "",
-          "Value": "2.2.1"
-        },
-        {
-          "Field": "PowerProfile",
-          "unit": "",
-          "Value": "MPP25"
-        },
-        {
-          "Field": "ManufacturerCode",
-          "unit": "",
-          "Value": "0x010E"
-        },
-        {
-          "Field": "AuthenticationSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "OBSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "DupSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "NegotiationSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "WPIDSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "SupportedPROPDataPackets",
-          "unit": "",
-          "Value": []
-        },
-        {
-          "Field": "XIDDataPacketSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "PCHDataPacketSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "SupportedProtocols",
-          "unit": "",
-          "Value": []
-        },
-        {
-          "Field": "GuaranteedLoadPower",
-          "unit": "W",
-          "Value": 15
-        },
-        {
-          "Field": "RestrictedToFullMode",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "CloakSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "SupportedCloakReasons",
-          "unit": "",
-          "Value": []
-        },
-        {
-          "Field": "CloakRetryCount",
-          "unit": "",
-          "Value": 1
-        },
-        {
-          "Field": "DetectPingSupport",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "SupportedGetRequests",
-          "unit": "",
-          "Value": []
-        },
-        {
-          "Field": "PRxSupportsDeltaPloss",
-          "unit": "",
-          "Value": false
-        },
-        {
-          "Field": "PRxSupportedSRQRequests",
-          "unit": "",
-          "Value": []
-        },
-        {
-          "Field": "PRxSupportedPowerModes",
-          "unit": "",
-          "Value": []
+          "Field": "DigitalSignatureInfoESDF",
+          "Value": {
+            "EncryptedHash256Bits": "clB1W4wkS7uuqtzd3d+Ian6Qa0KzDudkKxXvWwXB8JzAPmmhnoQTys+QsMjR2jS+De8RHon7sJWkPPEnInpVg/+jcqGYrQSM9Pn8EAA4BWnt6/yKnBZkVtTCUgmNCxQp2fFfRdbExRjwv/5YaqIb444hhr7dJVqupwLJndk6t108SnTIBulxpQhOBqQ3ErmpfKQuiKaeJD+s27+LGvo2/QHtQ8M7fymCBYz/crEliqaMoJMmlyQuTn0CyylwDlIZoXZX92acHop3mIDdj16Upmyuwhfo+S0wI9tDssUIVkDDJDHvs28EGfPxNdGBfXdywqKdmOqPbAVmc1oxdPX+UA==",
+            "ESDFPublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvSPpZZ4r5zhM3rlaS75i33l6wgQjk9YR1y/QV6+r2NoJS8I17dLZrqk6ivSCgOkRT08/wNUvAUO6vuvaSKo5mG9AalzwVA1EM5FOaaWxYqs3mSnIqft1leL8Q/DHx1A4RFW/SVq+3n8WXV0w+NW4p33yH3eLKD6O3aeCBj9kgkOammeu5uYqcPpu/UQd4tcTEuwE6d1Mcyf6VeBK4J9DMDAcrY43mWc4s/3Vh4AJQXs/iEtqxxlpk8Zv0BNoucomkbw8ZsvdGW+FcnCmcCvBsWBZhI/PZflQGr7FNcsL2LHGQxeIZ1epNzCeTcyVcjZjnNuBcGBL1kymOwOyGN5NPQIDAQAB",
+            "TimeStamp": "2026-08-04T12:34:34Z"
+          },
+          "unit": ""
         }
       ],
       "isFromEdit": false

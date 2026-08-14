@@ -991,6 +991,7 @@ class Run(MPPGUI):
         except Exception as e:
             self.update_logs("UI",f"Exception:{e}")
         # self.CreateProjectByPopUp()
+
     def LoadESDFFile(self):
         try:
             VerifyESDF = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutVerifyEsdfData'])
@@ -1002,8 +1003,10 @@ class Run(MPPGUI):
                 MainESDF = JsonOperations('json/ESDF.json')
                 
                 MainESDFData = MainESDF.read_file()
-           
-                rawdata = self.Esdf_converter(ESDFData)
+                
+                # rawdata = self.Esdf_converter(ESDFData)
+                converter = EsdfConverter()
+                rawdata = converter.convert(ESDFData)
                 MainESDFData[self.master.Product][self.master.Mode]['Esdf_Elements'] = rawdata['Esdf_Elements']
                 MainESDF.update_file(MainESDFData)
                 
@@ -3622,6 +3625,80 @@ class Reports(MPPGUI):
                     write = csv.writer(csvfile)
                     write.writerow(fields)
                     write.writerows(rows)
+
+class EsdfConverter:
+    FIELD_UNITS = {"GuaranteedLoadPower": "W","PotentialLoadPower": "W","PotentialLoadPowerEP": "W"}
+
+    FIELD_RENAME = {"BrandName": "ApplicantName","QiId": "QIID"}
+
+    @staticmethod
+    def _clean_value(value):
+        """Clean values before conversion."""
+
+        # Convert ["None"] -> []
+        if isinstance(value, list) and value == ["None"]:
+            return []
+
+        # Convert 15.0 -> 15
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+
+        return value
+
+    def flatten_esdf(self, data):
+        """
+        Converts nested ESDF JSON into a flat dictionary.
+        Supports PRx/PTx/MPTx automatically.
+        """
+        flat = {}
+        def recurse(obj):
+            if not isinstance(obj, dict):
+                return
+
+            for key, value in obj.items():
+                # Skip Digital Signature section
+                if key == "DigitalSignatureInfoESDF":
+                    continue
+
+                # Skip DutType (only used to locate device section)
+                if key == "DutType":
+                    continue
+
+                # Rename fields if required
+                field = self.FIELD_RENAME.get(key, key)
+                if isinstance(value, dict):
+                    recurse(value)
+                else:
+                    flat[field] = self._clean_value(value)
+        recurse(data)
+        return flat
+
+    def Esdf_converter(self, input_data):
+        """
+        Converts flat dictionary into ESDF_Elements format.
+        """
+
+        output = {
+            "Esdf_Elements": [],
+            "isFromEdit": False
+        }
+
+        for key, value in input_data.items():
+
+            output["Esdf_Elements"].append({
+                "Field": key,
+                "Value": value,
+                "unit": self.FIELD_UNITS.get(key, "")
+            })
+
+        return output
+
+    def convert(self, esdf_json):
+        """
+        Complete conversion.
+        """
+        flat_data = self.flatten_esdf(esdf_json)
+        return self.Esdf_converter(flat_data)
 
 class Menu(tk.Frame):   
     def __init__(self, master, height=650, bg=None, width=100, x=0,y=0,grid=None):
