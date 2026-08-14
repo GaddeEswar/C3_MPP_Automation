@@ -300,7 +300,7 @@ class CommonCTSChecks:
                 if count%3==2:
                     RP8=self.PktMethod.GetPacketDetails(packet="8 bit Received Power", limit=[id,self.Flow_limit[1]])
                     if len(RP8)>2:
-                        res.append([f'TPR sent 8-Bit Received_Power packet at {{{RP8[2]}}} after 3 RP packets','Pass'])
+                        res.append([f'TPR sent 8-Bit Received_Power packet at index@ {RP8[2]} after 3 RP packets','Pass'])
                         id=RP8[2]+1
                         RP8Check=True
                         last_RP8=RP8
@@ -1231,7 +1231,7 @@ class CommonCTSChecks:
                 id=ExpectedPacket_Details[2]+1
             else:id+=1
         if pktCount <= Check['PktsCount']: 
-            if Check['PktsCount']==1:res.append([f'TPR did not sent the {DataPacket} data packet atleast one time.','Pass'])
+            if Check['PktsCount']==1:res.append([f'TPR can not send second {DataPacket} data packet.','Pass'])
             else:res.append([f'TPR did not sent the {DataPacket} data packet more than {Check['PktsCount']} times.','Pass'])
                         
         return res
@@ -1457,8 +1457,9 @@ class CommonCTSChecks:
             CE2=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],value=Check['Pkt'][1], limit=[CE[2]+1,self.Flow_limit[1]])
             if len(CE2)>2:
                 Tinterval=round((CE2[0]-CE[0])*1000,2)
-                res.append([f'Measured timing from {CE[0]} at index@ {CE[2]} to {CE2[0]} at index@ {CE2[2]} is {Tinterval}mS Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
-            else:res.append([f'Test did not found next {Check['Pkt'][0]} data packet','Inconclusive'])
+                res.append([f'TPR sent second {Check['Pkt'][0]} data packet at index@ {CE2[2]}', 'Pass'])
+                res.append([f'Measured timing from {round(CE[0],3)}_sec  to {round(CE2[0],3)}_sec  is {Tinterval}_mS , Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
+            else:res.append([f'TPR sent only one {Check['Pkt'][0]} data packet','Fail'])
         else:res.append([f'Test did not entered PT phase','Inconclusive'])
 
         return res
@@ -1485,6 +1486,40 @@ class CommonCTSChecks:
                         else:res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}','Fail'])
                 id=Pkt[2]+1
             else:id+=1
+        return res
+
+    def ReplaceRP(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        self.Flow_limit = flows[flwID]['Limit']
+        resp_count=0
+        phaseCheck=self.CheckPhase(self.Flow_limit[0],"PT")
+        if phaseCheck is not None:
+            id=phaseCheck
+            while id < self.Flow_limit[1]:
+                RP0 = self.PktMethod.GetPacketDetails(packet='16 bit Received Power',value='Mode:0' ,limit=[id,self.Flow_limit[1]])
+                if len(RP0)>2:
+                    flag=True
+                    iid=RP0[2]+1
+                    while iid < self.Flow_limit[1]:
+                        rp =self.PktMethod.GetPacketDetails(packet='16 bit Received Power',limit=[iid,self.Flow_limit[1]])
+                        if len(rp)>2:
+                            if Check['Pkt'][1] in self.file_list[rp[2]]['value']:
+                                res.append([f'TPR sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]} after RP/0 at index@ {RP0[2]}', 'Pass'])
+                                resp=self.PktMethod.GetPacketResponse2(rp[2],[rp[2]+1,self.Flow_limit[1]])
+                                if resp is not None:
+                                    resp_count+=1
+                                    res.append([f'PTx sent {self.file_list[resp]["pktType"]} response, Exp: {Check['response']}', 'Pass' if self.file_list[resp]["pktType"] in Check['response'] else 'Fail'])
+                                else: res.append([f'PTx did not sent any response for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]}', 'Inconclusive'])
+                            else: 
+                                res.append([f'TPR did not sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet after RP/0 at index@ {RP0[2]}', 'Inconclusive'])
+                                flag=False
+                            id=rp[2]+1
+                        else: flag=False
+                        break
+                    if not flag: break
+                else:break
+            if resp_count < Check['pktcount']:  res.append([f'TPR logged {resp_count} responses for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packets, Limit at least {Check['pktcount']} responses within one minute', 'Inconclusive'])
+        else:res.append([f'TPR did not entered in to PT phase','Inconclusive'])
         return res
 
     def RP_Response(self,CTSCheck,Check,flows,flwID):
@@ -1692,6 +1727,14 @@ class CommonCTSChecks:
                 # Find the Power level 
                 Prect=round(vrect[0]*(self.CalculateVoltTwindow(CE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
                 res.append([f"Measured regualated Load power is {Prect}W at index@ {CE[2]}", "Fail" if Prect < Check['PowerLimit'][1][0] or Prect > Check['PowerLimit'][1][1] else "Pass"])
+                #Check CE packets and voltage regulation if there is no Load  assertion for Test_ID= "Guaranteed_Load_Power_23d_2"
+            elif self.Header['TestcaseID'] in ['Guaranteed_Load_Power_23d_2']:
+                pkt = self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
+                if len(pkt)>2:
+                    PktsCountBefore=self.CECount(Limit=[Regulated[2],pkt[2]],value=["+1","0","-1"])
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
+                    res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
+
             # Check the Appropriate Loads applied or not
             id=Regulated[2]+1
             for Load in Check['Loads']:
