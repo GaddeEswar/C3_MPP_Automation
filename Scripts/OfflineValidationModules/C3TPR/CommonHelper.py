@@ -1358,14 +1358,31 @@ class CommonCTSChecks:
                         continue
                     else:
                         if "SRQ [0x20]" in self.file_list[id]['pktType'] and "Re ping delay" in self.file_list[id]['value']:
-                            res.append([f'TPR sent SRQ/rep packet at index@ {{{id}}}','Pass'])
+                            res.append([f'TPR sent SRQ/rep packet at index@ {id}','Pass'])
                             reping_time=float(self.file_list[id]['value'].split(":")[1].split('Re-Ping value')[1].replace('}',''))/5
 
                             if 'REP_002' in self.Header['TestcaseID']:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time== 12.4 else 'Inconclusive'])
                             else:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time >=0.2 and reping_time <=12.6 else 'Inconclusive'])
+                            # Add check to validate the SRQ/rep response.
+                            id+=1
+                            while id < self.Flow_limit[1]:
+                                if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
+                                    if 'ACK' in self.file_list[id]['pktType']: res.append([f'PTx sent ACK response for SRQ/rep data packet at index@ {id}','Pass'])
+                                    else: res.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/rep data packet at index@ {id}','Fail'])
+                                    break
+                                elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
+                                    if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
+                                        id+=1
+                                        continue
+                                    else:
+                                        res.append(f"TPR sent {self.file_list[id]['pktType']} data packet, Exp: SRQ/rep", 'Inconclusive')
+                                        break
+                                else:
+                                    res.append(f"PTx did not sent response for SRQ/rep data packet")
+                                    break
                             break
                         else:
-                            res.append([f'TPR did not sent SRQ/rep packet at index@ {{{id}}} after SRQ/rpr', 'Inconclusive']) 
+                            res.append([f'TPR did not sent SRQ/rep packet at index@ {id} after SRQ/rpr', 'Inconclusive']) 
                             break
                 else:id+=1
             # find SRQ/ en packet
@@ -1374,11 +1391,11 @@ class CommonCTSChecks:
                 id=SRQ_En[2]+1
                 while id < self.Flow_limit[1]:
                     if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
-                        res.append([f'TPR sent SRQ/en packet at index@ {{{SRQ_En[2]}}}','Pass'])
+                        res.append([f'TPR sent SRQ/en packet at index@ {SRQ_En[2]}','Pass'])
                         count=float(self.file_list[SRQ_En[2]]['value'].split(":")[1].replace('}',''))
-                        res.append([f'End_Negotiation count was set to {{{count}}}, Exp: 2','Pass' if count==2 else 'Inconclusive'])
-                        if 'ACK' in self.file_list[id]['pktType']: res.append([f'Received ACK for SRQ/en packet at index@ {{{id}}}','Pass'])
-                        else:res.append([f'PTx sent {self.file_list[id]['pktType']} at index@ {{{id}}}','Fail'])
+                        res.append([f'End_Negotiation count was set to {count}, Exp: 2','Pass' if count==2 else 'Inconclusive'])
+                        if 'ACK' in self.file_list[id]['pktType']: res.append([f'PTx sent ACK response for SRQ/en data packet at index@ {id}','Pass'])
+                        else:res.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/en data packet at index@ {id}','Fail'])
                         break
                     elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
                         if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'End Negotiation' in self.file_list[id]['value']:
@@ -1386,7 +1403,7 @@ class CommonCTSChecks:
                             id+=1
                             continue
                         else:
-                            res.append([f'PTx did not sent response for SRQ/En packet at index@ {{{SRQ_En[2]}}}', 'Inconclusive'])
+                            res.append([f'PTx did not sent response for SRQ/En packet at index@ {SRQ_En[2]}', 'Inconclusive'])
                             break
                     else:id+=1
                 
