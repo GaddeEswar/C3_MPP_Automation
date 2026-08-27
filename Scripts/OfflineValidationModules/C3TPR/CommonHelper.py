@@ -1281,7 +1281,12 @@ class CommonCTSChecks:
                                     if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
                                         id+=1
                                         continue
-                                else:break
+                                    else:
+                                        res.append(f"TPR sent {self.file_list[id]['pktType']} data packet, Exp: SRQ/rep", 'Inconclusive')
+                                        break
+                                else:
+                                    res.append(f"PTx did not sent response for SRQ/rep data packet")
+                                    break
                             break
                         else:
                             res.append([f'TPR did not sent SRQ/rep packet at index@ {id} after SRQ/rpr', 'Inconclusive']) 
