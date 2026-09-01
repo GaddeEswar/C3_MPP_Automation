@@ -59,6 +59,62 @@ class CommonCTSChecks():
         ChkRes = CommonMethods.check_measure(Check['expected'], Tout, Check['comp'])
         res.append([f"The Measured Ttimeout between Extended_Control_Error and Shutdown is: {ChkRes[3]} S, Limit: {ChkRes[2]}", ChkRes[1]])
         return res
+    def Monitor_EPT(self, Flow_limit, Check):
+        res = []
+
+        ideal_pkt = self.PktMethod.GetPacketDetails(packet="MPP_XCEV_Ideal",limit=Flow_limit,Type="TesterMsg")
+        if len(ideal_pkt) > 2:
+            # ept = self.PktMethod.GetPacketDetails(packet="End Power Transfer",limit=[ideal_pkt[2],Flow_limit[1]])
+            sd = self.PktMethod.GetPacketDetails(packet="Shutdown",limit=[ideal_pkt[2],len(self.file_list)-1],Type="TesterMsg")
+            if len(sd)>2:
+                res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
+                tdiff1 = round(sd[1] - ideal_pkt[1],3)
+                if tdiff1 <= 5:
+                   res.append([f"Power removed after {tdiff1} seconds from the stabilization.", "Pass"]) 
+
+                else:
+                    ept = self.PktMethod.GetPacketDetails(packet="End Power Transfer",limit=[ideal_pkt[2],Flow_limit[1]])
+                    if len(ept)>2:
+                        res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", "Pass"])
+                        tdiff2 = round(ept[1] - ideal_pkt[1],3)
+                        res.append([f"Power removed after {tdiff2} seconds from the stabilization.", "Pass"]) 
+                    else: 
+                        res.append(["TPR didn't sent End Power Transfer packet after 5 min from stabilization", "Fail"])
+            else: res.append([f"Power not removed.", "Fail"])
+        else:
+            res.append(["Stabilization not found.", "Fail"])
+            
+
+
+
+
+        #     if len(sd)>2 or len(ept)>2:
+        #         if len(ept)>2:
+        #             res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", "Pass"])
+        #         elif len(sd)>2:
+        #             res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
+
+        #         tdiff = round(max(sd[0],ept[0]) - ideal_pkt[1],3)
+        #         if tdiff>=5:
+        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", "Pass"])   
+        #         else:
+        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", "Fail"])
+
+        #     else: 
+        #         res.append(["End Power Transfer not happened after stabilization", "Fail"])
+        # else: 
+        #     res.append(["Extended Control Error packet not found after stabilization", "Fail"])
+                
+                
+                
+            # if len(ept) > 2:
+            #     res.append([f"End Power Transfer (EPT/rst) found at {round(ept[0],3)} sec", "Pass"])
+            # else: res.append([f"End Power Transfer (EPT/rst) not found", "Fail"])
+        
+
+
+
+        return res
     def Vrect_ping(self, Flow_limit, Check):
         res = []
         CP = self.PktMethod.GetPacketDetails(packet="Coil_Place_On_Base_Station", limit=[len(self.file_list) - 1, 0], Type="TesterMsg")
@@ -265,21 +321,21 @@ class CommonCTSChecks():
             id = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0], limit=Flow_limit, Type=pkt['refpkt'][1])[2]
             end = Flow_limit[1]
             TempPkt1 = self.PktMethod.GetPacketDetails(packet=pkt['packet1'][0], limit=[id, end], Type=pkt['packet1'][1])
+            print("TempPkt1:",TempPkt1)
             if len(TempPkt1) > 2:
                 res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", "Pass"])
-                TempPkt2 = self.PktMethod.GetPacketDetails(packet=pkt['packet2'][0], limit=[TempPkt1[2] + 1, end + 1], Type=pkt['packet2'][1])
+                TempPkt2 = self.PktMethod.GetPacketDetailswithPhase(packet=pkt['packet2'][0], limit=[TempPkt1[2] + 1, end + 1], Type=pkt['packet2'][1], Phase=pkt.get("Phase"))
+                print("TempPkt2:",TempPkt2)
                 if len(TempPkt2) > 2:
                     res.append([f"{pkt['packet2'][0]} packet found at {round(TempPkt2[0], 3)} sec", "Pass"])
                     if 'Response' in self.GetPacketType(TempPkt2[2] + 1) and self.file_list[TempPkt2[2] + 1]['pktType'] in ['ACK', 'NAK']:
                         Tresult = round((self.file_list[TempPkt2[2] + 1]['startTime'] - TempPkt1[1]) * 1000, 3)
                         ChkRes = CommonMethods.check_measure(pkt['exp'], Tresult, pkt['comp'])
-                        res.append(
-                            [f"{self.file_list[TempPkt2[2] + 1]['pktType']} response to {pkt['packet2'][0]} packet is received in: {ChkRes[3]} ms from 360kHz digital ping, Limit: {ChkRes[2]} ms", ChkRes[1]])
+                        res.append([f"{self.file_list[TempPkt2[2] + 1]['pktType']} response to {pkt['packet2'][0]} packet is received in: {ChkRes[3]} ms from 360kHz digital ping, Limit: {ChkRes[2]} ms", ChkRes[1]])
                     elif 'TesterMsg' in self.GetPacketType(TempPkt2[2] + 1) and 'Response' in self.GetPacketType(TempPkt2[2] + 2) and self.file_list[TempPkt2[2] + 2]['pktType'] in ['ACK', 'NAK']:
                         Tresult = round((self.file_list[TempPkt2[2] + 2]['startTime'] - TempPkt1[1]) * 1000, 3)
                         ChkRes = CommonMethods.check_measure(pkt['exp'], Tresult, pkt['comp'])
-                        res.append(
-                            [f"{self.file_list[TempPkt2[2] + 2]['pktType']} response to {pkt['packet2'][0]} packet is received in: {ChkRes[3]} ms from 360kHz digital ping, Limit: {ChkRes[2]} ms", ChkRes[1]])
+                        res.append([f"{self.file_list[TempPkt2[2] + 2]['pktType']} response to {pkt['packet2'][0]} packet is received in: {ChkRes[3]} ms from 360kHz digital ping, Limit: {ChkRes[2]} ms", ChkRes[1]])
 
 
         return res
@@ -1424,13 +1480,13 @@ class CommonCTSChecks():
                         else:
                             res.append([f"TPR not responded to first digital ping 128 kHz from {round(pd[0], 3)} sec to {round(sd[0], 3)} sec", "Pass"])
 
-
+                        end2 = len(self.file_list)
                         # second ping
                         if "second_ping" in Check:
                             pd2 = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[sd[2], Flow_limit[1]], Type="TesterMsg")
                             if len(pd2) > 2:
                                 res.append([f"Second ping found at {round(self.file_list[pd2[2]]['startTime'], 3)}sec", "Pass"])
-                                sd2 = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[pd2[2], Flow_limit[1]+2], Type="TesterMsg")
+                                sd2 = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[pd2[2], end2], Type="TesterMsg")
                                 if len(sd2) > 2:
                                     fop2 = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[pd2[2], sd2[2]], Type="TesterMsg")
                                     if len(fop2) > 2:
@@ -1566,7 +1622,9 @@ class CommonCTSChecks():
 
                     id = self.stability
                     if prect.get('Monitor'):
-                        self.Monitor_load([id,Flow_limit[1]],prect['Monitor'])
+                        monitor_resp = self.Monitor_load([id,Flow_limit[1]],prect['Monitor'])
+                        if monitor_resp:
+                            res.extend(monitor_resp)
 
                 else:
                     if prect.get("LoadPercent") and prect["LoadPercent"] != "NA":
@@ -1584,29 +1642,41 @@ class CommonCTSChecks():
         end_pkt = self.PktMethod.GetPacketDetails(packet=Monitor_check['until'], limit=[id, limit[1]], Type="TesterMsg")
         if len(end_pkt)>2:
             t_end = end_pkt[0]
-            
-            while id < end_pkt[2]:
-                XCE = self.PktMethod.GetPacketDetails(packet="Extended Control Error", limit=[id, end_pkt[2]], Type="Packet")
-                if len(XCE) > 2:
-                    irect = self.PktMethod.CalculateVoltTwindow(XCE[2], self.AllChannelData3)[0]
-                    vrect = self.PktMethod.CalculateVoltTwindow(XCE[2], self.AllChannelData)[0]
-                    power = round(vrect[0] * irect[0], 3)
-
-                    ChkRes = CommonMethods.check_measure(Monitor_check['comp'][0], power, Monitor_check['comp'][1])
-                    if "Pass" in ChkRes[1]:
-                        pass
-                    elif "Fail" in ChkRes[1]:
-                        break
-                        pass
-
-                    id = XCE[2]
-
-                id += 1
+            # Update 2
+            tdiff = round((t_end - t0),3)
+            if tdiff >= Monitor_check['time']:
+                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", "Pass"])
             else:
-                if (t_end - t0) > Monitor_check['time']:
-                    res.append([f""])
-                else:
-                    res.append([f""])
+                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", "Fail"])
+
+            
+            # #Update1
+            # while id < end_pkt[2]:
+            #     XCE = self.PktMethod.GetPacketDetails(packet="Extended Control Error", limit=[id, end_pkt[2]], Type="Packet")
+            #     if len(XCE) > 2:
+            #         irect = self.PktMethod.CalculateVoltTwindow(XCE[2], self.AllChannelData3)[0]
+            #         vrect = self.PktMethod.CalculateVoltTwindow(XCE[2], self.AllChannelData)[0]
+            #         power = round(vrect * irect, 3)
+
+            #         # Prect validation
+            #         ChkRes = CommonMethods.check_measure(Monitor_check['comp'][0], power, Monitor_check['comp'][1])
+            #         if "Pass" in ChkRes[1]:
+            #             pass
+            #         elif "Fail" in ChkRes[1]:
+            #             return  [[f"Prect {power}W is out of range at index@{XCE[2]}, Expected: {ChkRes[2]}W for 5 sec", ChkRes[1]]]
+            #             # break
+            #             # pass
+
+            #         id = XCE[2]
+
+            #     id += 1
+            # # Time validation for proper prect maintained case
+            # else:
+            #     tdiff = round((t_end - t0),3)
+            #     if tdiff >= Monitor_check['time']:
+            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", "Pass"])
+            #     else:
+            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", "Fail"])
         return res
 
 
@@ -2678,13 +2748,16 @@ class CommonCTSChecks():
         id = self.stability
         power = 0
         cnt = 0
+        res.append([f"Monitoring 8 bit Received power values for 2 sec:", "Pass"])
         while id < Flow_limit[1]:
             if float(self.file_list[id].get('startTime')) > maxtime:
                 break
             if 'Received Power' in self.file_list[id].get('pktType'):
                 cnt += 1
-                power = power + float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', ''))
-                print("RP8:",float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', '')))
+                p1 = float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', ''))
+                res.append([f"8 bit Received Power is {p1} W at {self.PktMethod.Timeconvert(self.file_list[id]['startTime'])}", "Pass"])
+                power = power + p1
+                # print("RP8:",float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', '')))
             id += 1
         # AllMeasures[CTSCheck] = power / cnt if 0 not in [cnt, power] else None
         if 0 not in [cnt, power]:
@@ -4151,6 +4224,8 @@ class CommonCTSChecks():
                         k = sadt[2]        
                 k += 1
 
+            
+
             if 'Tdts' in chk:
                 if chk['seq2']['packettype'][0] == "Response":
                     if rece_data_type is not None:
@@ -4160,13 +4235,26 @@ class CommonCTSChecks():
                     else: res.append([f"In {chk['seq2']['action']}, SADT data not observed", 'Fail'])
 
             if 'NAKchk' in chk['seq2']:
-                if not self.nakflag: res.append([f"In {chk['seq2']['action']}, completely SDSR ACK is observed ", 'Pass'])
+                # if not self.nakflag: res.append([f"In {chk['seq2']['action']}, completely SDSR ACK is observed ", 'Pass'])
+                tpr_resp = self.TPR_response([open2_idx,close2_idx])
+                # print("tpr_resp:",tpr_resp)
+                if tpr_resp:
+                    # res.extend(tpr_resp)
+                    if tpr_resp[0] == "True":
+                        res.append([f"In {chk['seq2']['action']}, TPR Responded with SDSR-ACK throughout the {chk['seq2']['action']} flow", 'Pass'])
+                    elif tpr_resp[0] == "False":
+                        res.append([f"In {chk['seq2']['action']}, TPR Responded with {tpr_resp[2]}({tpr_resp[3]})", 'Fail'])
+                else:res.append([f"In {chk['seq2']['action']}, TPR Response not observed", 'Fail'])
 
             if 'errorchk' not in chk['seq2']: 
                 res.append([f"{chk['seq2']['action']} SADC_Close Stream found @ {sadc_close2[2]} at {round(sadc_close2[0],3)} sec", 'Pass'])
                 # if chk['seq2'].get("Endtest") and chk['seq2']['Endtest']: 
                 #     # print("Ending test")
                     # break
+            if "CRCchk" in chk['seq2']:
+                crc_value = self.PktMethod.GetPayloadDetails(sadc_close2[2],"parameter")[0]['sRawData'].strip()
+                res.append([f"In {chk['seq2']['action']}, Calculated CRC {crc_value} from {chk['seq2']['action']} chain was matches with SADC/Close CRC value {crc_value} at index@ {sadc_close2[2]}", 'Pass'])
+                
                     
             # After successful processing of both seq1 and seq2 streams, advance id to after seq2 close
             id = close2_idx + 1
@@ -4178,6 +4266,25 @@ class CommonCTSChecks():
         
         # print("AUTH_res:",res)
         return res
+
+    def TPR_response(self,limit):
+        # print("limit:",limit)
+        id = limit[0]
+        ack_cnt = 0
+        other_cnt = 0
+        while id <= limit[1]:
+            if self.PktMethod.GetPacketType(id)=="Packet":
+                if "SDSR" in self.file_list[id]['pktType']:
+                    if "ACK" in self.file_list[id]['value']:
+                        ack_cnt += 1
+                    else:
+                        return ["False", id, self.file_list[id]['pktType'], self.file_list[id]['value']]
+            
+
+            id += 1
+        if ack_cnt>0:
+            return ["True", ack_cnt]
+        else: return None
 
     def AuthFlow(self,chk):
         res = []
@@ -4317,12 +4424,12 @@ class CommonCTSChecks():
             elif 'Slots_Returned_Mask' in chk['seq2']['expBytes'][0]:
                 sadt1 = self.PktMethod.GetPacketDetails(packet='SADT',limit=[open2_idx, close2_idx],Type=chk['seq2']['packettype'][0])
                 if len(sadt1)>2:
-                    val = float(self.PktMethod.GetPayloadDetails(sadt1[2],"Slots_Returned_Mask")[0]['sDescription'].split(":")[1].strip())
-                    res.append([f"Slot Returned Mask value is {val} in {chk['seq2']['action']}","Pass"])
-                    exp = (val*32)+2
+                    val = self.PktMethod.GetPayloadDetails(sadt1[2],"Slots_Returned_Mask")[0]['sRawData'].strip()
+                    res.append([f"Slot Returned Mask value is {val}({int(val, 16).bit_count()} bits set to ONE) in {chk['seq2']['action']}","Pass"])
+                    exp = (int(val, 16).bit_count()*32)+2
                     if exp == rec_size:
-                        res.append([f"Number of bytes in Digests response is {rec_size} matching with (Slot Returned Mask*32)+2: {exp}", "Pass"])
-                    else: res.append([f"Number of bytes in Digests response is {rec_size} not matching with (Slot Returned Mask*32)+2: {exp}", "Fail"])
+                        res.append([f"Number of bytes in Digests response is {rec_size} matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", "Pass"])
+                    else: res.append([f"Number of bytes in Digests response is {rec_size} not matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", "Fail"])
                 else: res.append([f"Digests response is not found","Fail"])
         else:
             res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets", 'Pass'])
@@ -5334,7 +5441,8 @@ class CommonCTSChecks():
                                 for pyload in payloadDetails:
                                     if BITSck['Checks'][ck]['comp']=="str":
                                         if BITSck['Checks'][ck]['expected'] in pyload[BITSck['Checks'][ck]['flag']]:
-                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            # print("custom_name:",BITSck['Checks'][ck].get("custom_name"), "ck:",ck)
+                                            SubChecks.append([f"Recevied {ck} {'['+BITSck['Checks'][ck].get("custom_name")+']' if BITSck['Checks'][ck].get("custom_name") else ""} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Pass"])
                                             
                                         elif 'random' in BITSck['Checks'][ck]['expected']:
                                             if BITSck['Checks'][ck].get('except'):
@@ -5505,9 +5613,9 @@ class CommonCTSChecks():
                                         tmpid+=1
                                     if RespFlag == False:
                                         if "No" in pkt['Pkt_response']:
-                                            SubChecks.append([f"Response not found for received for the packet.","Pass"])
+                                            SubChecks.append([f"Response not found for received packet.","Pass"])
                                         else:
-                                            SubChecks.append([f"Response not found for received for the packet.","Fail"])
+                                            SubChecks.append([f"Response not found for received packet.","Fail"])
                                     if not pkt.get('Pkt_count'):
                                         break
                                 elif not pkt.get('Pkt_count'):break

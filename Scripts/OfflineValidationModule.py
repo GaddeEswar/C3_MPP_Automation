@@ -61,20 +61,21 @@ class PacketMethods:
         
     
     #2 To search a given packet in the given limit, if packet found return the packet details  [starttime,endtime,index]
-    def GetPacketDetails(self,packet='',value=None,limit=[],timelimit=None,Type="Packet"):
+    def GetPacketDetails(self,packet='',value=None,limit=[],timelimit=None,Type="Packet",Phase=None):
         # print(limit,packet)
         id = limit[0]
         if type(packet) != list:
             while id != limit[1]:
                 # print(id,self.file_list[id].get('pktType'))
                 if packet.lower() in self.file_list[id].get('pktType').lower() and value.lower() in self.file_list[id].get('value').lower() if value is not None else packet.lower() in self.file_list[id].get('pktType').lower():
-                    if self.GetPacketType(id)==Type:
+                    if self.GetPacketType(id)==Type: 
                         if timelimit is None:
                             return[self.file_list[id].get('startTime'),self.file_list[id].get('stopTime'),id]
                         else:
                             if self.file_list[id].get('startTime') >= timelimit:
                                 return[self.file_list[id].get('startTime'),self.file_list[id].get('stopTime'),id]
-                            
+                 
+                       
                 if limit[0]<limit[1]:
                     id+=1
                 else: id-=1
@@ -147,6 +148,64 @@ class PacketMethods:
                 if limit[0]<limit[1]:
                     id+=1
                 else: id-=1
+        return[0]
+    
+    def GetPacketDetailswithPhase(self,packet='',value=None,limit=[],timelimit=None,Type="Packet",Phase=None):
+        # print(limit,packet)
+        id = limit[0]
+        if type(packet) != list:
+            while id != limit[1]:
+                pkt = self.file_list[id]
+
+                condition = packet.lower() in (pkt.get('pktType') or '').lower()
+
+                if value is not None:
+                    condition = condition and (value.lower() in (pkt.get('value') or '').lower())
+
+                if Phase is not None:
+                    condition = condition and (Phase.lower() in (pkt.get('description') or '').lower())
+
+                if condition:
+                    if self.GetPacketType(id) == Type:
+                        # process packet
+                        
+                        if timelimit is None:
+                            return[self.file_list[id].get('startTime'),self.file_list[id].get('stopTime'),id]
+                        else:
+                            if self.file_list[id].get('startTime') >= timelimit:
+                                return[self.file_list[id].get('startTime'),self.file_list[id].get('stopTime'),id]
+                 
+                       
+                if limit[0]<limit[1]:
+                    id+=1
+                else: id-=1
+        else:
+
+            while id != limit[1]:
+                pkt = self.file_list[id]
+                pkt_type = pkt.get('pktType') or ''
+                pkt_value = pkt.get('value') or ''
+                description = pkt.get('description') or ''
+
+                condition = all(rs.lower() in pkt_type.lower()for rs in packet)
+
+                if value is not None:
+                    condition = condition and (value.lower() in pkt_value.lower())
+
+                if Phase is not None:
+                    condition = condition and (Phase.lower() in description.lower())
+
+                if condition:
+                    if self.GetPacketType(id) == Type:
+                        if timelimit is None:
+                            return [pkt.get('startTime'),pkt.get('stopTime'),id]
+                        elif pkt.get('startTime') >= timelimit:
+                            return [pkt.get('startTime'),pkt.get('stopTime'),id]
+
+                if limit[0] < limit[1]:
+                    id += 1
+                else:
+                    id -= 1
         return[0]
 
     def GetExactPacketDetails(self,packet='',value=None,limit=[],timelimit=None,Type="Packet"):

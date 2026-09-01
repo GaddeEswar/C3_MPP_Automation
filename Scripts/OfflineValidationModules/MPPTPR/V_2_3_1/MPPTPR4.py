@@ -1164,9 +1164,9 @@ class CTSChecks_MPP_TPR4():
                                     CEx = self.PktMethod.GetPacketDetails(packet=f"Extended Control Error",limit=[TempPkt5[2],TempPkt2[2]],Type="Packet")
                                     if len(CEx)>2:
                                         res.append([f"Required time period is 51 ms ± 2 ms, i.e, (t_xceresponsetimeout = 20 ms + t_delay = 5 ms + t_active = 21 ms + 5 ms ± 2 ms)", "Pass"])
-                                        t_req = (TempPkt5[0]-CEx[1])*1000
+                                        t_req = round((TempPkt5[0]-CEx[1])*1000,3)
                                         chk_resx = CommonMethods.check_measure(chk['t_gap'],t_req,0)
-                                        res.append([f"The time between Extended Control Error and Set_load {int(PotLoad/2)}mW is {chk_resx[3]} ms, Expected: {chk_resx[3]} ms",chk_resx[1]])
+                                        res.append([f"The time between Extended Control Error and Set_load {int(PotLoad/2)}mW is {chk_resx[3]} ms, Expected: {chk_resx[2]} ms",chk_resx[1]])
                                     else: res.append([f"Extended Control Error packet not found before Set_load {int(PotLoad/2)}mW",""])
 
                                 VrectTarget = [] #V
@@ -1186,10 +1186,11 @@ class CTSChecks_MPP_TPR4():
                                         if cnt == 2: break
                                     id += 1
                                 # print("match:",VrectTarget,Vrect)
-                                Vrec1del = Vrect[1]-Vrect[0]
-                                validation = round(abs(Vrec1del/(VrectTarget[0]-Vrect[0])-gtarget),3)
+                                Vrectdel = round(Vrect[1]-Vrect[0],3)
+                                validation = round(abs(Vrectdel/(VrectTarget[0]-Vrect[0])-gtarget),3)
+                                
                                 # print("validation:",validation)
-                                res.append([f"Vrect_target_{x}: {VrectTarget[0]}V, Vrect_{x}: {Vrect[0]}V, Vrect_after_{x}: {Vrect[1]}V", 'Pass'])
+                                res.append([f"∆Vrect_{x}: {Vrectdel}V, Vrect_target_{x}: {VrectTarget[0]}V, Vrect_{x}: {Vrect[0]}V, Vrect_after_{x}: {Vrect[1]}V", 'Pass'])
                                 ChkRes = CommonMethods.check_measure([0.4],validation,"LTEQL")
                                 res.append([f"|∆Vrect_{x} / (Vrect_target_{x}- Vrect_{x})- g_target_{x}| = {ChkRes[3]}, Expected: {ChkRes[2]}", ChkRes[1]])
                                 

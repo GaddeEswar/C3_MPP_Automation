@@ -426,6 +426,17 @@
               "CheckSEQ": 2
             }
           ],
+          "Monitor_EPT": [
+            {
+              "expected": [
+             
+              ],
+       
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 3
+            }
+          ],
           "Vrect_Irect": [
             {
               "expected": [
@@ -481,6 +492,17 @@
               "flow": 2,
               "Result_check": true,
               "CheckSEQ": 2
+            }
+          ],
+          "Monitor_EPT": [
+            {
+              "expected": [
+             
+              ],
+       
+              "flow": 2,
+              "Result_check": true,
+              "CheckSEQ": 3
             }
           ],
           "Vrect_Irect": [
@@ -9988,6 +10010,7 @@
                       "Packet"
                     ],
                     "action": "Certificate",
+                    "NAKchk": true,
                     "endassertion": [
                       "Certificate_Chain",
                       "-Valid",
@@ -10428,6 +10451,7 @@
                       "Packet"
                     ],
                     "action": "Certificate",
+                    "NAKchk": true,
                     "endassertion": [
                       "Certificate_Chain",
                       "-Valid",
@@ -10847,6 +10871,7 @@
                       "Packet"
                     ],
                     "action": "Certificate",
+                    "NAKchk": true,
                     "endassertion": [
                       "Certificate_Chain",
                       "-Valid",
@@ -11057,6 +11082,8 @@
                       "Packet"
                     ],
                     "action": "Certificate",
+                    "NAKchk": true,
+                    "CRCchk": true,
                     "endassertion": [
                       "Certificate_Chain",
                       "-Valid",
@@ -11083,6 +11110,7 @@
                     ],
                     "action": "Challenge_Auth",
                     "NAKchk": true,
+                    "CRCchk": true,
                     "endassertion": [
                       "Challenge_Auth",
                       "-Valid",
@@ -11595,6 +11623,7 @@
                   },
                   "refPrevious": false
                 },
+                
                 {
                   "packet": [
                     "SADC",
@@ -11656,6 +11685,26 @@
                       "flag": "sRawData",
                       "comp": "str"
                     }
+                  },
+                  "refPrevious": false
+                },
+                {
+                  "packet": [
+                    "SDSR",
+                    "{ Type: ACK }"
+                  ],
+                  "PacketType": "Response",
+                  "PacketCount": 1,
+                  "PktLimit": "FromCustomPacket",
+                  "CustomLimit": {
+                    "Packet": [
+                      "SADC",
+                      "Close Stream:"
+                    ],
+                    "Type": "Packet"
+                  },
+                  "Checks": {
+                    
                   },
                   "refPrevious": false
                 }
@@ -13120,7 +13169,7 @@
                   "phase": "ID&CFG",
                   "PktLimit": "Flow",
                   "Pkt_response": [
-                    "NO"
+                    "No"
                   ]
                 }
               ],
@@ -13820,7 +13869,14 @@
                     "Extended Identification",
                     null
                   ],
-                  "Checks": {},
+                  "Checks": {
+                    "Restricted:": {
+                      "expected": 0,
+                      "flag": "sRawData",
+                      "comp": "EQL",
+                      "units": " "
+                    }
+                  },
                   "refPrevious": false
                 },
                 {
@@ -15570,6 +15626,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -15857,6 +15914,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -16034,6 +16092,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -16321,6 +16380,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -16510,6 +16570,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -16821,6 +16882,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -17010,6 +17072,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -17321,6 +17384,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -17498,6 +17562,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -17785,6 +17850,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -17962,6 +18028,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -18249,6 +18316,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -18426,6 +18494,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -18713,6 +18782,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -18890,6 +18960,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -19180,6 +19251,7 @@
                     "exp": [
                       3000
                     ],
+                    "Phase": "PT",
                     "comp": "LTEQL",
                     "chk": "Tpla"
                   }
@@ -19354,6 +19426,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -19644,6 +19717,7 @@
                     "exp": [
                       3000
                     ],
+                    "Phase": "PT",
                     "comp": "LTEQL",
                     "chk": "Tpla"
                   }
@@ -19818,6 +19892,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -20105,6 +20180,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -20282,6 +20358,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -20569,6 +20646,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -20746,6 +20824,7 @@
                     "Power Loss Accounting",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     3000
                   ],
@@ -21033,6 +21112,7 @@
                       "Power Loss Accounting",
                       "Packet"
                     ],
+                    "Phase": "PT",
                     "exp": [
                       3000
                     ],
@@ -21977,13 +22057,8 @@
                     null
                   ],
                   "phase": "Nego",
-                  "PktLimit": "FromCustomPacket",
-                  "CustomLimit": {
-                    "Packet": [
-                      "Power_Loss_Accounting_Parameters",
-                      null
-                    ]
-                  },
+                  "PktType": "Packet",
+                  "PktLimit": "Flow",
                   "Pkt_response": [
                     "ACK"
                   ]
@@ -22291,14 +22366,9 @@
                     "Power Loss Accounting Parameters",
                     null
                   ],
+                  "PktType": "Packet",
                   "phase": "Nego",
-                  "PktLimit": "FromCustomPacket",
-                  "CustomLimit": {
-                    "Packet": [
-                      "Power Loss Accounting Parameters",
-                      null
-                    ]
-                  },
+                  "PktLimit": "Flow",
                   "Pkt_response": [
                     "ACK"
                   ]
@@ -23841,7 +23911,8 @@
                     "Slots_Populated_Mask": {
                       "expected": "1",
                       "flag": "sDescription",
-                      "comp": "str"
+                      "comp": "str",
+                      "custom_name": "Bit b4 of Byte 1"
                     },
                     "Slots_Returned_Mask": {
                       "expected": "1",
@@ -24304,41 +24375,7 @@
                     }
                   },
                   "refPrevious": false
-                },
-                {
-                  "packet": [
-                    "SADT",
-                    null
-                  ],
-                  "PacketType": "Response",
-                  "PktLimit": "BTWNpkts",
-                  "PacketCount": 1,
-                  "CustomLimit": {
-                    "Packet1": [
-                      "SADC",
-                      "Open Stream:",
-                      "Response"
-                    ],
-                    "Packet2": [
-                      "SADC",
-                      "Close Stream:",
-                      "Response"
-                    ]
-                  },
-                  "Checks": {
-                    "Digests": {
-                      "expected": "Digests",
-                      "flag": "sDecodedValue",
-                      "comp": "str"
-                    },
-                    "Slots_Returned_Mask": {
-                      "expected": "1.0",
-                      "flag": "sDescription",
-                      "comp": "EQL"
-                    }
-                  },
-                  "refPrevious": false
-                }
+                } 
               ],
               "flow": 2,
               "Result_check": true,
@@ -29329,7 +29366,7 @@
                     ],
                     "comp": "GTEQL"
                   },
-                  "Monitor": {"value":3.75,"comp": [3.61125,"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29350,7 +29387,7 @@
                     ],
                     "comp": "GTEQL"
                   },
-                  "Monitor": {"value":7.5,"comp": [7.2225,"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29371,7 +29408,7 @@
                     ],
                     "comp": "GTEQL"
                   },
-                  "Monitor": {"value":7.5,"comp": [7.226352,"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29433,7 +29470,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29453,7 +29491,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29473,7 +29512,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29619,7 +29659,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29639,7 +29680,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29659,7 +29701,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29721,7 +29764,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29741,7 +29785,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29761,7 +29806,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29907,7 +29953,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29927,7 +29974,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -29947,7 +29995,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -30009,7 +30058,8 @@
                       3.61125
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":3.75,"comp": [[3.61125],"GTEQL"],"time":5,"until":"Set_Load 625mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -30029,7 +30079,8 @@
                       7.2225
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.2225],"GTEQL"],"time":5,"until":"Set_Load 536mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -30049,7 +30100,8 @@
                       7.226352
                     ],
                     "comp": "GTEQL"
-                  }
+                  },
+                  "Monitor": {"value":7.5,"comp": [[7.226352],"GTEQL"],"time":5,"until":"Set_Load 1071mA:ILim:Enabled"}
                 },
                 {
                   "setting": "irect",
@@ -30772,21 +30824,11 @@
                 },
                 {
                   "packet": [
-                    "Extended Control Error",
+                    "MPP_XCEV_Ideal",
                     null
                   ],
-                  "phase": "PT",
-                  "PktLimit": "FromCustomPacket",
-                  "CustomLimit": {
-                    "Packet": [
-                      "MPP_XCEV_Ideal",
-                      null
-                    ]
-                  },
-                  "Pkt_response": [
-                    "ACK",
-                    "NAK"
-                  ]
+                  "phase": "",
+                  "PktLimit": "Flow"
                 }
               ],
               "flow": 2,
@@ -44332,6 +44374,7 @@
                     "Ping Detected",
                     "TesterMsg"
                   ],
+                  "Phase": "PT",
                   "packet2": [
                     "PLA_2",
                     "Packet"
@@ -44661,6 +44704,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT", 
                   "exp": [
                     5000
                   ],
@@ -44685,12 +44729,12 @@
                     "Major_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "Minor_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "PRMC": {
                       "expected": "random",
@@ -44749,12 +44793,12 @@
                     "Major_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "Minor_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "PRMC": {
                       "expected": "random",
@@ -44840,12 +44884,12 @@
                     "Major_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "Minor_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "PRMC": {
                       "expected": "random",
@@ -44904,12 +44948,12 @@
                     "Major_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "Minor_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "PRMC": {
                       "expected": "random",
@@ -44985,7 +45029,7 @@
                   "packet2": [
                     "PLA_2",
                     "Packet"
-                  ],
+                  ],"Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -45010,7 +45054,7 @@
                     "Major_Version": {
                       "expected": 2,
                       "flag": "sDescription",
-                      "comp": "GEQL"
+                      "comp": "GTEQL"
                     },
                     "Minor_Version": {
                       "expected": 2,
@@ -45311,6 +45355,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -45350,6 +45395,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -45675,6 +45721,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -46000,6 +46047,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -46325,6 +46373,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -46650,6 +46699,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -46975,6 +47025,7 @@
                     "PLA_2",
                     "Packet"
                   ],
+                  "Phase": "PT",
                   "exp": [
                     5000
                   ],
@@ -78259,9 +78310,6 @@
               "Result_check": true,
               "Remove_Power": false,
               "Throttle": true,
-              "exp_resp": [
-                "NAK"
-              ],
               "CheckSEQ": 3
             }
           ],
@@ -80555,7 +80603,7 @@
               ],
               "flow": 2,
               "Result_check": true,
-              "CheckSEQ": 2
+              "CheckSEQ": 1
             }
           ]
         }
