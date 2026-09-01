@@ -1008,8 +1008,9 @@ class CommonCTSChecks:
                     if len(Stable)>2:
                         # Check 10%
                         PLA=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],limit=[Stable[2],PhaseLimit[0]])
-                        RRP,Power=self.FormatPLA(PLA[2],Check['Pkt'][0])
-                        res.append([f"Measured Prect_Power value in {Check['Pkt'][0]} pkt is {Power} W  at {{{PLA[2]}}}, Expected Range :[{round((NPowerCal-(10/100)*NPowerCal),2)},{round((NPowerCal+(10/100)*NPowerCal),2)}]", "Inconclusive" if Power > (NPowerCal+(10/100)*NPowerCal) or Power < (NPowerCal-(10/100)*NPowerCal) else 'Pass'])
+                        #These function belongs to phy layer testcases not required to check before the stabilization.
+                        # RRP,Power=self.FormatPLA(PLA[2],Check['Pkt'][0])
+                        # res.append([f"Measured Prect_Power value in {Check['Pkt'][0]} pkt is {Power} W  at {{{PLA[2]}}}, Expected Range :[{round((NPowerCal-(10/100)*NPowerCal),2)},{round((NPowerCal+(10/100)*NPowerCal),2)}]", "Inconclusive" if Power > (NPowerCal+(10/100)*NPowerCal) or Power < (NPowerCal-(10/100)*NPowerCal) else 'Pass'])
                         res.append([f'Stabilization happened at {{{Stable[2]}}}', 'Pass'])
                     else: res.append([f'Stabilization did not  happened', 'Fail'])
                 else:res.append([f'PRx did not Entered in to Power Transfer Phase','Fail']) 
@@ -1399,6 +1400,7 @@ class CommonCTSChecks:
         if len(MPP)>2:
             Flow2RestrictedBit=self.MPPRestrictedBit(MPP[2])
             if Flow2RestrictedBit:
+                res.append([f'PRx set Restricted Bit to One in MPP_Extended_Identification at {{{MPP[2]}}}', 'Pass'])
                 Pch,PchPkt=self.PchTime()
                 res.append([f'PRx sent Power Control Hold off pkt with Val:{Pch} mS Exp:>=20 mS','Pass' if Pch >=20 else 'Fail'])
                 End_Power=self.PktMethod.GetPacketDetails(packet="End Power Transfer", value= "[EPT/rst]",limit=[MPP[2]+1,self.Flow_limit[1]])
