@@ -1196,7 +1196,7 @@ class CommonCTSChecks():
             # print("TempPkt1:",TempPkt1)
             if len(TempPkt1) > 2:
                 res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0],3)} sec", "Pass"])
-                TempPkt2 =  self.PktMethod.GetPacketDetails(packet=pkt['packet2'][0],limit=[TempPkt1[2]+1,end+1],Type=pkt['packet2'][1])
+                TempPkt2 =  self.PktMethod.GetPacketDetailswithPhase(packet=pkt['packet2'][0],limit=[TempPkt1[2]+1,end+1],Type=pkt['packet2'][1])
                 # print("TempPkt2:",TempPkt2)
                 if len(TempPkt2) > 2:
                     res.append([f"{pkt['packet2'][0]} packet found at {round(TempPkt2[0],3)} sec", "Pass"])
@@ -1795,7 +1795,8 @@ class CommonCTSChecks():
                     else:
                         res.append([f"Stabilization found at {self.PktMethod.Timeconvert(TempPkt3[0])}","Pass"])
                         #Get Prect from PLA
-                        TempPkt4 = self.PktMethod.GetPacketDetails(packet="PLA_2",limit=[TempPkt3[2]-15,Flow_limit[1]])
+                        # TempPkt4 = self.PktMethod.GetPacketDetails(packet="PLA_2",limit=[TempPkt3[2]-15,Flow_limit[1]])
+                        TempPkt4 = self.PktMethod.GetPacketDetails(packet="PLA_2",limit=[TempPkt3[2],Flow_limit[1]])
                     # print("TempPkt4:",TempPkt4)
                     if len(TempPkt4)>2:
                         if prect.get("XCE_Stabilisation"):
@@ -2078,16 +2079,32 @@ class CommonCTSChecks():
             if Mode_type != "LPM":
                 ECAP = self.PktMethod.GetPacketDetails(packet=self.ECAP_pkt,limit=Flow_limit,Type="Response")
                 if len(ECAP)>2:
-                    Nego = GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(ECAP[2],"Negotiable_Load_Power")[0]['sDescription'])[0]
-                    # print("Nego:",Nego)
-                    if Nego >= 15:
-                        res.append([f"Negotiable_Load_Power is {Nego} W in {self.ECAP_pkt}, so DPLOSS calibration will perform, Expected: >= 15 W", "Pass"])
+                    ECAPppwr = float(self.PktMethod.GetPayloadDetails(ECAP[2],"Potential_Load_Power")[0]['sDescription'].split(":")[1].split("W")[0].strip())
+                    # print("ECAPppwr:",ECAPppwr)
+                    res.append([f"Potential_Load_Power is {ECAPppwr} W in {self.ECAP_pkt} at {round(ECAP[0],3)} sec", "Pass"])
+                    if ECAPppwr >= 15:
+                        res.append([f"Potential_Load_Power is {ECAPppwr} W in {self.ECAP_pkt}, so DPLOSS calibration will perform, Expected: >= 15 W", "Pass"])
                         tempcheck = {"expected": "DPlossCalibrationCheck","DPLC": "DPLC1","flow": 2,"Result_check": True,"Inconclusive": False,"CheckSEQ": 1}
                         if Mode_type == "NPM":
                             tempcheck = {"expected": "DPlossCalibrationCheck","DPLC": "DPLC1","skiplevel": ["Level4"],"flow": 2,"Result_check": True,"Inconclusive": False,"CheckSEQ": 1}
                         dploss_res=self.DPlossCalibration(Flow_limit,tempcheck)
                         for tempres in dploss_res: res.append(tempres)
-                    else: res.append([f"Negotiable_Load_Power is {Nego} W in {self.ECAP_pkt}, so DPLOSS calibration won't perform, Expected: >= 15 W", "Pass"])
+                    else: res.append([f"Potential_Load_Power is {ECAPppwr} W in {self.ECAP_pkt}, so DPLOSS calibration won't perform, Expected: >= 15 W", "Pass"])
+
+
+
+
+
+                    # Nego = GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(ECAP[2],"Negotiable_Load_Power")[0]['sDescription'])[0]
+                    # # print("Nego:",Nego)
+                    # if Nego >= 15:
+                    #     res.append([f"Negotiable_Load_Power is {Nego} W in {self.ECAP_pkt}, so DPLOSS calibration will perform, Expected: >= 15 W", "Pass"])
+                    #     tempcheck = {"expected": "DPlossCalibrationCheck","DPLC": "DPLC1","flow": 2,"Result_check": True,"Inconclusive": False,"CheckSEQ": 1}
+                    #     if Mode_type == "NPM":
+                    #         tempcheck = {"expected": "DPlossCalibrationCheck","DPLC": "DPLC1","skiplevel": ["Level4"],"flow": 2,"Result_check": True,"Inconclusive": False,"CheckSEQ": 1}
+                    #     dploss_res=self.DPlossCalibration(Flow_limit,tempcheck)
+                    #     for tempres in dploss_res: res.append(tempres)
+                    # else: res.append([f"Negotiable_Load_Power is {Nego} W in {self.ECAP_pkt}, so DPLOSS calibration won't perform, Expected: >= 15 W", "Pass"])
                 else: res.append([f"{self.ECAP_pkt} response is not observed", "Fail"])
         else:
             res.append([f"MSR packet is not observed", "Fail"])
@@ -2914,8 +2931,8 @@ class CommonCTSChecks():
                                         # print("revdval:",revdval)
                                         if BITSck['Checks'][ck]['comp'] == 'GTEQL':
                                             if  revdval[0] >= float(BITSck['Checks'][ck]['expected']):
-                                                res.append([f"Recevied value of {ck} is {revdval[0]}, which is >={BITSck['Checks'][ck]['expected']}","Pass"])
-                                            else:res.append([f"Recevied value of {ck} is {revdval[0]}, which is not >={BITSck['Checks'][ck]['expected']}","Fail"])
+                                                res.append([f"Recevied value of {ck} is {int(revdval[0]) if "Major_Version" or "Minor_Version" in ck else revdval[0]}, which is >={BITSck['Checks'][ck]['expected']}","Pass"])
+                                            else:res.append([f"Recevied value of {ck} is {int(revdval[0]) if "Major_Version" or "Minor_Version" in ck else revdval[0]}, which is not >={BITSck['Checks'][ck]['expected']}","Fail"])
                                         elif BITSck['Checks'][ck]['comp'] == 'LTEQL':
                                             if  revdval[0] <= float(BITSck['Checks'][ck]['expected']):
                                                 res.append([f"Recevied value of {ck} is {revdval[0]}, which is <={BITSck['Checks'][ck]['expected']}","Pass"])
@@ -3698,11 +3715,13 @@ class CommonCTSChecks():
                     #2.Find PLA packts has power offset
                     duration_flag = False
                     removepwr = False
+                    offset_cnt = 0
                     id = self.stability#renegload[2]
                     while id < end:
                         TempPkt2 = self.PktMethod.GetPacketDetails(packet="PLA_2",limit=[id,end])
                         # # print("TempPkt2:",TempPkt2)
                         if len(TempPkt2)>2:
+                            # print("TempPkt2:",TempPkt2)
                             Pktresp = self.PktMethod.GetPacketResponse2(TempPkt2[2],[TempPkt2[2]+1,end])
                             if Pktresp is not None:
                                 if 'exp_resp' in Check:
@@ -3716,6 +3735,10 @@ class CommonCTSChecks():
                             TempPkt3 = self.PktMethod.GetPacketDetails(packet="Power Offset",limit=[TempPkt2[2],TempPkt2[2]-5],Type="TesterMsg")
                             TempPkt4 = self.PktMethod.GetPacketDetails(packet="Rectified",limit=[TempPkt2[2],TempPkt2[2]-5],Type="TesterMsg")
                             if len(TempPkt3)>2 and len(TempPkt4)>2:
+                                # print("TempPkt3:",TempPkt3)
+                                # print("TempPkt4:",TempPkt4)
+                                offset_cnt += 1
+                                # print("offset_cnt:",offset_cnt)
                                 RP_Actual = GeneralMethods.GetFloatFromStr(self.file_list[TempPkt4[2]]['pktType'])[1]
                                 Prect_Actual = GeneralMethods.GetFloatFromStr(self.file_list[TempPkt4[2]]['pktType'])[0]
 
@@ -3779,9 +3802,15 @@ class CommonCTSChecks():
                                     if self.file_list[Pktresp]['pktType'] in ['ATN']:
                                         id = Pktresp
                                         break
+   
                             id = TempPkt2[2]
                         id += 1
-                    
+
+                    if offset_cnt > 0:
+                        res.append([f"{int(Check['FixedOffsetValues']['Prect']*1000)} mW POFFSET is removed and TPR started sending PPR,est = PPR and Prect,est = Prect", "Pass"])
+                    else:
+                        res.append([f"{int(Check['FixedOffsetValues']['Prect']*1000)} mW POFFSET is not applied in the execution.", "Fail"])
+
                     # Power remove
                     if 'Remove_Power' in Check:
                         sd = self.PktMethod.GetPacketDetails(packet="Shutdown",limit=[id,end],Type="TesterMsg")
@@ -5171,10 +5200,10 @@ class CommonCTSChecks():
                                         if cnt == 2: break
                                     id += 1
                                 # print("match:",VrectTarget,Vrect)
-                                Vrec1del = Vrect[1]-Vrect[0]
-                                validation = round(abs(Vrec1del/(VrectTarget[0]-Vrect[0])-gtarget),3)
+                                Vrectdel = round(Vrect[1]-Vrect[0],3)
+                                validation = round(abs(Vrectdel/(VrectTarget[0]-Vrect[0])-gtarget),3)
                                 # print("validation:",validation)
-                                res.append([f"Vrect_target_{x}: {VrectTarget[0]}V, Vrect_{x}: {Vrect[0]}V, Vrect_after_{x}: {Vrect[1]}V", 'Pass'])
+                                res.append([f"∆Vrect_{x}: {Vrectdel}V, Vrect_target_{x}: {VrectTarget[0]}V, Vrect_{x}: {Vrect[0]}V, Vrect_after_{x}: {Vrect[1]}V", 'Pass'])
                                 ChkRes = CommonMethods.check_measure([0.4],validation,"LTEQL")
                                 res.append([f"|∆Vrect_{x} / (Vrect_target_{x}- Vrect_{x})- g_target_{x}| = {ChkRes[3]}, Expected: {ChkRes[2]}", ChkRes[1]])
                                 

@@ -4,6 +4,7 @@ from datetime import datetime,date
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, PatternFill
 from SQLite import SQLiteConnection 
+from pathlib import Path
 
 class ExcelReports():
     def __init__(self):
@@ -117,7 +118,9 @@ class ExcelReports():
             )
             now = datetime.now()
             timestamp = now.strftime("%d%m%Y_%H%M%S")
-            output_file = f'Results/C3_MPP Excel Results/CTSChecks_Report_{product}_{Mode}_{timestamp}.xlsx'
+            folder_path = Path("Results") / "C3_MPP Excel Results"
+            folder_path.mkdir(parents=True, exist_ok=True)
+            output_file = folder_path / f'CTSChecks_Report_{product}_{Mode}_{timestamp}.xlsx'
             with pd.ExcelWriter(output_file) as writer:pivot_table.to_excel(writer, sheet_name="AllTestCases")
             #Update Excel sheet
             self.format_excel(output_file)
@@ -196,7 +199,9 @@ class ExcelReports():
             # print(result_count)          
             now = datetime.now()
             timestamp = now.strftime("%d%m%Y_%H%M%S")
-            output_file = (f'Results/C3_MPP Excel Results/_{'Summary_table'}_{filters['Product']}_{filters['Certification']}_{filters['SW'][0]}_{filters['FW'][0]}_{timestamp}.xlsx')
+            folder_path = Path("Results") / "C3_MPP Excel Results"
+            folder_path.mkdir(parents=True, exist_ok=True)
+            output_file = (folder_path/f'_{'Summary_table'}_{filters['Product']}_{filters['Certification']}_{filters['SW'][0]}_{filters['FW'][0]}_{timestamp}.xlsx')
             with pd.ExcelWriter(output_file, engine="xlsxwriter") as writer:
                 workbook = writer.book
                 worksheet = workbook.add_worksheet("Summary Table")
@@ -373,7 +378,9 @@ class ExcelReports():
             
             now = datetime.now()
             timestamp = now.strftime("%d%m%Y_%H%M%S")
-            output_file = f'Results/C3_MPP Excel Results/PayLoadChecks_Report_{filters['Product']}_{filters['Certification']}_{filters['SW'][0]}_{filters['FW'][0]}_{timestamp}.xlsx'
+            folder_path = Path("Results") / "C3_MPP Excel Results"
+            folder_path.mkdir(parents=True, exist_ok=True)
+            output_file = folder_path/f'PayLoadChecks_Report_{filters['Product']}_{filters['Certification']}_{filters['SW'][0]}_{filters['FW'][0]}_{timestamp}.xlsx'
             with pd.ExcelWriter(output_file) as writer:
                 for Phases in FinalDataFrames:
                     phasename = Phases if len(Phases)<30 else Phases[0:30]
