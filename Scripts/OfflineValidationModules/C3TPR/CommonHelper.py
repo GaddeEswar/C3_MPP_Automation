@@ -7,6 +7,7 @@ import csv
 import json
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
+from Enums import Enums
 
 
 class CommonCTSChecks:
@@ -41,15 +42,15 @@ class CommonCTSChecks:
             if len(VR)>2:
                 Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="start",measure="before")
                 res.append([f'while TPR Regulating to its Operating Voltage Measured Voltage is : {Loadvrect[0]} V -> Limits : 4.116 V ~ 4.284 V', 
-                            'Pass' if Loadvrect[0] >= 4.116 and Loadvrect[0] <= 4.284 else 'Inconclusive'])
+                            Enums.TestResult.PASS if Loadvrect[0] >= 4.116 and Loadvrect[0] <= 4.284 else Enums.TestResult.INCONCLUSIVE])
                 self.id =VR[2]+1
                 # Check Loads are applied or not
                 results,LoadFlag=self.CheckLoads(Check)
                 res.extend(results)
                 # Get Voltages and Temperature data
                 res.extend(self.Measure_Voltage_Current_Plot(phaseCheck,LoadFlag,Check)) 
-            else:res.append([f'TPR did not regulated to its operating voltage','Inconclusive'])
-        else : res.append([f'PRx did not entered PT Phase','Inconclusive'])
+            else:res.append([f'TPR did not regulated to its operating voltage',Enums.TestResult.INCONCLUSIVE])
+        else : res.append([f'PRx did not entered PT Phase',Enums.TestResult.INCONCLUSIVE])
         return res
     
     # 5.2.2 Test PTX-POW-TEMP-EPP: thermal performance of TPR-THERMAL-15W
@@ -64,7 +65,7 @@ class CommonCTSChecks:
             VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(VR)>2:
                 Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData,at="start",measure="before")
-                res.append([f'while TPR Regulating to its Operating Voltage , Measured Voltage is {Loadvrect[0]} V -> Limits : 11.4 V ~ 12.6 V', 'Pass' if Loadvrect[0] >= 11.4 and Loadvrect[0] <= 12.6 else 'Inconclusive'])
+                res.append([f'while TPR Regulating to its Operating Voltage , Measured Voltage is {Loadvrect[0]} V -> Limits : 11.4 V ~ 12.6 V', Enums.TestResult.PASS if Loadvrect[0] >= 11.4 and Loadvrect[0] <= 12.6 else Enums.TestResult.INCONCLUSIVE])
                 id =VR[2]+1
                 LoadFlag=False
                 # Check Negotiable Load Power Reached or not
@@ -75,15 +76,15 @@ class CommonCTSChecks:
                     Power=round(Loadvrect[0]*Current[0],3)
                     NPLimit=[round((NPower - ((NPower*5)/100)),2), round((NPower +((NPower*5)/100)),2)]
                     res.append([f'While regulating to Load Voltage (12 ± 5%) V, Measured Load power is {Power} W -> Limits : {NPLimit[0]} W ~ {NPLimit[1]} W',
-                                    'Pass' if Power >= NPLimit[0] and Power <= NPLimit[1] else 'Inconclusive'])
+                                    Enums.TestResult.PASS if Power >= NPLimit[0] and Power <= NPLimit[1] else Enums.TestResult.INCONCLUSIVE])
 
                 else:
-                    res.append([f'Could not found Power Transmitter capabilities packet ','Inconclusive'])
+                    res.append([f'Could not found Power Transmitter capabilities packet ',Enums.TestResult.INCONCLUSIVE])
                     LoadFlag=False
                 # Get Voltages and Temperature data
                 res.extend(self.Measure_Voltage_Current_Plot(phaseCheck,LoadFlag,Check))  
-            else:res.append([f'TPR did not regulated to its operating voltage','Inconclusive'])
-        else : res.append([f'PRx did not entered PT Phase','Inconclusive'])
+            else:res.append([f'TPR did not regulated to its operating voltage',Enums.TestResult.INCONCLUSIVE])
+        else : res.append([f'PRx did not entered PT Phase',Enums.TestResult.INCONCLUSIVE])
         return res
       
     #-----------------------------------------------------------Negotiation Phase Tests------------------------------------------------------------------------- #
@@ -93,7 +94,7 @@ class CommonCTSChecks:
         self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration",value= "Neg:true",limit=self.Flow_limit)
         if len(CFG)>2:
-            res.append([f'TPR sent a CFG/ep data packet at index@ {CFG[2]} replacing the CFG/bp data packet','Pass'])
+            res.append([f'TPR sent a CFG/ep data packet at index@ {CFG[2]} replacing the CFG/bp data packet',Enums.TestResult.PASS])
             #Check RP8 Packets
             id=CFG[2]+1
             count=[]
@@ -102,20 +103,20 @@ class CommonCTSChecks:
                 if self.PktMethod.GetPacketType(id)=='Packet':
                     if 'TEST_PTX_CPX_NEG_S07_ABT_002' in self.Header['TestcaseID'] and not DefaultCheck:
                         if "8 bit Received Power" in self.file_list[id]['pktType']:
-                            res.append([f'TPR sent RP8 data packet at index@ {id} by replacing the First CE packet','Pass'])
+                            res.append([f'TPR sent RP8 data packet at index@ {id} by replacing the First CE packet',Enums.TestResult.PASS])
                             count.append(id)
                         else: 
                             if self.file_list[CFG[2]]['pktType'] in self.file_list[id]['pktType']:# Suppose if retry happens when Response is not received
                                 id+=1
                                 continue
-                            else:res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of first CE packet','Inconclusive'])
+                            else:res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of first CE packet',Enums.TestResult.INCONCLUSIVE])
                         DefaultCheck=True
                     else:
                         if "8 bit Received Power" in self.file_list[id]['pktType']: count.append(id)
                 id+=1
-            if len(count)>=2: res.append([f'TPR sent its second RP8 data packet at index@ {count[1]}','Pass'])
-            else:res.append(['TPR cannot send its second RP8 data packet','Fail'])   
-        else: res.append([f'TPR did not sent CFG/ep packet in the sequence', 'Inconclusive'])
+            if len(count)>=2: res.append([f'TPR sent its second RP8 data packet at index@ {count[1]}',Enums.TestResult.PASS])
+            else:res.append(['TPR cannot send its second RP8 data packet',Enums.TestResult.FAIL])   
+        else: res.append([f'TPR did not sent CFG/ep packet in the sequence', Enums.TestResult.INCONCLUSIVE])
         return res
         
     def Nego_fod(self,CTSCheck,Check,flows,flwID):
@@ -123,11 +124,11 @@ class CommonCTSChecks:
         self.Flow_limit = flows[flwID]['Limit']
         Rf=self.PktMethod.GetPacketDetails(packet="FOD Status",value='Rf',limit=self.Flow_limit)
         if len(Rf)>2:
-            res.append([f'TPR sent a FOD/Rf data packet at index@ {Rf[2]}','Pass'])
+            res.append([f'TPR sent a FOD/Rf data packet at index@ {Rf[2]}',Enums.TestResult.PASS])
             Qf=self.PktMethod.GetPacketDetails(packet="FOD Status",value='Qf',limit=[Rf[2]+1,self.Flow_limit[1]])
             if len(Qf)>2:
-                res.append([f'TPR sent a FOD/Qf data packet at index@ {Qf[2]}','Pass'])
-                res.append([f'Fod_rf is swapped with Fod_qf','Pass'])
+                res.append([f'TPR sent a FOD/Qf data packet at index@ {Qf[2]}',Enums.TestResult.PASS])
+                res.append([f'Fod_rf is swapped with Fod_qf',Enums.TestResult.PASS])
                 # count CE packets
                 id=Qf[2]+1
                 count=[]
@@ -135,10 +136,10 @@ class CommonCTSChecks:
                     if self.PktMethod.GetPacketType(id)=='Packet':
                         if 'Control Error' in self.file_list[id]['pktType']:count.append(id)
                     id+=1
-                if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}','Pass'])
-                else:res.append([f'TPR cannot send its second CE Packet','Fail'])
-            else: res.append([f'TPR did not sent FOD/Qf packet in the sequence', 'Inconclusive'])
-        else: res.append([f'TPR did not sent FOD/Rf packet in the sequence', 'Inconclusive'])
+                if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}',Enums.TestResult.PASS])
+                else:res.append([f'TPR cannot send its second CE Packet',Enums.TestResult.FAIL])
+            else: res.append([f'TPR did not sent FOD/Qf packet in the sequence', Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f'TPR did not sent FOD/Rf packet in the sequence', Enums.TestResult.INCONCLUSIVE])
         return res
 
 
@@ -155,16 +156,16 @@ class CommonCTSChecks:
                 # Find SRQ/GP 
                 SRQ_GP=self.PktMethod.GetPacketDetails(packet="SRQ [0x20]",value="Guaranteed Load Power",limit=[PT_CAP[2]+1,self.Flow_limit[1]])
                 if len(SRQ_GP)>2:
-                    res.append([f'TPR sent SRQ/GP packet at {{{SRQ_GP[2]}}}','Pass'])
+                    res.append([f'TPR sent SRQ/GP packet at {{{SRQ_GP[2]}}}',Enums.TestResult.PASS])
                     # Verify the Guranteed Load Power according to CTS
                     GPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(SRQ_GP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
                     if Check.get('0.5',False):
-                        res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is { '' if GPower==NPower+0.5 else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W + 0.5 W','Pass' if GPower==NPower+0.5 else 'Inconclusive'])
+                        res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is { '' if GPower==NPower+0.5 else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W + 0.5 W',Enums.TestResult.PASS if GPower==NPower+0.5 else Enums.TestResult.INCONCLUSIVE])
                     else:
                         if 'GPX_002' in self.Header['TestcaseID'] :
-                            res.append([f'TPR set Guranteed_Power value to {GPower}_W  in SRQ/GP packet, Expected 3W','Pass' if GPower==3 else 'Inconclusive'])
+                            res.append([f'TPR set Guranteed_Power value to {GPower}_W  in SRQ/GP packet, Expected 3W',Enums.TestResult.PASS if GPower==3 else Enums.TestResult.INCONCLUSIVE])
                         else:
-                            res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is {'' if GPower==NPower else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W','Pass' if GPower==NPower else 'Inconclusive'])
+                            res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is {'' if GPower==NPower else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W',Enums.TestResult.PASS if GPower==NPower else Enums.TestResult.INCONCLUSIVE])
 
                     # Verify SRQ/GP Response
                     id= SRQ_GP[2]+1
@@ -176,21 +177,21 @@ class CommonCTSChecks:
                                 id+=1
                                 continue
                             else:
-                                PF.append([f"TPR sent packet {self.file_list[id]['pktType']}_{self.file_list[id]['value']} at {{{id}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",'Inconclusive'])
+                                PF.append([f"TPR sent packet {self.file_list[id]['pktType']}_{self.file_list[id]['value']} at {{{id}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",Enums.TestResult.INCONCLUSIVE])
                                 break
                         elif self.PktMethod.GetPacketType(id)=='Response':
-                            PF.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/GP packet, Expected - {Check['Response']}','Pass' if Check['Response'] in self.file_list[id]['pktType'] else 'Fail'])
+                            PF.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/GP packet, Expected - {Check['Response']}',Enums.TestResult.PASS if Check['Response'] in self.file_list[id]['pktType'] else Enums.TestResult.FAIL])
                             break
                         id+=1
                         
-                    if PF==[]:PF.append([f'PTx did not sent response for SRQ/GP packet','Inconclusive'])
+                    if PF==[]:PF.append([f'PTx did not sent response for SRQ/GP packet',Enums.TestResult.INCONCLUSIVE])
                     res.extend(PF)
 
-                else: res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP','Inconclusive'])
+                else: res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP',Enums.TestResult.INCONCLUSIVE])
                     
-            else: res.append([f'Power Transmitter Capability response is not found','Inconclusive'])
+            else: res.append([f'Power Transmitter Capability response is not found',Enums.TestResult.INCONCLUSIVE])
                     
-        else: res.append([f'TPR did not sent GRQ/ PT-CAP packet in the sequence ','Inconclusive'])
+        else: res.append([f'TPR did not sent GRQ/ PT-CAP packet in the sequence ',Enums.TestResult.INCONCLUSIVE])
                 
         return res
 
@@ -219,30 +220,30 @@ class CommonCTSChecks:
                                     iid+=1
                                     continue
                                 else:
-                                    PF.append([f"TPR sent packet {self.file_list[iid]['pktType']}_{self.file_list[iid]['value']} at {{{iid}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",'Inconclusive'])
+                                    PF.append([f"TPR sent packet {self.file_list[iid]['pktType']}_{self.file_list[iid]['value']} at {{{iid}}} without getting response for {self.file_list[SRQ_GP[2]]['pktType']}_{self.file_list[SRQ_GP[2]]['value']}",Enums.TestResult.INCONCLUSIVE])
                                     break
                             elif self.PktMethod.GetPacketType(iid)=='Response':
                                 ExpResponse= 'ACK' if GPowerStart <= NPower else 'NAK' 
-                                PF.append([f'TPR sent SRQ/GP packet at {{{SRQ_GP[2]}}}','Pass'])
+                                PF.append([f'TPR sent SRQ/GP packet at {{{SRQ_GP[2]}}}',Enums.TestResult.PASS])
                                  # Verify the Guranteed Load Power according to CTS
                                 GPower=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(SRQ_GP[2],'Guaranteed_Power_Value')[0]['sRawData']))/2
-                                PF.append([f'TPR set Guranteed_Power value to {GPower} W, Expected - {GPowerStart}_W','Pass' if GPower==GPowerStart else 'Inconclusive'])
-                                PF.append([f'PTx sent {self.file_list[iid]['pktType']} response for SRQ/GP packet , Expected: {ExpResponse}','Pass' if ExpResponse in self.file_list[iid]['pktType'] else 'Fail'])
+                                PF.append([f'TPR set Guranteed_Power value to {GPower} W, Expected - {GPowerStart}_W',Enums.TestResult.PASS if GPower==GPowerStart else Enums.TestResult.INCONCLUSIVE])
+                                PF.append([f'PTx sent {self.file_list[iid]['pktType']} response for SRQ/GP packet , Expected: {ExpResponse}',Enums.TestResult.PASS if ExpResponse in self.file_list[iid]['pktType'] else Enums.TestResult.FAIL])
                                 break
                             iid+=1
                             
                         if PF==[]:
-                            res.append([f'PTx did not sent response for SRQ/GP packet','Inconclusive'])
+                            res.append([f'PTx did not sent response for SRQ/GP packet',Enums.TestResult.INCONCLUSIVE])
                             break
                         res.extend(PF)
                         id=iid+1
                         GPowerStart-=0.5
                     else: 
-                        res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP','Inconclusive'])
+                        res.append([f'TPR did not sent SRQ/GP in the Sequence after GRQ/PT-CAP',Enums.TestResult.INCONCLUSIVE])
                         break
                     if GPowerStart==0: break # Break the Loop if GP power reaches 0W
-            else: res.append([f'Power Transmitter capability response is not found','Inconclusive'])
-        else: res.append([f'TPR did not sent GRQ/PT-CAP packet in the sequence ','Inconclusive'])
+            else: res.append([f'Power Transmitter capability response is not found',Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f'TPR did not sent GRQ/PT-CAP packet in the sequence ',Enums.TestResult.INCONCLUSIVE])
                 
         return res
 
@@ -259,10 +260,10 @@ class CommonCTSChecks:
                 while id < self.Flow_limit[1]:
                     if self.PktMethod.GetPacketType(id)=="Packet":
                         if Check['pkt'] in self.file_list[id]['pktType']:
-                            res.append([f'TPR sent {Check['pkt']} at index@ {id} directly after the CFG/ep packet','Pass'])
+                            res.append([f'TPR sent {Check['pkt']} at index@ {id} directly after the CFG/ep packet',Enums.TestResult.PASS])
                             break 
                         else:
-                            res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of {Check['pkt']} packet','Inconclusive'])
+                            res.append([f'TPR sent {self.file_list[id]['pktType']} at index@ {id} instead of {Check['pkt']} packet',Enums.TestResult.INCONCLUSIVE])
                             pkt=False
                             break 
                     id+=1
@@ -271,18 +272,18 @@ class CommonCTSChecks:
                     PD=self.Payload_Details(PacketName=Check['pkt'],Index=id,PayLoads=Check['PayLoad'])
                     if len(PD)>0:res.extend(PD)
                     Pres=self.PktMethod.GetPacketResponse(id,[id+1,self.Flow_limit[1]])
-                    if Pres is not None: res.append([f'PTx sent {self.file_list[Pres]['pktType']} response to {Check['pkt']} at index@ {Pres} , Exp :{Check['Exp']}','Pass' if self.file_list[Pres]['pktType'] in Check['Exp'] else 'Fail'])
-                    else: res.append([f'PTx did not sent response to {Check['pkt']} at index@ {id}','Inconclusive'])
+                    if Pres is not None: res.append([f'PTx sent {self.file_list[Pres]['pktType']} response to {Check['pkt']} at index@ {Pres} , Exp :{Check['Exp']}',Enums.TestResult.PASS if self.file_list[Pres]['pktType'] in Check['Exp'] else Enums.TestResult.FAIL])
+                    else: res.append([f'PTx did not sent response to {Check['pkt']} at index@ {id}',Enums.TestResult.INCONCLUSIVE])
                     # count CE packets
                     count=[]
                     while id < self.Flow_limit[1]:
                         if self.PktMethod.GetPacketType(id)=='Packet':
                             if 'Control Error' in self.file_list[id]['pktType']:count.append(id)
                         id+=1
-                    if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}','Pass'])
-                    else:res.append([f'TPR cannot send its second CE Packet','Fail'])
-            else:res.append([f'Cound found response for CFG/ep packet','Inconclusive'])
-        else:res.append([f'could not found CFG/ep packet','Inconclusive'])       
+                    if len(count) >=2:res.append([f'TPR sent its second control Error packet at index@ {count[1]}',Enums.TestResult.PASS])
+                    else:res.append([f'TPR cannot send its second CE Packet',Enums.TestResult.FAIL])
+            else:res.append([f'Cound found response for CFG/ep packet',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'could not found CFG/ep packet',Enums.TestResult.INCONCLUSIVE])       
         return res   
         
     #-----------------------------------------------------------Power Transfer Phase Tests------------------------------------------------------------------------- #
@@ -300,13 +301,13 @@ class CommonCTSChecks:
                 if count%3==2:
                     RP8=self.PktMethod.GetPacketDetails(packet="8 bit Received Power", limit=[id,self.Flow_limit[1]])
                     if len(RP8)>2:
-                        res.append([f'TPR sent 8-Bit Received_Power packet at index@ {RP8[2]} after 3 RP packets','Pass'])
+                        res.append([f'TPR sent 8-Bit Received_Power packet at index@ {RP8[2]} after 3 RP packets',Enums.TestResult.PASS])
                         id=RP8[2]+1
                         RP8Check=True
                         last_RP8=RP8
                         count=0 # Reset count to check the next sequence of RP packets
                     else:
-                        res.append([f'TPR did not send RP/8 packet after 3 RP packets','Inconclusive'])
+                        res.append([f'TPR did not send RP/8 packet after 3 RP packets',Enums.TestResult.INCONCLUSIVE])
                         break
                 else:
                     RP=self.PktMethod.GetPacketDetails(packet="16 bit Received Power", limit=[id,self.Flow_limit[1]])
@@ -319,15 +320,15 @@ class CommonCTSChecks:
                 iid=last_RP8[2]+1
                 while iid< self.Flow_limit[1]:
                     if self.PktMethod.GetPacketType(iid) in ["Response","Packet"]:
-                        res.append([f'PTx did not detach after the last RP/8 packet ','Inconclusive'])
+                        res.append([f'PTx did not detach after the last RP/8 packet ',Enums.TestResult.INCONCLUSIVE])
                     else:
                         if 'shutdown' in self.file_list[iid]['pktType'] or 'CoilVoltpkpk' in self.file_list[iid]['pktType']:
                             Timing=round((self.file_list[iid]['startTime']-last_RP8[1])*1000,3)
-                            res.append([f'Measured t_terminate from last RP/8 packet at {{{last_RP8[2]}}} is {Timing}_mS ,Limit[≤ 28 mS]','Pass' if Timing <=28 else 'Fail'])
+                            res.append([f'Measured t_terminate from last RP/8 packet at {{{last_RP8[2]}}} is {Timing}_mS ,Limit[≤ 28 mS]',Enums.TestResult.PASS if Timing <=28 else Enums.TestResult.FAIL])
                         break
                     iid+=1
-            else:res.append([f'TPR did not send RP/8 packet or 3 RP packets before RP/8 packet','Inconclusive'])         
-        else:res.append([f'TPR did not enter into PT phase','Inconclusive'])
+            else:res.append([f'TPR did not send RP/8 packet or 3 RP packets before RP/8 packet',Enums.TestResult.INCONCLUSIVE])         
+        else:res.append([f'TPR did not enter into PT phase',Enums.TestResult.INCONCLUSIVE])
         return res
   
     
@@ -344,11 +345,11 @@ class CommonCTSChecks:
                 ADCpktCount+=1
                 Payload=self.PktMethod.GetPayloadDetails(ADC[2],"Request")[0]['sRawData']
                 if Payload in Check['ADC']:
-                    res.append([f'PTx sent ADC data packet with parameter {Payload} at index@ {ADC[2]}', 'Pass'])
-                else: res.append([f'PTx sent ADC data packet with parameter {Payload} at index@ {ADC[2]} which is not in set {Check["ADC"]}.', 'Pass'])
+                    res.append([f'PTx sent ADC data packet with parameter {Payload} at index@ {ADC[2]}', Enums.TestResult.PASS])
+                else: res.append([f'PTx sent ADC data packet with parameter {Payload} at index@ {ADC[2]} which is not in set {Check["ADC"]}.', Enums.TestResult.PASS])
                 id=ADC[2]+1
             else:id+=1
-        if ADCpktCount<10:res.append([f'PTx did not sent 10 ADC Data packets', 'Inconclusive'])
+        if ADCpktCount<10:res.append([f'PTx did not sent 10 ADC Data packets', Enums.TestResult.INCONCLUSIVE])
         return res
 
     def ADT(self,CTSCheck,Check,flows,flwID):
@@ -361,7 +362,7 @@ class CommonCTSChecks:
             ADC=self.PktMethod.GetPacketDetails(packet="ADC",value="Auth", Type='Response',limit=[id,self.Flow_limit[1]])
             if len(ADC)>2:
                 ADCpktCount+=1
-                res.append([f'PTx sent ADC/auth data packet at index@ {ADC[2]}', 'Pass'])
+                res.append([f'PTx sent ADC/auth data packet at index@ {ADC[2]}', Enums.TestResult.PASS])
                 ADT1=self.PktMethod.GetPacketDetails(packet="ADT",Type='Response', limit=[ADC[2]+1,self.Flow_limit[1]])
                 if len(ADT1)>2:
                     if Check["DSRNAK"]:
@@ -369,28 +370,28 @@ class CommonCTSChecks:
                         i=ADT1[2]+1
                         while i < self.Flow_limit[1]:
                             if self.file_list[i]['pktType']=="DSR":
-                                if "NAK" in  self.file_list[i]['value']: res.append([f'PRx sent DSR/Nak at index@ {i} packet after the ADT packet at index@ {ADT1[2]}.', 'Pass'])
-                                else:res.append([f'PRx did not sent DSR/Nak packet after the ADT packet at index@ {ADT1[2]}.', 'Inconclusive'])
+                                if "NAK" in  self.file_list[i]['value']: res.append([f'PRx sent DSR/Nak at index@ {i} packet after the ADT packet at index@ {ADT1[2]}.', Enums.TestResult.PASS])
+                                else:res.append([f'PRx did not sent DSR/Nak packet after the ADT packet at index@ {ADT1[2]}.', Enums.TestResult.INCONCLUSIVE])
                                 break
                             else:i+=1
                         ADT2=self.PktMethod.GetPacketDetails(packet="ADT", Type='Response',limit=[i+1,self.Flow_limit[1]])
                         if len(ADT2)>2:
                             if self.file_list[ADT1[2]]['pktType']==self.file_list[ADT2[2]]['pktType']:
-                                res.append([f'PRx sent { self.file_list[ADT1[2]]["pktType"]} data packet at index@ {ADT1[2]}, { self.file_list[ADT2[2]]["pktType"]} data packet at index@ {ADT2[2]}.', 'Pass'])
-                            else: res.append([f'PRx sent { self.file_list[ADT1[2]]["pktType"]} data packet at index@ {ADT1[2]}, { self.file_list[ADT2[2]]["pktType"]} data packet at index@ {ADT2[2]}.', 'Fail'])
+                                res.append([f'PRx sent { self.file_list[ADT1[2]]["pktType"]} data packet at index@ {ADT1[2]}, { self.file_list[ADT2[2]]["pktType"]} data packet at index@ {ADT2[2]}.', Enums.TestResult.PASS])
+                            else: res.append([f'PRx sent { self.file_list[ADT1[2]]["pktType"]} data packet at index@ {ADT1[2]}, { self.file_list[ADT2[2]]["pktType"]} data packet at index@ {ADT2[2]}.', Enums.TestResult.FAIL])
                             id=ADT2[2]+1
                         else:
-                            res.append([f'PTx did not sent next ADT packet after the ADT packet at index@ {ADT1[2]}.', 'Inconclusive'])
+                            res.append([f'PTx did not sent next ADT packet after the ADT packet at index@ {ADT1[2]}.', Enums.TestResult.INCONCLUSIVE])
                             id=i+1
                     else:
-                        if 'e' in self.file_list[ADT1[2]]['pktType']:res.append([f'PTx sent {self.file_list[ADT1[2]]["pktType"]} Packet after ADC/Auth at @Id{ADC[2]} .', 'Pass'])
-                        else:res.append([f'PTx sent {self.file_list[ADT1[2]]["pktType"]} packet after ADC/Auth at index@ {ADC[2]} .', 'Fail'])
+                        if 'e' in self.file_list[ADT1[2]]['pktType']:res.append([f'PTx sent {self.file_list[ADT1[2]]["pktType"]} Packet after ADC/Auth at @Id{ADC[2]} .', Enums.TestResult.PASS])
+                        else:res.append([f'PTx sent {self.file_list[ADT1[2]]["pktType"]} packet after ADC/Auth at index@ {ADC[2]} .', Enums.TestResult.FAIL])
                         id=ADT1[2]+1
                 else:
-                    res.append([f'PTx did not sent ADT Packet after ADC/auth at index@ {ADC[2]}.', 'Inconclusive'])
+                    res.append([f'PTx did not sent ADT Packet after ADC/auth at index@ {ADC[2]}.', Enums.TestResult.INCONCLUSIVE])
                     id+=1
             else:break
-        if ADCpktCount<5:res.append([f'PTx did not sent 5 {Check["PktCheck"]} data packets.', 'Inconclusive'])
+        if ADCpktCount<5:res.append([f'PTx did not sent 5 {Check["PktCheck"]} data packets.', Enums.TestResult.INCONCLUSIVE])
         return res
 
    
@@ -407,7 +408,7 @@ class CommonCTSChecks:
                 Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[id,self.Flow_limit[1]])
                 if len(Get_Certificate)>2:
                     count+=1
-                    res.append([f'Sequence - {count}','Pass'])
+                    res.append([f'Sequence - {count}',Enums.TestResult.PASS])
                     results=self.Payload_Details(PacketName='Get_Certificate',Index=Get_Certificate[2],PayLoads=Check['Get_Certificate'])
                     if len(results)>0:res.extend(results)
                     ADCAuth=self.PktMethod.GetPacketDetails(packet="ADC",value="Auth",Type='Response', limit=[Get_Certificate[2]+1,self.Flow_limit[1]])
@@ -434,28 +435,28 @@ class CommonCTSChecks:
                                 else:break
 
                             # Validate
-                            if len(ADTPkts)==1:res.append([f'PTx sent only one {self.file_list[iD-1]['pktType']} at index@ {iD-1} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at @index@ {ADCEnd[2]}', 'Pass'])                                                    
-                            elif len(ADTPkts)==0:res.append([f'PTx did not sent any ADT data packets in bewtween the sequence -{count}', 'Inconclusive'])
+                            if len(ADTPkts)==1:res.append([f'PTx sent only one {self.file_list[iD-1]['pktType']} at index@ {iD-1} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at @index@ {ADCEnd[2]}', Enums.TestResult.PASS])                                                    
+                            elif len(ADTPkts)==0:res.append([f'PTx did not sent any ADT data packets in bewtween the sequence -{count}', Enums.TestResult.INCONCLUSIVE])
                             else:
                                 for i,j in zip(ADTPkts,ADTPkts[1:]):
                                     if self.file_list[i]['pktType'][-1] != self.file_list[j]['pktType'][-1]:
-                                        res.append([f'PTx sent different {self.file_list[i]['pktType']} at index@ {i},{self.file_list[j]['pktType']} at index@ {j} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at index@ {ADCEnd[2]}', 'Pass'])
-                                    else:res.append([f'PTx sent same {self.file_list[i]['pktType']} at index@ {i},{self.file_list[j]['pktType']} at index@ {j} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at index@ {ADCEnd[2]}', 'Fail'])
+                                        res.append([f'PTx sent different {self.file_list[i]['pktType']} at index@ {i},{self.file_list[j]['pktType']} at index@ {j} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at index@ {ADCEnd[2]}', Enums.TestResult.PASS])
+                                    else:res.append([f'PTx sent same {self.file_list[i]['pktType']} at index@ {i},{self.file_list[j]['pktType']} at index@ {j} in between the sequence from {self.file_list[ADCAuth[2]]['pktType']} at index@ {ADCAuth[2]} to {self.file_list[ADCEnd[2]]['pktType']} at index@ {ADCEnd[2]}', Enums.TestResult.FAIL])
                             id=ADCEnd[2]+1
                         else:
-                            res.append([f'PTx did not sent ADC/end response in sequence -{count}', 'Inconclusive'])
+                            res.append([f'PTx did not sent ADC/end response in sequence -{count}', Enums.TestResult.INCONCLUSIVE])
                             id=ADCAuth[2]+1
                             
                     else:
-                        res.append([f'PTx did not sent ADC/auth response in sequence -{count}', 'Inconclusive'])
+                        res.append([f'PTx did not sent ADC/auth response in sequence -{count}', Enums.TestResult.INCONCLUSIVE])
                         id=Get_Certificate[2]+1
                 
                 else:
-                    res.append([f'TPR did not sent Get_Certificate request','Inconclusive'])
+                    res.append([f'TPR did not sent Get_Certificate request',Enums.TestResult.INCONCLUSIVE])
                     break
             
-            if count <5 :res.append([f'TPR cannot log the data packets of five complete data transport streams','Inconclusive'])
-        else:res.append([f'Prx did not entered PT phase', 'Inconclusive'])
+            if count <5 :res.append([f'TPR cannot log the data packets of five complete data transport streams',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Prx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -475,10 +476,10 @@ class CommonCTSChecks:
                     if seq :
                         # Check Signature Valid
                         Signature=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="Valid" ,Type="TesterMsg",limit=[0,self.Flow_limit[1]])
-                        if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', 'Pass'])
-                        else:res.append([f'Signature contained in Challenge is not valid', 'Fail'])
-                else:res.append([f'Certificate chain is not valid or not found', 'Inconclusive'])
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+                        if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', Enums.TestResult.PASS])
+                        else:res.append([f'Signature contained in Challenge is not valid', Enums.TestResult.FAIL])
+                else:res.append([f'Certificate chain is not valid or not found', Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
                         
         return res
 
@@ -500,11 +501,11 @@ class CommonCTSChecks:
                         if seq :
                             # Check Signature Valid
                             Signature=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="Valid" ,Type="TesterMsg",limit=[0,self.Flow_limit[1]])
-                            if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', 'Pass'])
-                            else:res.append([f'Signature contained in Challenge is not valid', 'Fail'])
-                    else:res.append([f'Certificate chain is not valid or not found', 'Inconclusive'])
+                            if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', Enums.TestResult.PASS])
+                            else:res.append([f'Signature contained in Challenge is not valid', Enums.TestResult.FAIL])
+                    else:res.append([f'Certificate chain is not valid or not found', Enums.TestResult.INCONCLUSIVE])
                
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -519,11 +520,11 @@ class CommonCTSChecks:
             if seq:
                 # Check Signature Valid
                 Signature=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="Valid" ,Type="TesterMsg",limit=[0,self.Flow_limit[1]])
-                if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', 'Pass'])
-                else:res.append([f'Signature contained in Challenge is not valid', 'Fail'])
+                if len(Signature)>2:res.append([f'Signature contained in Challenge_auth is valid', Enums.TestResult.PASS])
+                else:res.append([f'Signature contained in Challenge is not valid', Enums.TestResult.FAIL])
                 result,id,seq=self.AuthSequence(id,Authvalue1="Get_Certificate",Payload1=Check['Certificate'],Authvalue2="Certificate",Payload2=[])
                 res.extend(result)
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -550,7 +551,7 @@ class CommonCTSChecks:
             if seq and Check.get("Challenge",True):
                 result,id,seq=self.AuthSequence(id,Authvalue1="Challenge",Authvalue2="Challenge_Auth",Payload2=[])
                 res.extend(result) 
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -568,7 +569,7 @@ class CommonCTSChecks:
                 if seq:
                     result,id,seq=self.AuthSequence(id,Authvalue1="Challenge",Authvalue2="Challenge_Auth",Payload2=[])
                     res.extend(result) 
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -583,7 +584,7 @@ class CommonCTSChecks:
             if seq:
                 result,id,seq=self.AuthSequence(id,Authvalue1="Get_Certificate",Payload1=Check['Certificate'],Authvalue2="Certificate",Payload2=[])
                 res.extend(result)
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -616,10 +617,10 @@ class CommonCTSChecks:
                             if Pkt_val1 and Pkt_val2==1:Pkt_val2=True
                             else: Pkt_val2=False
                         
-                    if items['comp']=="EQL":  res.append([f'{items['Name2']} field is set to {Pkt_val2} in data packet, {f'and {items['Name1']} field is set to {Pkt_val1} in data packet,' if not SDF_Check else f'in SDF it was set to {Pkt_val1} '}, Comp :{items['comp']}', 'Pass'  if Pkt_val1==Pkt_val2 else 'Fail'])  
-                    elif items['comp']=="GEQL": res.append([f'{items['Name2']} filed is set to {Pkt_val2} in data packet, {f'and {items['Name1']} field is set to {Pkt_val1} in data packet,' if not SDF_Check else f'in SDF it was set to {Pkt_val1} '}, Comp :{items['comp']}', 'Pass'  if Pkt_val1>=Pkt_val2 else 'Fail'])  
+                    if items['comp']=="EQL":  res.append([f'{items['Name2']} field is set to {Pkt_val2} in data packet, {f'and {items['Name1']} field is set to {Pkt_val1} in data packet,' if not SDF_Check else f'in SDF it was set to {Pkt_val1} '}, Comp :{items['comp']}', Enums.TestResult.PASS  if Pkt_val1==Pkt_val2 else Enums.TestResult.FAIL])  
+                    elif items['comp']=="GEQL": res.append([f'{items['Name2']} filed is set to {Pkt_val2} in data packet, {f'and {items['Name1']} field is set to {Pkt_val1} in data packet,' if not SDF_Check else f'in SDF it was set to {Pkt_val1} '}, Comp :{items['comp']}', Enums.TestResult.PASS  if Pkt_val1>=Pkt_val2 else Enums.TestResult.FAIL])  
             
-            else: res.append([f'{'PRx' if not pkt[3] else "PTx"} did not sent {pkt[0]} data packet','Fail'])
+            else: res.append([f'{'PRx' if not pkt[3] else "PTx"} did not sent {pkt[0]} data packet',Enums.TestResult.FAIL])
                         
         return res
 
@@ -636,14 +637,14 @@ class CommonCTSChecks:
                 if pkt[2][0]['Type']=="DEC":Pkt_val=self.PktMethod.hex_to_decimal(Pkt_val)
                 Pkt_vals.append(Pkt_val)
                 Descriptions.append(f'Measured {pkt[2][0]['Name']} at index@ {PD[2]} is {Pkt_val}')
-            else: res.append([f'Test did not found {pkt[0]} data packet','Inconclusive'])
+            else: res.append([f'Test did not found {pkt[0]} data packet',Enums.TestResult.INCONCLUSIVE])
 
         if Check['Addval']:
             i=0
             while i< len(Pkt_vals)-1:
                 Pkt_vals[i]=Pkt_vals[i]+Check['Addval'][i+1]
                 i+=1
-        if Check['Comp']=="NEQ": res.append([f'{', '.join(Descriptions)} Comp :{Check['Comp']}','Inconclusive' if Pkt_vals[0]==Pkt_vals[1] else 'Pass'])
+        if Check['Comp']=="NEQ": res.append([f'{', '.join(Descriptions)} Comp :{Check['Comp']}',Enums.TestResult.INCONCLUSIVE if Pkt_vals[0]==Pkt_vals[1] else Enums.TestResult.PASS])
 
         return res
 
@@ -661,12 +662,12 @@ class CommonCTSChecks:
                     RepPkt=True
                     # AllMeasures_exp = f"TPR should send {DataPacket} datapacket"
                     if (Check['ExpectedPacket'][1]is None and Check['ExpectedPacket'][0] in self.file_list[id].get('pktType')) or (Check['ExpectedPacket'][0] in self.file_list[id].get('pktType') and (Check['ExpectedPacket'][1] in self.file_list[id].get('value'))):
-                        res.append([f"TPR sent {DataPacket} dataPacket","Pass"])   
-                    else:  res.append([f"TPR sent {self.file_list[id].get('pktType')} packet instead of {DataPacket}","Fail"])
+                        res.append([f"TPR sent {DataPacket} dataPacket",Enums.TestResult.PASS])   
+                    else:  res.append([f"TPR sent {self.file_list[id].get('pktType')} packet instead of {DataPacket}",Enums.TestResult.FAIL])
                     break
                 pktCount+=1
             id+=1
-        if not RepPkt: res.append([f"TPR did not sent complete {DataPacket} due to voltage drop ","Pass"])
+        if not RepPkt: res.append([f"TPR did not sent complete {DataPacket} due to voltage drop ",Enums.TestResult.PASS])
 
         return res
     def SignalStrengthCheck(self,CTSCheck,Check,flows,flwID):
@@ -677,10 +678,10 @@ class CommonCTSChecks:
             # check signal Strength Packet
             SS = self.PktMethod.GetPacketDetails(packet='Signal strength',limit=[ST[2]+1,SP[2]])
             if len(SS)>2:
-                res.append([f'TPR sent Signal_strength packet at index@ {{{SS[2]}}}','Fail'])
-            else:res.append([f'TPR did not sent Signal_strength packet','Pass'])
+                res.append([f'TPR sent Signal_strength packet at index@ {{{SS[2]}}}',Enums.TestResult.FAIL])
+            else:res.append([f'TPR did not sent Signal_strength packet',Enums.TestResult.PASS])
 
-        else:res.append([f'test_stop [or] test_start is missing','Inconclusive'])
+        else:res.append([f'test_stop [or] test_start is missing',Enums.TestResult.INCONCLUSIVE])
         
         return res
 
@@ -694,35 +695,35 @@ class CommonCTSChecks:
         def Tfod():
             # find the Timing between NAK and shutdown
             Tfod=round((shutdown[1]- self.file_list[resp]['stopTime'])*1000,2)
-            if Check['ACK_Check']:  res.append([f"PTx sent { self.file_list[resp]['pktType']} response for FOD packet","Fail"])
+            if Check['ACK_Check']:  res.append([f"PTx sent { self.file_list[resp]['pktType']} response for FOD packet",Enums.TestResult.FAIL])
             else:
-                res.append([f"Measured t_fod timing is {Tfod} mS","Fail" if Tfod >5000 else "Pass"]) 
+                res.append([f"Measured t_fod timing is {Tfod} mS",Enums.TestResult.FAIL if Tfod >5000 else Enums.TestResult.PASS]) 
 
 
         if len(FOD1)>2:
             # check FOD value
             Pkt_val1=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(FOD1[2],'FOD_support_data')[0]['sRawData'])
             Specval=Check['defaultVal'][0]+(Check['defaultVal'][0] *10)/100 if Check['defaultVal'][2]=="Greater" else Check['defaultVal'][0]-(Check['defaultVal'][0] *10)/100 
-            res.append([f"Measured FOD/qf is {Pkt_val1} at index@ {FOD1[2]}, expected val should be {Check['defaultVal'][2]} than 10% of default value :{Check['defaultVal'][0]}",'Fail' if Pkt_val1 <= Specval else 'Pass'])
+            res.append([f"Measured FOD/qf is {Pkt_val1} at index@ {FOD1[2]}, expected val should be {Check['defaultVal'][2]} than 10% of default value :{Check['defaultVal'][0]}",Enums.TestResult.FAIL if Pkt_val1 <= Specval else Enums.TestResult.PASS])
             resp = self.PktMethod.GetPacketResponse(FOD1,[FOD1[2]+1,self.Flow_limit[1]])
             if self.file_list[resp]['pktType'] =="ACK":
                 if len(FOD2)>2:
                     Pkt_val2=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(FOD2[2],'FOD_support_data')[0]['sRawData'])
                     Specval=Check['defaultVal'][1]+(Check['defaultVal'][1] *2)/100 if Check['defaultVal'][3]=="Greater" else Check['defaultVal'][0]-(Check['defaultVal'][0] *10)/100 
-                    res.append([f"Measured FOD/rf is {Pkt_val2} at index@ {FOD2[2]}, expected val should be {Check['defaultVal'][3]} than 2% of default value :{Check['defaultVal'][1]}",'Fail' if Pkt_val2 >=Specval else 'Pass'])
+                    res.append([f"Measured FOD/rf is {Pkt_val2} at index@ {FOD2[2]}, expected val should be {Check['defaultVal'][3]} than 2% of default value :{Check['defaultVal'][1]}",Enums.TestResult.FAIL if Pkt_val2 >=Specval else Enums.TestResult.PASS])
                     resp = self.PktMethod.GetPacketResponse(FOD2,[FOD2[2]+1,self.Flow_limit[1]])
-                    if self.file_list[resp]['pktType'] =="ACK":res.append([f"PTx sent ACK response for both FOD packets","Pass"])       
+                    if self.file_list[resp]['pktType'] =="ACK":res.append([f"PTx sent ACK response for both FOD packets",Enums.TestResult.PASS])       
                     else: 
                         if self.file_list[resp]['pktType'] =="NAK":Tfod()  
-                        else:  res.append([f"PTx sent {self.file_list[resp]['pktType']} response for FOD packet","Inconclusive"])       
+                        else:  res.append([f"PTx sent {self.file_list[resp]['pktType']} response for FOD packet",Enums.TestResult.INCONCLUSIVE])       
                         
             else:
                 if Check['FodCheck']:
-                    if len(FOD2)<2:res.append([f"PRx did not sent FOD/rf packet","Inconclusive"])
+                    if len(FOD2)<2:res.append([f"PRx did not sent FOD/rf packet",Enums.TestResult.INCONCLUSIVE])
                 else:
                     if self.file_list[resp]['pktType'] =="NAK":Tfod()  
-                    else:  res.append([f"PTx sent {self.file_list[resp]['pktType']} response for FOD packet","Inconclusive"])       
-        else:res.append([f"PRx did not sent FOD packet","Inconclusive"])
+                    else:  res.append([f"PTx sent {self.file_list[resp]['pktType']} response for FOD packet",Enums.TestResult.INCONCLUSIVE])       
+        else:res.append([f"PRx did not sent FOD packet",Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -744,13 +745,13 @@ class CommonCTSChecks:
                         resp2 = self.PktMethod.GetPacketResponse(RP2,[RP2[2]+1,self.Flow_limit[1]])
                         if  self.file_list[resp]['pktType'] =="ACK":
                             Tcalibrate=round((self.file_list[resp2]['stopTime']-self.file_list[resp]['stopTime'])*1000,2)
-                            res.append([f"Measured t_calibrate time is {Tcalibrate} mS",'Pass' if Tcalibrate <=10000 else 'Fail'])
+                            res.append([f"Measured t_calibrate time is {Tcalibrate} mS",Enums.TestResult.PASS if Tcalibrate <=10000 else Enums.TestResult.FAIL])
                             break
                         else:id=resp2+1    
                     else:
-                        res.append([f"PRx did not sent RP/2 data packet with ACK","Inconclusive"])    
-            else:res.append([f"PTx sent { self.file_list[resp]['pktType']} response for SRQ/en packet","Inconclusive"])
-        else: res.append([f"PRx did not sent SRQ/en packet","Inconclusive"])
+                        res.append([f"PRx did not sent RP/2 data packet with ACK",Enums.TestResult.INCONCLUSIVE])    
+            else:res.append([f"PTx sent { self.file_list[resp]['pktType']} response for SRQ/en packet",Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f"PRx did not sent SRQ/en packet",Enums.TestResult.INCONCLUSIVE])
                         
         return res
 
@@ -764,13 +765,13 @@ class CommonCTSChecks:
             resp = self.PktMethod.GetPacketResponse(ExpectedPacket_Details,[ExpectedPacket_Details[2]+1,self.Flow_limit[1]])
             if resp is not None:
                 if self.file_list[resp]['pktType'] in Check['ExpResponse']:
-                    res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket ','Pass'])
+                    res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket ',Enums.TestResult.PASS])
                     if Check.get("ResponseTiming",False):
                         Timing= round((self.file_list[resp]['startTime']-ExpectedPacket_Details[1])*1000,3)
-                        res.append([f'Measured t_response is {Timing} mS Limit [3 ≤ t_response ≤ 10]mS', 'Pass' if Timing >=3 and Timing <=10 else 'Fail'])
-                else: res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket which is Not expected.','Fail'])
-            else:   res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket ','Fail'])
-        else: res.append([f'TPR did not sent the {Check['ExpectedPacket'][0]} datapacket.','Inconclusive'])
+                        res.append([f'Measured t_response is {Timing} mS Limit [3 ≤ t_response ≤ 10]mS', Enums.TestResult.PASS if Timing >=3 and Timing <=10 else Enums.TestResult.FAIL])
+                else: res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket which is Not expected.',Enums.TestResult.FAIL])
+            else:   res.append([f'TPR received {self.file_list[resp]['pktType']} response for the {DataPacket} datapacket ',Enums.TestResult.FAIL])
+        else: res.append([f'TPR did not sent the {Check['ExpectedPacket'][0]} datapacket.',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -791,13 +792,13 @@ class CommonCTSChecks:
 
         if len(ExpPkts)>0:
             for ExpectedPacket in Check['ExpectedPacket']:   
-                if ExpectedPacket[0] not in ExpPkts: res.append([f'TPR did not sent the {ExpectedPacket[0]} datapacket .', "Inconclusive" if Check['Inconclusive'] else 'Fail']) 
+                if ExpectedPacket[0] not in ExpPkts: res.append([f'TPR did not sent the {ExpectedPacket[0]} datapacket .', Enums.TestResult.INCONCLUSIVE if Check['Inconclusive'] else Enums.TestResult.FAIL]) 
                 else: 
                     if ExpPkts[ExpectedPacket[0]] < ExpectedPacket[2]:
-                        res.append([f'TPR sent the {ExpectedPacket[0]} datapacket {ExpPkts[ExpectedPacket[0]]} times which is less than expected {ExpectedPacket[2]} times.', "Inconclusive" if Check['Inconclusive'] else 'Fail'])
-                    else:res.append([f'TPR sent the {ExpectedPacket[0]} datapacket {ExpPkts[ExpectedPacket[0]]} times.', "Pass"])
+                        res.append([f'TPR sent the {ExpectedPacket[0]} datapacket {ExpPkts[ExpectedPacket[0]]} times which is less than expected {ExpectedPacket[2]} times.', Enums.TestResult.INCONCLUSIVE if Check['Inconclusive'] else Enums.TestResult.FAIL])
+                    else:res.append([f'TPR sent the {ExpectedPacket[0]} datapacket {ExpPkts[ExpectedPacket[0]]} times.', Enums.TestResult.PASS])
                 # AllMeasures_exp+=f'TPR should send the Packet {ExpectedPacket[0]};'
-        else: res.append([f'TPR did not sent the {ExpectedPacket[0]} datapacket.', "Inconclusive" if Check['Inconclusive'] else 'Fail'])
+        else: res.append([f'TPR did not sent the {ExpectedPacket[0]} datapacket.', Enums.TestResult.INCONCLUSIVE if Check['Inconclusive'] else Enums.TestResult.FAIL])
 
         return res
 
@@ -815,7 +816,7 @@ class CommonCTSChecks:
         if len(Start_Details)>2:
             Stop_Details=self.PktMethod.GetPacketDetails(packet="Test_Status",value=": Test_Stop",Type="TesterMsg",limit=[Start_Details[2],len(self.file_list)])   if Check['Phase'] =='Ping' else [1,1,TestCaseLimit[1]]
             if len(Stop_Details)>2:
-                if Check['Phase'] == 'Ping': res.append([f"Test executed for {round((Stop_Details[0]-Start_Details[0]),3)} seconds after placing the TPR coil on the PTx Product",'Pass' if round((Stop_Details[0]-Start_Details[0]),3) > 30 else 'Fail' ])
+                if Check['Phase'] == 'Ping': res.append([f"Test executed for {round((Stop_Details[0]-Start_Details[0]),3)} seconds after placing the TPR coil on the PTx Product",Enums.TestResult.PASS if round((Stop_Details[0]-Start_Details[0]),3) > 30 else Enums.TestResult.FAIL ])
                 ExpectedPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['ExpectedPacket'][0], value=Check['ExpectedPacket'][1], limit=[Start_Details[2],Stop_Details[2]+1])
                 if len(ExpectedPacket_Details)>2:
                         # check shutdown
@@ -823,7 +824,7 @@ class CommonCTSChecks:
                     if len(SD)>2:
                         #Measure the first Ping Calculation
                         TterminateVal=round((SD[1] - ExpectedPacket_Details[1]) * 1000, 3)
-                        res.append([f'Measured t_terminate for packet {DataPacket} is {TterminateVal} mS ,Limit:{Check['expected']} ','Fail' if TterminateVal > Check['expected'][1] else 'Pass'])
+                        res.append([f'Measured t_terminate for packet {DataPacket} is {TterminateVal} mS ,Limit:{Check['expected']} ',Enums.TestResult.FAIL if TterminateVal > Check['expected'][1] else Enums.TestResult.PASS])
                         if Trestart:
                             res=self.TrestartCheck(DataPacketName=DataPacket,PktId=ExpectedPacket_Details[2],CoilPkpk=SD)
                             if len(res)>0:res.extend(res)
@@ -831,17 +832,17 @@ class CommonCTSChecks:
                         TterminateList,res=self.calculate_Tterminate(SD[2]+1,Stop_Details[2],ExpPkt=Check['ExpectedPacket'][0],result=res,TterminateLimit=Check['expected'],PacketDetailsCheck=Check['ExpectedPacket'][2],PayLoads=Check['ExpectedPacket'][3] if Check['ExpectedPacket'][2] else [],DataPacketName=DataPacket,Trestart=Trestart)
                         res=res
                     else:
-                        res.append([f'voltage drops below 200mV[pk=pk] level before reaching the end of the {DataPacket} datapacket.','Pass'])
-                        res.append([f'Measured t_terminate is 0.0 mS','Pass'])   
+                        res.append([f'voltage drops below 200mV[pk=pk] level before reaching the end of the {DataPacket} datapacket.',Enums.TestResult.PASS])
+                        res.append([f'Measured t_terminate is 0.0 mS',Enums.TestResult.PASS])   
                 else:
-                    res.append([f'voltage drops below 200mV[pk=pk] level before reaching the end of the {DataPacket} datapacket.','Pass'])
-                    res.append([f'Measured t_terminate is 0.0 mS','Pass'])
+                    res.append([f'voltage drops below 200mV[pk=pk] level before reaching the end of the {DataPacket} datapacket.',Enums.TestResult.PASS])
+                    res.append([f'Measured t_terminate is 0.0 mS',Enums.TestResult.PASS])
                     if Trestart:
                         SD=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[Start_Details[2]+1, Stop_Details[2]])
                         res=self.TrestartCheck(DataPacketName=DataPacket,PktId="None",CoilPkpk=SD)
                         if len(res)>0:res.extend(res)
-            else:  res.append(['Test did not find the Test_Stop assertion','Fail'])
-        else: res.append([f'Test did not entered {Check['Phase']}','Inconclusive'])
+            else:  res.append(['Test did not find the Test_Stop assertion',Enums.TestResult.FAIL])
+        else: res.append([f'Test did not entered {Check['Phase']}',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -854,21 +855,21 @@ class CommonCTSChecks:
         EndPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['EndPacket'][0], value=Check['EndPacket'][1], limit=self.Flow_limit)
         if len(EndPacket_Details)>2 :
             if Check['EndPacket'][2]: 
-                res.append([f'TPR sent {EndDataPacket} data packet','Pass'])
+                res.append([f'TPR sent {EndDataPacket} data packet',Enums.TestResult.PASS])
                 Pres=self.Payload_Details(PacketName=EndDataPacket,Index=EndPacket_Details[2],PayLoads=Check['EndPacket'][3])
                 if len(Pres)>0:res.extend(Pres)  
             id =EndPacket_Details[2]-1
             while id > self.Flow_limit[0]:
                 if self.PktMethod.GetPacketType(id)=="Packet":
                     if (Check['PreviousPacket'][1] is None and Check['PreviousPacket'][0] in self.file_list[id]['pktType'] ) or ( Check['PreviousPacket'][0] in self.file_list[id]['pktType'] and Check['PreviousPacket'][1] in self.file_list[id]['value']) :
-                        res.append([f'TPR sent {PreviousPacket} data packet','Pass'])
+                        res.append([f'TPR sent {PreviousPacket} data packet',Enums.TestResult.PASS])
                         if Check['PreviousPacket'][2]:
                             Pres=self.Payload_Details(PacketName=PreviousPacket,Index=id,PayLoads=Check['PreviousPacket'][3])
                             if len(Pres)>0:res.extend(Pres)     
-                    else:res.append([f'TPR did not sent {PreviousPacket} data packet','Inconclusive'])
+                    else:res.append([f'TPR did not sent {PreviousPacket} data packet',Enums.TestResult.INCONCLUSIVE])
                     break
                 id-=1
-        else: res.append([f'TPR did not sent {EndDataPacket} data packet','Inconclusive'])
+        else: res.append([f'TPR did not sent {EndDataPacket} data packet',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -891,17 +892,17 @@ class CommonCTSChecks:
                 while id < self.Flow_limit[1]:
                     if self.PktMethod.GetPacketType(id)=="Packet":
                         if (SeqPkt[1] is None and SeqPkt[0] in self.file_list[id]['pktType'] ) or (SeqPkt[0] in self.file_list[id]['pktType'] and SeqPkt[1] in self.file_list[id]['value'] ) :
-                            res.append([f'TPR sent {SeqPktDataPacket} data packet','Pass'])
+                            res.append([f'TPR sent {SeqPktDataPacket} data packet',Enums.TestResult.PASS])
                             if SeqPkt[2]:res.extend(self.Payload_Details(PacketName=SeqPktDataPacket,Index=id,PayLoads=SeqPkt[3]))     
                         else: 
-                            res.append([f'TPR did not sent {SeqPktDataPacket} data packet','Inconclusive'])
+                            res.append([f'TPR did not sent {SeqPktDataPacket} data packet',Enums.TestResult.INCONCLUSIVE])
                             Seqcheck=False
                         id+=1
                         break
                     id+=1
                 if  not Seqcheck: break
             # AllMeasures_exp=f'TPR should send {ExpPkts} in the Sequence'  
-        else: res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])   
+        else: res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])   
 
         return res
 
@@ -930,11 +931,11 @@ class CommonCTSChecks:
                 PktorResId=self.findTypeid(limit=[id,self.Flow_limit[1]],Type="Packet")
                 if PktorResId is not None:
                     if self.packet_matches(packet_id=PktorResId,Pkt=SeqPkt[0],PktVal=SeqPkt[1]):
-                        res.append([f'TPR sent {SeqPktDataPacket} data packet at index@ {PktorResId}','Pass'])
+                        res.append([f'TPR sent {SeqPktDataPacket} data packet at index@ {PktorResId}',Enums.TestResult.PASS])
                         if Check['Pktretry']:
                             i=PktorResId+1
                             if i==self.Flow_limit[1]:
-                                res.append([f'PTx did not sent response for {SeqPktDataPacket}','Inconclusive'])
+                                res.append([f'PTx did not sent response for {SeqPktDataPacket}',Enums.TestResult.INCONCLUSIVE])
                             while  i < self.Flow_limit[1]:
                                 # Check the reponse for the pkt and continue for next Pkt
                                 resp=self.PktResponse(i,self.Flow_limit[1])
@@ -946,7 +947,7 @@ class CommonCTSChecks:
                                     break
                                 else:
                                     if i==self.Flow_limit[1]-1:
-                                        res.append([f'PTx did not sent response for {SeqPktDataPacket}','Inconclusive'])
+                                        res.append([f'PTx did not sent response for {SeqPktDataPacket}',Enums.TestResult.INCONCLUSIVE])
                                         i+=1
                                     else:
                                         i+=1
@@ -957,7 +958,7 @@ class CommonCTSChecks:
                 
                 if  not Seqcheck: break
             # AllMeasures_exp=f'TPR should send {ExpPkts} in the Sequence'  
-        else: res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+        else: res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
     
@@ -980,7 +981,7 @@ class CommonCTSChecks:
                     if pktfound:break
                     if  self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                         if  (pkt[0] in self.file_list[id]['pktType']) if pkt[1] is None else  (pkt[0] in self.file_list[id]['pktType'] and  pkt[1] in self.file_list[id]['value']):
-                            res.append([f'TPR sent {pkt_Name} at index@ {{{id}}}','Pass'])
+                            res.append([f'TPR sent {pkt_Name} at index@ {{{id}}}',Enums.TestResult.PASS])
                             pktfound=True
                             if pkt[2]: # Check Paylod data if required
                                 Pres=self.Payload_Details(PacketName=pkt_Name,Index=id,PayLoads=pkt[3])
@@ -993,7 +994,7 @@ class CommonCTSChecks:
                                         pktfound=False
                                         continue
                                     else:# Stop the TestCase if TPR sends next packet without any response for the previous packet
-                                        res.append([f'TPR sent {self.file_list[Type[1]]['pktType']}_{self.file_list[Type[1]]['value']} without any response for {pkt_Name}','Inconclusive']) 
+                                        res.append([f'TPR sent {self.file_list[Type[1]]['pktType']}_{self.file_list[Type[1]]['value']} without any response for {pkt_Name}',Enums.TestResult.INCONCLUSIVE]) 
                                         seqCheck=False
                                         break
                                 else: 
@@ -1001,19 +1002,19 @@ class CommonCTSChecks:
                                         ResFound=False
                                         for ExRes in pkt[-2][0]['ExpResp']:
                                             if ExRes[0] in self.file_list[Type[1]]['pktType']:
-                                                res.append([f'PTx responded with {self.file_list[Type[1]]['pktType']} for {pkt_Name}','Pass'])
+                                                res.append([f'PTx responded with {self.file_list[Type[1]]['pktType']} for {pkt_Name}',Enums.TestResult.PASS])
                                                 ResFound=True
-                                        if not ResFound: res.append([f'PTx responded with {self.file_list[Type[1]]['pktType']} for {pkt_Name}','Fail'])
+                                        if not ResFound: res.append([f'PTx responded with {self.file_list[Type[1]]['pktType']} for {pkt_Name}',Enums.TestResult.FAIL])
 
                                     # if 'ND' in  self.file_list[Type[1]]['pktType']: # Stop Validating the TestCase if PTx responds with ND response
-                                    #     res.append([f'PTx responded with ND Response for {pkt_Name} at {{{id}}}','Inconclusive'])
+                                    #     res.append([f'PTx responded with ND Response for {pkt_Name} at {{{id}}}',Enums.TestResult.INCONCLUSIVE])
                                     #     seqCheck=False        
                             else:
-                                res.append([f'PTx did not sent response for {pkt_Name} at index@ {{{id}}}','Inconclusive'])
+                                res.append([f'PTx did not sent response for {pkt_Name} at index@ {{{id}}}',Enums.TestResult.INCONCLUSIVE])
                                 seqCheck=False
                             if not seqCheck:break 
                         else:
-                            res.append([f'TPR did not sent {pkt_Name} after {beforePkt}','Inconclusive'])
+                            res.append([f'TPR did not sent {pkt_Name} after {beforePkt}',Enums.TestResult.INCONCLUSIVE])
                             beforePkt=pkt_Name
                             seqCheck=False
                             break
@@ -1021,7 +1022,7 @@ class CommonCTSChecks:
                     else:id+=1
                 if not seqCheck : break
                 pktid+=1
-        else:res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+        else:res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1047,7 +1048,7 @@ class CommonCTSChecks:
                     Seq=True
                     id=seqpktDetails[2]+1
                 if  not Seq: 
-                    res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+                    res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
                     break    
             if  not Seq: break
             SeqCount+=1
@@ -1057,16 +1058,16 @@ class CommonCTSChecks:
                 PktorResId=self.findTypeid(limit=[id,self.Flow_limit[1]],Type="Packet")
                 if PktorResId is not None:
                     if self.packet_matches(packet_id=PktorResId,Pkt=ExpPkt[0],PktVal=ExpPkt[1]):
-                        res.append([f'TPR sent {ExpPktDataPacket} data packet index@ {PktorResId} after the sequence {SeqPackets}','Pass'])
+                        res.append([f'TPR sent {ExpPktDataPacket} data packet index@ {PktorResId} after the sequence {SeqPackets}',Enums.TestResult.PASS])
                         #Check for the response or Timng for the ExpPkt
                         Tres=self.RspTimngCheck(ExpPktDataPacket,ExpPkt,PktorResId)
                         if len(Tres)>0:res.extend(Tres) 
                         id=PktorResId+1
                     else:
-                        res.append([f'TPR did not sent {ExpPktDataPacket} data packet after the sequence {SeqPackets}','Inconclusive'])
+                        res.append([f'TPR did not sent {ExpPktDataPacket} data packet after the sequence {SeqPackets}',Enums.TestResult.INCONCLUSIVE])
                         break
                 else:
-                    res.append([f'TPR did not sent {ExpPktDataPacket} data packet after the sequence {SeqPackets}','Inconclusive'])  
+                    res.append([f'TPR did not sent {ExpPktDataPacket} data packet after the sequence {SeqPackets}',Enums.TestResult.INCONCLUSIVE])  
                     break  
                 SeqPackets+="--"+ExpPktDataPacket
         # AllMeasures_exp=f'TPR should send {ExpPackets} in the Sequence.'  
@@ -1096,15 +1097,15 @@ class CommonCTSChecks:
                     if len(Tres)>0:res.extend(Tres) 
                     id=InPktDetails[2]+1
                     Time=round((round(InPktDetails[0],2)-Timing1),2)
-                    res.append([f'Timing differnce between {InsertedDataPacket} at {round(InPktDetails[0],2)}S and {StartDataPacket} at {Timing1}S is {Time} sec ','Pass' if Time > Check['TimeInterval'][0] <8 and Time < Check['TimeInterval'][1] else 'Fail'])
+                    res.append([f'Timing differnce between {InsertedDataPacket} at {round(InPktDetails[0],2)}S and {StartDataPacket} at {Timing1}S is {Time} sec ',Enums.TestResult.PASS if Time > Check['TimeInterval'][0] <8 and Time < Check['TimeInterval'][1] else Enums.TestResult.FAIL])
                     Timing1=round(InPktDetails[0],2)
                     StartDataPacket=InsertedDataPacket
                     SeqCount+=1
                 else:
-                    res.append([f'TPR did not sent {InsertedDataPacket} data packet after {StartDataPacket}','Inconclusive'])
+                    res.append([f'TPR did not sent {InsertedDataPacket} data packet after {StartDataPacket}',Enums.TestResult.INCONCLUSIVE])
                     break
-            res.append([f'TPR sent {SeqCount} {InsertedDataPacket} data packets','Pass' if SeqCount >=Check['SeqCount'] else 'Inconclusive'])
-        else:res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+            res.append([f'TPR sent {SeqCount} {InsertedDataPacket} data packets',Enums.TestResult.PASS if SeqCount >=Check['SeqCount'] else Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1130,9 +1131,9 @@ class CommonCTSChecks:
                         if len(Tres)>0:res.extend(Tres) 
                         id=InPktDetails[2]+1
                     else:id+=1
-                res.append([f'TPR sent {SeqCount} {InsertedDataPacket} data packets','Pass' if SeqCount >=Check['SeqCount'] else 'Fail'])
-            else: res.append([f'TPR did not sent {EndDataPacket} data packet','Fail'])
-        else:res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+                res.append([f'TPR sent {SeqCount} {InsertedDataPacket} data packets',Enums.TestResult.PASS if SeqCount >=Check['SeqCount'] else Enums.TestResult.FAIL])
+            else: res.append([f'TPR did not sent {EndDataPacket} data packet',Enums.TestResult.FAIL])
+        else:res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1164,7 +1165,7 @@ class CommonCTSChecks:
                             SeqPackets+="--"+SeqPktDataPacket
                             seqpktDetails=self.PktMethod.GetPacketDetails(packet=SeqPkt[0],value=SeqPkt[1],limit=[id,self.Flow_limit[1]])
                             if len(seqpktDetails)>2:
-                                res.append([f'TPR sent {SeqPktDataPacket} at {{{seqpktDetails[2]}}}','Pass'])
+                                res.append([f'TPR sent {SeqPktDataPacket} at {{{seqpktDetails[2]}}}',Enums.TestResult.PASS])
                                 ReponseCheckid=3
                                 if SeqPkt[2]:
                                     Pres=self.Payload_Details(PacketName=SeqPktDataPacket,Index=seqpktDetails[2],PayLoads=SeqPkt[3])
@@ -1178,7 +1179,7 @@ class CommonCTSChecks:
                                 Seq=True
                                 id=seqpktDetails[2]+1
                             else: 
-                                res.append([f'TPR did not entered ReNego phase at Seq_Count: {SeqCount+1}','Inconclusive'])
+                                res.append([f'TPR did not entered ReNego phase at Seq_Count: {SeqCount+1}',Enums.TestResult.INCONCLUSIVE])
                                 Seq=False
                                 break
                         SeqPkts=SeqPackets
@@ -1187,13 +1188,13 @@ class CommonCTSChecks:
                     if SeqCount >= Check['SeqCount']:
                         for resp in Check['ExpResponse'][0].keys():
                             if resp in LoggedResponse:
-                                if  LoggedResponse[resp] >= Check['ExpResponse'][0][resp]:res.append([f'Tester seen upto {LoggedResponse[resp]}-{resp} responses','Pass'])
-                                else:res.append([f'Tester seen upto {LoggedResponse[resp]}-{resp}  responses Exp: {Check['ExpResponse'][0][resp]}','Fail'])
-                            else:res.append([f'TPR could not able to log {resp} response for atleast one sequence','Fail'])
-                    res.append([f'TPR sent the sequence {SeqPkts}-{SeqCount} times','Pass' if SeqCount >= Check['SeqCount'] else 'Inconclusive'])
-                else:res.append([f'PTx did not supports ReNeg phase','Inconclusive'])
-            else:res.append([f'TPR did not sent ReNeg packet','Inconclusive'])
-        else:res.append([f'TPR did not entered {Check['Phase']} phase','Inconclusive'])
+                                if  LoggedResponse[resp] >= Check['ExpResponse'][0][resp]:res.append([f'Tester seen upto {LoggedResponse[resp]}-{resp} responses',Enums.TestResult.PASS])
+                                else:res.append([f'Tester seen upto {LoggedResponse[resp]}-{resp}  responses Exp: {Check['ExpResponse'][0][resp]}',Enums.TestResult.FAIL])
+                            else:res.append([f'TPR could not able to log {resp} response for atleast one sequence',Enums.TestResult.FAIL])
+                    res.append([f'TPR sent the sequence {SeqPkts}-{SeqCount} times',Enums.TestResult.PASS if SeqCount >= Check['SeqCount'] else Enums.TestResult.INCONCLUSIVE])
+                else:res.append([f'PTx did not supports ReNeg phase',Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent ReNeg packet',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'TPR did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1209,8 +1210,8 @@ class CommonCTSChecks:
                     Pres=self.Payload_Details(PacketName=DataPacket,Index=ExpectedPacket_Details[2],PayLoads=ExpPacket[3])
                     if len(Pres)>0: res.extend(Pres) 
                 id=ExpectedPacket_Details[2]+1
-                res.append([f'TPR sent the {DataPacket} datapacket.', "Pass"]) 
-            else:res.append([f'TPR did not sent the {DataPacket} datapacket.', "Fail"])   
+                res.append([f'TPR sent the {DataPacket} datapacket.', Enums.TestResult.PASS]) 
+            else:res.append([f'TPR did not sent the {DataPacket} datapacket.', Enums.TestResult.FAIL])   
 
         return res
 
@@ -1226,13 +1227,13 @@ class CommonCTSChecks:
             if len(ExpectedPacket_Details)>2:
                 pktCount+=1
                 if pktCount> Check['PktsCount']:
-                    res.append([f'TPR sent the {DataPacket} data packet {pktCount} times. Expected: Not more than {Check['PktsCount']} times','Fail'])
+                    res.append([f'TPR sent the {DataPacket} data packet {pktCount} times. Expected: Not more than {Check['PktsCount']} times',Enums.TestResult.FAIL])
                     break
                 id=ExpectedPacket_Details[2]+1
             else:id+=1
         if pktCount <= Check['PktsCount']: 
-            if Check['PktsCount']==1:res.append([f'TPR can not send second {DataPacket} data packet.','Pass'])
-            else:res.append([f'TPR did not sent the {DataPacket} data packet more than {Check['PktsCount']} times.','Pass'])
+            if Check['PktsCount']==1:res.append([f'TPR can not send second {DataPacket} data packet.',Enums.TestResult.PASS])
+            else:res.append([f'TPR did not sent the {DataPacket} data packet more than {Check['PktsCount']} times.',Enums.TestResult.PASS])
                         
         return res
 
@@ -1251,20 +1252,20 @@ class CommonCTSChecks:
                 Pktid=self.findTypeid(limit=[Shutdown_details[2],self.Flow_limit[0]],Type="Packet")
                 if Pktid is not None:
                     Time=round((self.file_list[Pktid]['stopTime']-ExpectedPacket_Details[1]),3)
-                    if Time >0 : res.append([f'PRx stopped sending packets after {Time}S from the {ExpectedPacket} packet','Pass'])
-                    else:res.append([f'PRx did not sent any data packets after {ExpectedPacket}','Pass'])
+                    if Time >0 : res.append([f'PRx stopped sending packets after {Time}S from the {ExpectedPacket} packet',Enums.TestResult.PASS])
+                    else:res.append([f'PRx did not sent any data packets after {ExpectedPacket}',Enums.TestResult.PASS])
                 #find next ping  
                 NextPing_details=self.PktMethod.GetPacketDetails(packet="Ping", Type="TesterMsg",limit=[Shutdown_details[2]+1, len(self.file_list)-1])
                 if len(NextPing_details)>2:
                     tnopower=round((NextPing_details[0]-Shutdown_details[1])*1000,3)
-                    res.append([f'Measured t_nopower from {round(NextPing_details[1],3)}Sec to {round(Shutdown_details[1],3)}Sec   is {tnopower} mS , Limit ≥ 32 mS', 'Pass' if  tnopower > Check['expected'][1] else 'Fail'])
+                    res.append([f'Measured t_nopower from {round(NextPing_details[1],3)}Sec to {round(Shutdown_details[1],3)}Sec   is {tnopower} mS , Limit ≥ 32 mS', Enums.TestResult.PASS if  tnopower > Check['expected'][1] else Enums.TestResult.FAIL])
                 else:
                     Time=round((self.file_list[len(self.file_list)-1]['startTime']-Shutdown_details[1])*1000,3)
-                    if Time > Check['expected'][1]:res.append([f'Measured t_nopower is greater than {Check['expected'][1]} mS','Pass'])
-                    else:res.append([f'Measured t_nopower is {Time} mS','Fail'])
-                    # res.append(['PTx did not Initiated next Ping','Fail'])
-            else: res.append([f'PTx did not detached after {ExpectedPacket}','Fail'])
-        else: res.append([f'Test did not entered {Check['Phase']}','Inconclusive'])
+                    if Time > Check['expected'][1]:res.append([f'Measured t_nopower is greater than {Check['expected'][1]} mS',Enums.TestResult.PASS])
+                    else:res.append([f'Measured t_nopower is {Time} mS',Enums.TestResult.FAIL])
+                    # res.append(['PTx did not Initiated next Ping',Enums.TestResult.FAIL])
+            else: res.append([f'PTx did not detached after {ExpectedPacket}',Enums.TestResult.FAIL])
+        else: res.append([f'Test did not entered {Check['Phase']}',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1280,15 +1281,15 @@ class CommonCTSChecks:
                 if len(Pres)>0:res.extend(Pres)
             resp=self.PktResponse(ExpectedPacket_Details[2]+1,self.Flow_limit[1])
             if resp is not None:
-                res.append([f'PTx responded with {resp[0]} for the {ExpectedPacket} data packet','Pass'])
+                res.append([f'PTx responded with {resp[0]} for the {ExpectedPacket} data packet',Enums.TestResult.PASS])
                 Shutdown_details=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[resp[1], self.Flow_limit[1]])
                 if len(Shutdown_details)>2:
                     #find Total=Tnegotiate+Tterminate 
                     Ttotal=round((Shutdown_details[1]-self.file_list[resp[1]]['stopTime'])*1000,3)
-                    res.append([f'Measured t_negotiate + t_terminate from {round(Shutdown_details[1],3)}Sec to {round(self.file_list[resp[1]]['stopTime'],3)}Sec is {Ttotal} mS, Limit [≤ 528mS]', 'Fail' if  Ttotal > Check['expected'][1] else 'Pass'])
-                else: res.append([f'PTx did not detached after {ExpectedPacket}','Fail'])
-            else:  res.append([f'PTx did not sent response for the {ExpectedPacket} data packet','Fail'])
-        else: res.append([f'Test did not entered {Check['Phase']} phase','Inconclusive'])
+                    res.append([f'Measured t_negotiate + t_terminate from {round(Shutdown_details[1],3)}Sec to {round(self.file_list[resp[1]]['stopTime'],3)}Sec is {Ttotal} mS, Limit [≤ 528mS]', Enums.TestResult.FAIL if  Ttotal > Check['expected'][1] else Enums.TestResult.PASS])
+                else: res.append([f'PTx did not detached after {ExpectedPacket}',Enums.TestResult.FAIL])
+            else:  res.append([f'PTx did not sent response for the {ExpectedPacket} data packet',Enums.TestResult.FAIL])
+        else: res.append([f'Test did not entered {Check['Phase']} phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1316,23 +1317,23 @@ class CommonCTSChecks:
                         tnextping=round((NextPing_details[0]-  (ExpectedPacket_Details[1] if Check['Measurefrom']=='Pkt' else Shutdown_details[1]))*1000,3)
                         ValidationLimit=Check['expected']
                         if Check['Type'] =="Between":
-                            Tnextpingres= "Pass" if tnextping >= Check['expected'][0] and tnextping <= Check['expected'][1] else 'Fail'
+                            Tnextpingres= Enums.TestResult.PASS if tnextping >= Check['expected'][0] and tnextping <= Check['expected'][1] else Enums.TestResult.FAIL
                         elif Check['Type'] =="GTE":
-                            Tnextpingres= "Pass" if tnextping >= Check['expected'][1]  else 'Fail'
+                            Tnextpingres= Enums.TestResult.PASS if tnextping >= Check['expected'][1]  else Enums.TestResult.FAIL
                             ValidationLimit=Check['expected'][1]
                         elif Check['Type']=='referPkt':
                             repingTime=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(self.PktMethod.GetPacketDetails(packet="SRQ [0x20] ", value="Re ping delay", limit=self.Flow_limit)[2],'Re_ping_time')[0]['sRawData'])/5
                             Check['expected']=[(80*repingTime/100)*1000,(120*repingTime/100)*1000]
-                            Tnextpingres= "Pass" if tnextping >= Check['expected'][0] and tnextping <= Check['expected'][1] else 'Fail'
+                            Tnextpingres= Enums.TestResult.PASS if tnextping >= Check['expected'][0] and tnextping <= Check['expected'][1] else Enums.TestResult.FAIL
                             ValidationLimit=Check['expected']
                         res.append([f'Measured t_nextping from the {ExpectedPacket} at index@: {ExpectedPacket_Details[2]} ending from {round(ExpectedPacket_Details[1] if Check['Measurefrom']=='Pkt' else Shutdown_details[1],3)} Sec to {round(NextPing_details[1],3)} Sec is {tnextping}mS ,Limit :{ValidationLimit},Comp:{Check['Type']}.', Tnextpingres])
                     else: 
                         Time=round((self.file_list[len(self.file_list)-1]['startTime']-Shutdown_details[1])*1000,3)
-                        if Time > Check['expected'][1]:res.append([f'Measured t_nextping from the {ExpectedPacket} at index@: {ExpectedPacket_Details[2]} ending from {round(ExpectedPacket_Details[1],2)} Sec is greater than {Check['expected'][1]} mS','Pass'])
-                        else:res.append([f'Measured t_nextping is {Time} mS','Fail'])
-                        # res.append(['PTx did not Initiated next Ping','Fail'])
-                else: res.append([f'PTx did not detached after {ExpectedPacket}','Fail'])
-        else: res.append([f'Test did not entered {Check['phase']}','Inconclusive'])
+                        if Time > Check['expected'][1]:res.append([f'Measured t_nextping from the {ExpectedPacket} at index@: {ExpectedPacket_Details[2]} ending from {round(ExpectedPacket_Details[1],2)} Sec is greater than {Check['expected'][1]} mS',Enums.TestResult.PASS])
+                        else:res.append([f'Measured t_nextping is {Time} mS',Enums.TestResult.FAIL])
+                        # res.append(['PTx did not Initiated next Ping',Enums.TestResult.FAIL])
+                else: res.append([f'PTx did not detached after {ExpectedPacket}',Enums.TestResult.FAIL])
+        else: res.append([f'Test did not entered {Check['phase']}',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1358,14 +1359,14 @@ class CommonCTSChecks:
                         continue
                     else:
                         if "SRQ [0x20]" in self.file_list[id]['pktType'] and "Re ping delay" in self.file_list[id]['value']:
-                            res.append([f'TPR sent SRQ/rep packet at index@ {{{id}}}','Pass'])
+                            res.append([f'TPR sent SRQ/rep packet at index@ {{{id}}}',Enums.TestResult.PASS])
                             reping_time=float(self.file_list[id]['value'].split(":")[1].split('Re-Ping value')[1].replace('}',''))/5
 
-                            if 'REP_002' in self.Header['TestcaseID']:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time== 12.4 else 'Inconclusive'])
-                            else:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time >=0.2 and reping_time <=12.6 else 'Inconclusive'])
+                            if 'REP_002' in self.Header['TestcaseID']:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs',Enums.TestResult.PASS if reping_time== 12.4 else Enums.TestResult.INCONCLUSIVE])
+                            else:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs',Enums.TestResult.PASS if reping_time >=0.2 and reping_time <=12.6 else Enums.TestResult.INCONCLUSIVE])
                             break
                         else:
-                            res.append([f'TPR did not sent SRQ/rep packet at index@ {{{id}}} after SRQ/rpr', 'Inconclusive']) 
+                            res.append([f'TPR did not sent SRQ/rep packet at index@ {{{id}}} after SRQ/rpr', Enums.TestResult.INCONCLUSIVE]) 
                             break
                 else:id+=1
             # find SRQ/ en packet
@@ -1374,11 +1375,11 @@ class CommonCTSChecks:
                 id=SRQ_En[2]+1
                 while id < self.Flow_limit[1]:
                     if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
-                        res.append([f'TPR sent SRQ/en packet at index@ {{{SRQ_En[2]}}}','Pass'])
+                        res.append([f'TPR sent SRQ/en packet at index@ {{{SRQ_En[2]}}}',Enums.TestResult.PASS])
                         count=float(self.file_list[SRQ_En[2]]['value'].split(":")[1].replace('}',''))
-                        res.append([f'End_Negotiation count was set to {{{count}}}, Exp: 2','Pass' if count==2 else 'Inconclusive'])
-                        if 'ACK' in self.file_list[id]['pktType']: res.append([f'Received ACK for SRQ/en packet at index@ {{{id}}}','Pass'])
-                        else:res.append([f'PTx sent {self.file_list[id]['pktType']} at index@ {{{id}}}','Fail'])
+                        res.append([f'End_Negotiation count was set to {{{count}}}, Exp: 2',Enums.TestResult.PASS if count==2 else Enums.TestResult.INCONCLUSIVE])
+                        if 'ACK' in self.file_list[id]['pktType']: res.append([f'Received ACK for SRQ/en packet at index@ {{{id}}}',Enums.TestResult.PASS])
+                        else:res.append([f'PTx sent {self.file_list[id]['pktType']} at index@ {{{id}}}',Enums.TestResult.FAIL])
                         break
                     elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
                         if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'End Negotiation' in self.file_list[id]['value']:
@@ -1386,15 +1387,15 @@ class CommonCTSChecks:
                             id+=1
                             continue
                         else:
-                            res.append([f'PTx did not sent response for SRQ/En packet at index@ {{{SRQ_En[2]}}}', 'Inconclusive'])
+                            res.append([f'PTx did not sent response for SRQ/En packet at index@ {{{SRQ_En[2]}}}', Enums.TestResult.INCONCLUSIVE])
                             break
                     else:id+=1
                 
                 # Check Nexping
                 res.extend(self.EPT_Helper(Check,[id,self.Flow_limit[1]],reping_time if 'REP_003' in self.Header['TestcaseID'] else None ))
 
-            else:res.append([f'TPR did not sent SRQ/en packet', 'Inconclusive'])
-        else:res.append([f'TPR did not sent SRQ/rpr Packet','Inconclusive'])
+            else:res.append([f'TPR did not sent SRQ/en packet', Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'TPR did not sent SRQ/rpr Packet',Enums.TestResult.INCONCLUSIVE])
         
 
         return res
@@ -1405,7 +1406,7 @@ class CommonCTSChecks:
         self.Flow_limit = flows[flwID]['Limit']
         EPT = self.PktMethod.GetPacketDetails(packet=Check['EPT'][0], value=Check['EPT'][1], limit=self.Flow_limit)
         if len(EPT)>2:
-            res.append([f'TPR sent {PktName} at {{{EPT[2]}}}', 'Pass'])
+            res.append([f'TPR sent {PktName} at {{{EPT[2]}}}', Enums.TestResult.PASS])
             CoilPkPk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[EPT[2]+1, self.Flow_limit[1]])
             if len(CoilPkPk)>2:
                 Stop=self.PktMethod.GetPacketDetails(packet="Test_Status",value="Test_Stop",Type="TesterMsg",limit=[CoilPkPk[2]+1,len(self.file_list)])  
@@ -1413,11 +1414,11 @@ class CommonCTSChecks:
                     NextPing=self.PktMethod.GetPacketDetails(packet="Ping", Type="TesterMsg",limit=[CoilPkPk[2], Stop[2]])
                     if len(NextPing)>2:
                         Timing=round((NextPing[0]-EPT[1])*1000,3)
-                        res.append([f'PTx initiated next ping at index@ {{{NextPing[2]}}}, Measured t_next ping from end of End Power Transfer packet is: {Timing} mS , Limit: GTE {Check['Limit']} mS', 'Pass' if Timing >= Check['Limit'] else 'Fail'])
-                    else:res.append([f'PTx did not initiated next ping for  {Check['Limit']} mS, Limit: GTE {Check['Limit']} mS', 'Pass'])
-                else: res.append([f'Test_stop did not found','Inconclusive'])
-            else:res.append([f'PTx did not detached after sending {PktName} ','Fail'])
-        else:res.append([f'TPR did not sent {PktName} packet ','Inconclusive'])
+                        res.append([f'PTx initiated next ping at index@ {{{NextPing[2]}}}, Measured t_next ping from end of End Power Transfer packet is: {Timing} mS , Limit: GTE {Check['Limit']} mS', Enums.TestResult.PASS if Timing >= Check['Limit'] else Enums.TestResult.FAIL])
+                    else:res.append([f'PTx did not initiated next ping for  {Check['Limit']} mS, Limit: GTE {Check['Limit']} mS', Enums.TestResult.PASS])
+                else: res.append([f'Test_stop did not found',Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'PTx did not detached after sending {PktName} ',Enums.TestResult.FAIL])
+        else:res.append([f'TPR did not sent {PktName} packet ',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1431,21 +1432,21 @@ class CommonCTSChecks:
                 EPT = self.PktMethod.GetPacketDetails(packet="End Power Transfer", value="[EPT/nr]", limit=[id,Stop[2]])
                 if len(EPT)>2:
                     count+=1
-                    res.append([f'Found EPT/nr packet at {{{EPT[2]}}}','Pass'])
+                    res.append([f'Found EPT/nr packet at {{{EPT[2]}}}',Enums.TestResult.PASS])
                     id=EPT[2]+1
                 else:break
             
-            if count <3:res.append([f'Test did not found 3 EPT/nr sequences','Inconclusive'])
+            if count <3:res.append([f'Test did not found 3 EPT/nr sequences',Enums.TestResult.INCONCLUSIVE])
             elif count==3:
                 NextPing=self.PktMethod.GetPacketDetails(packet="Ping", Type="TesterMsg",limit=[id+1, Stop[2]])
                 if len(NextPing)>2:
                     Timing=round((NextPing[0]-self.file_list[id-1]['stopTime'])*1000,3)
-                    res.append([f'PTx initiated next ping at index@ {{{NextPing[2]}}}, Measured t_next ping from end of End Power Transfer packet is: {Timing} mS , Limit : >= 10 mins', 'Pass' if Timing >=600000 else 'Fail'])
-                else:res.append([f'PTx did not initiated next ping for 10 mins', 'Pass'])
-            else:res.append([f'Found {count} EPT/nr packets','Fail'])
+                    res.append([f'PTx initiated next ping at index@ {{{NextPing[2]}}}, Measured t_next ping from end of End Power Transfer packet is: {Timing} mS , Limit : >= 10 mins', Enums.TestResult.PASS if Timing >=600000 else Enums.TestResult.FAIL])
+                else:res.append([f'PTx did not initiated next ping for 10 mins', Enums.TestResult.PASS])
+            else:res.append([f'Found {count} EPT/nr packets',Enums.TestResult.FAIL])
 
                 
-        else: res.append([f'Test_stop did not found','Inconclusive'])
+        else: res.append([f'Test_stop did not found',Enums.TestResult.INCONCLUSIVE])
         return res
 
 
@@ -1457,10 +1458,10 @@ class CommonCTSChecks:
             CE2=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],value=Check['Pkt'][1], limit=[CE[2]+1,self.Flow_limit[1]])
             if len(CE2)>2:
                 Tinterval=round((CE2[0]-CE[0])*1000,2)
-                res.append([f'TPR sent second {Check['Pkt'][0]} data packet at index@ {CE2[2]}', 'Pass'])
-                res.append([f'Measured timing from {round(CE[0],3)}_sec  to {round(CE2[0],3)}_sec  is {Tinterval}_mS , Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
-            else:res.append([f'TPR sent only one {Check['Pkt'][0]} data packet','Fail'])
-        else:res.append([f'Test did not entered PT phase','Inconclusive'])
+                res.append([f'TPR sent second {Check['Pkt'][0]} data packet at index@ {CE2[2]}', Enums.TestResult.PASS])
+                res.append([f'Measured timing from {round(CE[0],3)}_sec  to {round(CE2[0],3)}_sec  is {Tinterval}_mS , Limit: {Check['Limit']}', Enums.TestResult.INCONCLUSIVE if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else Enums.TestResult.PASS])
+            else:res.append([f'TPR sent only one {Check['Pkt'][0]} data packet',Enums.TestResult.FAIL])
+        else:res.append([f'Test did not entered PT phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1474,16 +1475,16 @@ class CommonCTSChecks:
             if len(Pkt)>2:
                 #Check the Response defined in CTS Checks
                 resp=self.PktResponse(Pkt[2]+1,self.Flow_limit[1])
-                if resp is None and  Check['response'] is None: res.append([f'PTx did not sent any response for {PKT} data packet at index@ {Pkt[2]}','Pass'])
+                if resp is None and  Check['response'] is None: res.append([f'PTx did not sent any response for {PKT} data packet at index@ {Pkt[2]}',Enums.TestResult.PASS])
                 else:
                     if resp is not None and (resp[0] in Check['response'] if Check['response'] is not None else False) :
-                        res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}','Pass'])
+                        res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}',Enums.TestResult.PASS])
                         if Check['Timing']:
                             ResponseTime= round(( self.file_list[resp[1]]['startTime']-self.file_list[Pkt[2]]['stopTime'])*1000,3)
-                            res.append([f'Measured response time between {PKT} and {resp[0]} is {ResponseTime} mS ','Fail'if ResponseTime < Check['ExpTime'][0]-Check['ExpTime'][1] or ResponseTime >Check['ExpTime'][0]+Check['ExpTime'][1] else "Pass"])
+                            res.append([f'Measured response time between {PKT} and {resp[0]} is {ResponseTime} mS ',Enums.TestResult.FAIL if ResponseTime < Check['ExpTime'][0]-Check['ExpTime'][1] or ResponseTime >Check['ExpTime'][0]+Check['ExpTime'][1] else Enums.TestResult.PASS])
                     else:
-                        if resp is None:res.append([f'PTx did not sent response for {Check['Pkt'][0]} at index@ {Pkt[2]}','Inconclusive'])
-                        else:res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}','Fail'])
+                        if resp is None:res.append([f'PTx did not sent response for {Check['Pkt'][0]} at index@ {Pkt[2]}',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'PTx responded with {resp[0]} for {PKT} data packet at index@ {Pkt[2]}',Enums.TestResult.FAIL])
                 id=Pkt[2]+1
             else:id+=1
         return res
@@ -1504,22 +1505,22 @@ class CommonCTSChecks:
                         rp =self.PktMethod.GetPacketDetails(packet='16 bit Received Power',limit=[iid,self.Flow_limit[1]])
                         if len(rp)>2:
                             if Check['Pkt'][1] in self.file_list[rp[2]]['value']:
-                                res.append([f'TPR sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]} after RP/0 at index@ {RP0[2]}', 'Pass'])
+                                res.append([f'TPR sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]} after RP/0 at index@ {RP0[2]}', Enums.TestResult.PASS])
                                 resp=self.PktMethod.GetPacketResponse2(rp[2],[rp[2]+1,self.Flow_limit[1]])
                                 if resp is not None:
                                     resp_count+=1
-                                    res.append([f'PTx sent {self.file_list[resp]["pktType"]} response, Exp: {Check['response']}', 'Pass' if self.file_list[resp]["pktType"] in Check['response'] else 'Fail'])
-                                else: res.append([f'PTx did not sent any response for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]}', 'Inconclusive'])
+                                    res.append([f'PTx sent {self.file_list[resp]["pktType"]} response, Exp: {Check['response']}', Enums.TestResult.PASS if self.file_list[resp]["pktType"] in Check['response'] else Enums.TestResult.FAIL])
+                                else: res.append([f'PTx did not sent any response for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet at index@ {rp[2]}', Enums.TestResult.INCONCLUSIVE])
                             else: 
-                                res.append([f'TPR did not sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet after RP/0 at index@ {RP0[2]}', 'Inconclusive'])
+                                res.append([f'TPR did not sent {Check['Pkt'][0]}_{Check['Pkt'][1]} data packet after RP/0 at index@ {RP0[2]}', Enums.TestResult.INCONCLUSIVE])
                                 flag=False
                             id=rp[2]+1
                         else: flag=False
                         break
                     if not flag: break
                 else:break
-            if resp_count < Check['pktcount']:  res.append([f'TPR logged {resp_count} responses for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packets, Limit at least {Check['pktcount']} responses within one minute', 'Inconclusive'])
-        else:res.append([f'TPR did not entered in to PT phase','Inconclusive'])
+            if resp_count < Check['pktcount']:  res.append([f'TPR logged {resp_count} responses for {Check['Pkt'][0]}_{Check['Pkt'][1]} data packets, Limit at least {Check['pktcount']} responses within one minute', Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'TPR did not entered in to PT phase',Enums.TestResult.INCONCLUSIVE])
         return res
 
     def RP_Response(self,CTSCheck,Check,flows,flwID):
@@ -1538,16 +1539,16 @@ class CommonCTSChecks:
                         # Check Response Timing
                         Response=self.PktResponse(RP[2]+1,self.Flow_limit[1])
                         if Response is not None:
-                            res.append([f'PTx responded with {Response[0]} for {PKT} data packet at index@ {RP[2]}','Pass'])
+                            res.append([f'PTx responded with {Response[0]} for {PKT} data packet at index@ {RP[2]}',Enums.TestResult.PASS])
                             ResponseTime=round((self.file_list[Response[1]]['startTime']-self.file_list[RP[2]]['stopTime'])*1000,3)
-                            res.append([f'Measured response time between {PKT} and {Response[0]} is {ResponseTime} mS ,Limit [3 ≤ t_response ≤ 10] ms','Fail'if ResponseTime < 3 or ResponseTime > 10 else "Pass"])
+                            res.append([f'Measured response time between {PKT} and {Response[0]} is {ResponseTime} mS ,Limit [3 ≤ t_response ≤ 10] ms',Enums.TestResult.FAIL if ResponseTime < 3 or ResponseTime > 10 else Enums.TestResult.PASS])
                             PktFound=True
                             RpCount+=1
                         id=RP[2]+1
                     else:break
-                if not PktFound : res.append([f'Test did not found at least one {PKT} with response in the sequence','Inconclusive'])  
-            if RpCount <4:res.append([f'Test did not found at least 4 16-Bit RP packets with responses in the sequence','Inconclusive'])  
-        else:res.append([f'PRx did not entered Neg phase','Inconclusive'])
+                if not PktFound : res.append([f'Test did not found at least one {PKT} with response in the sequence',Enums.TestResult.INCONCLUSIVE])  
+            if RpCount <4:res.append([f'Test did not found at least 4 16-Bit RP packets with responses in the sequence',Enums.TestResult.INCONCLUSIVE])  
+        else:res.append([f'PRx did not entered Neg phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1563,11 +1564,11 @@ class CommonCTSChecks:
                 ADT2=self.PktMethod.GetPacketDetails(packet="ADT",Type="Response" ,limit=[id,Limit[1]])
                 if len(ADT2)>2:
                     Tds=round((self.file_list[ADT2[2]]['startTime']-Time1[0])*1000,2)
-                    res.append([f'Measured T_dts time between ADT index@ {Time1[1]} and ADT at index@ {ADT2[2]} is {Tds} mS','Pass' if Tds <=1500 else 'Fail'])
+                    res.append([f'Measured T_dts time between ADT index@ {Time1[1]} and ADT at index@ {ADT2[2]} is {Tds} mS',Enums.TestResult.PASS if Tds <=1500 else Enums.TestResult.FAIL])
                     Time1=[self.file_list[ADT2[2]]['startTime'],ADT2[2]]
                     id=ADT2[2]+1
                 else:break
-        else:res.append([f'PTx did not sent any ADT data packets','Fail'])
+        else:res.append([f'PTx did not sent any ADT data packets',Enums.TestResult.FAIL])
 
         return res
 
@@ -1593,24 +1594,24 @@ class CommonCTSChecks:
                         # Find Uro1
                         vrect1 = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at=Check['t1a'][1],measure=Check['t1a'][2],winsize=Check['t1a'][0])
                         print("Vrect1",vrect1)
-                        res.append([f"Measured Uro{count} is {vrect1[0]} V at {Check['Pkt'][0]} index @{CE60[2]}", "Pass"])
+                        res.append([f"Measured Uro{count} is {vrect1[0]} V at {Check['Pkt'][0]} index @{CE60[2]}", Enums.TestResult.PASS])
                         #Find Vro1
                         vrect2 = self.CalculateVoltTwindow(CE60[2],self.AllChannelData,at=Check['t2a'][1],measure=Check['t2a'][2],winsize=Check['t2a'][0])
                         if Check['NextPkt']:
                             nextpktid=self.findTypeid(limit=[CE60[2]+1,self.Flow_limit[1]])
                             if nextpktid is not None:vrect2 = self.CalculateVoltTwindow(nextpktid,self.AllChannelData,at=Check['t2a'][1],measure=Check['t2a'][2],winsize=Check['t2a'][0])
                         print("Vrect2",vrect2)
-                        res.append([f"Measured Vro{count} is {vrect2[0]} V", "Pass"])
+                        res.append([f"Measured Vro{count} is {vrect2[0]} V", Enums.TestResult.PASS])
                         ChkRes = CommonMethods.check_measure(Check['exp'],round(abs((vrect1[0]-vrect2[0])*1000),3),Check['comp'])
                         print("Chkres",ChkRes)
                         res.append([f"The measured |U_ro{count}-V_ro{count}| is: {ChkRes[3]} mV, Limit: {ChkRes[2]}mV", ChkRes[1]])
                         id=CE60[2]+1
                     else:
-                        res.append([f'PRx sent only {count} CE-60 data packets','Inconclusive'])
+                        res.append([f'PRx sent only {count} CE-60 data packets',Enums.TestResult.INCONCLUSIVE])
                         break
 
-            else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
-        else:res.append([f'PRx did not applied {CoilLoad}_ohms load','Inconclusive'])
+            else:res.append([f'PRx did not regulated to its final Load',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not applied {CoilLoad}_ohms load',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1624,11 +1625,11 @@ class CommonCTSChecks:
             PCH=self.PktMethod.GetPacketDetails(packet="Power control hold off",limit=[ID[2]+1,CFG[2]])
             if len(PCH)>2:
                 PCHTime=float(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(PCH[2],'Power_Control_Hold_Off_Time')[0]['sRawData']))
-                res.append([f'TPR sent PCH packet at index@ {{{PCH[2]}}} in between Identification and Configuration Packets','Pass'])
-                res.append([f'TPR set PowerControlHold Off Time to {PCHTime} mS , Exp : {Check['Pchtime']} mS','Pass' if PCHTime==Check['Pchtime'] else 'Inconclusive'])
+                res.append([f'TPR sent PCH packet at index@ {{{PCH[2]}}} in between Identification and Configuration Packets',Enums.TestResult.PASS])
+                res.append([f'TPR set PowerControlHold Off Time to {PCHTime} mS , Exp : {Check['Pchtime']} mS',Enums.TestResult.PASS if PCHTime==Check['Pchtime'] else Enums.TestResult.INCONCLUSIVE])
                 Count=int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(CFG[2],'Count')[0]['sRawData']))
-                res.append([f'TPR set Count field to {Count} in Configuration Packet , Exp : 1', 'Pass' if Count==1 else 'Inconclusive'])
-            else: res.append([f'TPR did not sent PCH Packet in between ID and  CFG','Inconclusive'])
+                res.append([f'TPR set Count field to {Count} in Configuration Packet , Exp : 1', Enums.TestResult.PASS if Count==1 else Enums.TestResult.INCONCLUSIVE])
+            else: res.append([f'TPR did not sent PCH Packet in between ID and  CFG',Enums.TestResult.INCONCLUSIVE])
         phaseCheck=self.CheckPhase(self.Flow_limit[0],"PT")
         if phaseCheck is not None:
             # Check target operating voltage reached or not
@@ -1637,10 +1638,10 @@ class CommonCTSChecks:
                 self.AllChannelData_Volatge = self.PlotMethod.GetAllChannelData2('2',self.JapiData)  #  Voltage Plot
                 Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="start",measure="before")
                 res.append([f'while TPR Regulating to its Operating Voltage -> Measured Voltage is : {Loadvrect[0]} V , Limits : {Check['RegulationLimit'][0]} V ~ {Check['RegulationLimit'][1]} V', 
-                            'Pass' if Loadvrect[0] >= Check['RegulationLimit'][0] and Loadvrect[0] <= Check['RegulationLimit'][1] else 'Inconclusive'])
+                            Enums.TestResult.PASS if Loadvrect[0] >= Check['RegulationLimit'][0] and Loadvrect[0] <= Check['RegulationLimit'][1] else Enums.TestResult.INCONCLUSIVE])
                 CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[VR[2]+1,self.Flow_limit[1]])
                 if len(CE60)>2:
-                    res.append([f'TPR sent CE {Check['Pkt'][1]} at index@ {CE60[2]}','Pass'])
+                    res.append([f'TPR sent CE {Check['Pkt'][1]} at index@ {CE60[2]}',Enums.TestResult.PASS])
 
                     if 'Power_Control_21' not in self.Header['TestcaseID']:
                         Voltages=[]
@@ -1659,15 +1660,15 @@ class CommonCTSChecks:
                     
                     PktsCountBefore=self.CE_CE60_CE(CE60[2],start=VR[2])
                     PktsCountAfter=self.CE_CE60_CE(CE60[2],before=False)
-                    res.append([f'PRx sent sequence of {PktsCountBefore} CE 0 before CE {Check['Pkt'][1]} data packet.','Fail' if PktsCountBefore < 10 else "Pass"])
-                    res.append([f'PRx sent sequence of {PktsCountAfter} CE 0 after CE {Check['Pkt'][1]} data packet.','Fail' if PktsCountAfter < 10 else "Pass"]) 
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE 0 before CE {Check['Pkt'][1]} data packet.',Enums.TestResult.FAIL if PktsCountBefore < 10 else Enums.TestResult.PASS])
+                    res.append([f'PRx sent sequence of {PktsCountAfter} CE 0 after CE {Check['Pkt'][1]} data packet.',Enums.TestResult.FAIL if PktsCountAfter < 10 else Enums.TestResult.PASS]) 
                     if Check.get('Tstabilize',False):
                         vrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData_Volatge,at="end",measure="after",winsize=[1,101])
-                        result="Fail" if vrect[0] > 7.2 else "Pass"
-                        res.append([f"Measured T_stabilize from end of packet at index@ {CE60[2]} to votlage crosses 7.2V is  {'greater than 100 ms' if result =='Pass' else 'less than 100 ms'} Limit >= 100 ms", result])
-                else: res.append([f'PRx did not sent CE {Check['Pkt'][1]}','Inconclusive'])
-            else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
-        else: res.append([f'PRx did not entered PT Phase','Inconclusive'])
+                        result=Enums.TestResult.FAIL if vrect[0] > 7.2 else Enums.TestResult.PASS
+                        res.append([f"Measured T_stabilize from end of packet at index@ {CE60[2]} to votlage crosses 7.2V is  {'greater than 100 ms' if result ==Enums.TestResult.PASS else 'less than 100 ms'} Limit >= 100 ms", result])
+                else: res.append([f'PRx did not sent CE {Check['Pkt'][1]}',Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'PRx did not regulated to its final Load',Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f'PRx did not entered PT Phase',Enums.TestResult.INCONCLUSIVE])
         return res
 
 
@@ -1681,15 +1682,15 @@ class CommonCTSChecks:
             #find Initial Load
             if Check['EPP']:
                 ILD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Load']}",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
-                if len(ILD)>2:res.append([f'PRx applied the Load {Check['InitialLoad']}_ohms','Pass'])
-                else:res.append([f'PRx did not applied the Load {Check['InitialLoad']}_ohms','Inconclusive'])
+                if len(ILD)>2:res.append([f'PRx applied the Load {Check['InitialLoad']}_ohms',Enums.TestResult.PASS])
+                else:res.append([f'PRx did not applied the Load {Check['InitialLoad']}_ohms',Enums.TestResult.INCONCLUSIVE])
 
             # Find the Load
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Load']}",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
             if len(LD)>2:
                 #Check 10CE packets are sent or not before applying the Load
                 PktsCountBefore=self.CECount(Limit=[LD[2],self.Flow_limit[0]],value=["+1","0","-1"])
-                res.append([f'PRx sent sequence of {PktsCountBefore} CE Packets with -1, 0, 1 before the Load: {Check['Load']}_ohms.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
+                res.append([f'PRx sent sequence of {PktsCountBefore} CE Packets with -1, 0, 1 before the Load: {Check['Load']}_ohms.',Enums.TestResult.FAIL if PktsCountBefore < Check['PktsCount'] else Enums.TestResult.PASS])
                 MaxValue = 0
                 MaxIndex = 0
                 #Get the max voltage received time for the PD start to end
@@ -1703,11 +1704,11 @@ class CommonCTSChecks:
                         MaxIndex=id
                     id+=1
                 if MaxValue !=0:
-                    res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*MaxIndex)/1000,3)}sec  is {MaxValue}V (through out the recording) , Limit <20V', 'Fail' if MaxValue >20 else 'Pass'])
-                    res.append([f'Load voltage {'does not exceed' if MaxValue <16 else' exceeded'} 16V at any time in between data packets from 500 ms after switching the Load to {Check['Load']}_ohms', 'Fail' if MaxValue >16 else 'Pass'])
+                    res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*MaxIndex)/1000,3)}sec  is {MaxValue}V (through out the recording) , Limit <20V', Enums.TestResult.FAIL if MaxValue >20 else Enums.TestResult.PASS])
+                    res.append([f'Load voltage {'does not exceed' if MaxValue <16 else' exceeded'} 16V at any time in between data packets from 500 ms after switching the Load to {Check['Load']}_ohms', Enums.TestResult.FAIL if MaxValue >16 else Enums.TestResult.PASS])
 
-            else:res.append([f'PRx did not applied Load: {Check['Load']}_ohms','Inconclusive'])
-        else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
+            else:res.append([f'PRx did not applied Load: {Check['Load']}_ohms',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not regulated to its final Load',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1722,18 +1723,18 @@ class CommonCTSChecks:
             #Find the Control Error before Voltage Regualtion
             CE=self.PktMethod.GetPacketDetails(packet="Control Error" ,limit=[Regulated[2],self.Flow_limit[0]])
             vrect = self.CalculateVoltTwindow(CE[2],self.AllChannelData,at="start",measure="before")
-            res.append([f"Measured U_L is {vrect[0]}V at index@ {CE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
+            res.append([f"Measured U_L is {vrect[0]}V at index@ {CE[2]}, Limit:{Check['RegulationLimit']}", Enums.TestResult.FAIL if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else Enums.TestResult.PASS])
             if Check['PowerLimit'][0]:
                 # Find the Power level 
                 Prect=round(vrect[0]*(self.CalculateVoltTwindow(CE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
-                res.append([f"Measured regualated Load power is {Prect}W at index@ {CE[2]}", "Fail" if Prect < Check['PowerLimit'][1][0] or Prect > Check['PowerLimit'][1][1] else "Pass"])
+                res.append([f"Measured regualated Load power is {Prect}W at index@ {CE[2]}", Enums.TestResult.FAIL if Prect < Check['PowerLimit'][1][0] or Prect > Check['PowerLimit'][1][1] else Enums.TestResult.PASS])
                 #Check CE packets and voltage regulation if there is no Load  assertion for Test_ID= "Guaranteed_Load_Power_23d_2"
             elif self.Header['TestcaseID'] in ['Guaranteed_Load_Power_23d_2']:
                 pkt = self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
                 if len(pkt)>2:
                     PktsCountBefore=self.CECount(Limit=[Regulated[2],pkt[2]],value=["+1","0","-1"])
-                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
-                    res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit:{Check['RegulationLimit']}", "Fail" if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else "Pass"])
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1',Enums.TestResult.FAIL if PktsCountBefore < Check['PktsCount'] else Enums.TestResult.PASS])
+                    res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit:{Check['RegulationLimit']}", Enums.TestResult.FAIL if vrect[0] < Check['RegulationLimit'][0] or vrect[0] > Check['RegulationLimit'][1] else Enums.TestResult.PASS])
 
             # Check the Appropriate Loads applied or not
             id=Regulated[2]+1
@@ -1743,7 +1744,7 @@ class CommonCTSChecks:
                 if len(LD)>2:
                     #Check 10CE packets are sent or not before applying the Load
                     PktsCountBefore=self.CECount(Limit=[LD[2],self.Flow_limit[0] if Load ==Check['Loads'][0] else id],value=["+1","0","-1"])
-                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1 before Load: {Load}_ohms.','Fail' if PktsCountBefore < Check['PktsCount'] else "Pass"])
+                    res.append([f'PRx sent sequence of {PktsCountBefore} CE packets with -1, 0, 1 before Load: {Load}_ohms.',Enums.TestResult.FAIL if PktsCountBefore < Check['PktsCount'] else Enums.TestResult.PASS])
                     # Check Regulated or not after applying the Load
                     Regulated=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[LD[2]+1,self.Flow_limit[1]])
                     if len(Regulated)>2:
@@ -1751,19 +1752,19 @@ class CommonCTSChecks:
                         LoadCE=self.PktMethod.GetPacketDetails2(packet="Control Error",value=["0","+1","-1"] ,limit=[Regulated[2],LD[2]+1])
                         Loadvrect = self.CalculateVoltTwindow(LoadCE[2],self.AllChannelData,at="start",measure="before")
                         LoadResistance=round(Loadvrect[0]/(self.CalculateVoltTwindow(LoadCE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
-                        res.append([f"Measured LoadResistance: {LoadResistance}_ohms at index@ {LoadCE[2]}", "Fail" if LoadResistance > round((LoadResistance + ((LoadResistance*0.2)/100)),2) or LoadResistance < round((LoadResistance-((LoadResistance*0.2)/100)),2) else "Pass"])
+                        res.append([f"Measured LoadResistance: {LoadResistance}_ohms at index@ {LoadCE[2]}", Enums.TestResult.FAIL if LoadResistance > round((LoadResistance + ((LoadResistance*0.2)/100)),2) or LoadResistance < round((LoadResistance-((LoadResistance*0.2)/100)),2) else Enums.TestResult.PASS])
                         if Load ==Check['Loads'][-1]:
                             PktsCountAfter=self.CECount(Limit=[Regulated[2],LD[2]],value=["+1","0","-1"])
-                            res.append([f'PRx sent sequence of {PktsCountAfter} CE Packets with -1, 0, 1 after Load: {Load}_ohms.','Fail' if PktsCountAfter < Check['PktsCount'] else "Pass"])
-                            res.append([f"Measured U_L is {Loadvrect[0]}V at index@ {LoadCE[2]}, Limit:{Check['RegulationLimit']}", "Fail" if Loadvrect[0] < Check['RegulationLimit'][0] or Loadvrect[0] > Check['RegulationLimit'][1] else "Pass"])
+                            res.append([f'PRx sent sequence of {PktsCountAfter} CE Packets with -1, 0, 1 after Load: {Load}_ohms.',Enums.TestResult.FAIL if PktsCountAfter < Check['PktsCount'] else Enums.TestResult.PASS])
+                            res.append([f"Measured U_L is {Loadvrect[0]}V at index@ {LoadCE[2]}, Limit:{Check['RegulationLimit']}", Enums.TestResult.FAIL if Loadvrect[0] < Check['RegulationLimit'][0] or Loadvrect[0] > Check['RegulationLimit'][1] else Enums.TestResult.PASS])
                         id=LD[2]+1
                     else:
-                        res.append([f'PRx did not regulated after appying the Load: {Load}_ohms','Inconclusive']) 
+                        res.append([f'PRx did not regulated after appying the Load: {Load}_ohms',Enums.TestResult.INCONCLUSIVE]) 
                         break
                 else: 
-                    res.append([f'PRx did not applied Load: {Load}_ohms','Inconclusive'])
+                    res.append([f'PRx did not applied Load: {Load}_ohms',Enums.TestResult.INCONCLUSIVE])
                     break
-        else:res.append([f'PRx did not regulated to its final Load','Inconclusive'])
+        else:res.append([f'PRx did not regulated to its final Load',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1777,7 +1778,7 @@ class CommonCTSChecks:
             # Check target operating voltage reached or not
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Load']}",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(LD)>2:
-                res.append([f'Prx Applied its final Load : {Check['Load']} Ohms','Pass'])
+                res.append([f'Prx Applied its final Load : {Check['Load']} Ohms',Enums.TestResult.PASS])
                 VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[LD[2]+1,self.Flow_limit[1]])
                 if len(VR)>2:
                     self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)  #  Voltage Plot
@@ -1787,27 +1788,27 @@ class CommonCTSChecks:
                     LoadResistance=round(Loadvrect[0]/LoadCurrent[0],3)
                     RLimit=[round((Check['Load'] - ((Check['Load']*Check['LoadTolerance'])/100)),3), round((Check['Load'] +((Check['Load']*Check['LoadTolerance'])/100)),3)]
                     res.append([f"Measured load resistance: {LoadResistance}_ohms, Limit:[{RLimit[0]}_ohms ~ {RLimit[1]}_ohms]", 
-                                    'Pass' if LoadResistance >= RLimit[0] and LoadResistance <= RLimit[1] else 'Inconclusive'])
+                                    Enums.TestResult.PASS if LoadResistance >= RLimit[0] and LoadResistance <= RLimit[1] else Enums.TestResult.INCONCLUSIVE])
                     VLimit= [round((Check['Voltage'] - ((Check['Voltage']*Check['VoltageTolerance'])/100)),3), round((Check['Voltage'] +((Check['Voltage']*Check['VoltageTolerance'])/100)),3)]
 
                     res.append([f'while TPR Regulating to its Operating Target Load Voltage -> Measured Voltage is : {Loadvrect[0]} V ,Limits : {VLimit[0]} V ~ {VLimit[1]} V', 
-                                'Pass' if Loadvrect[0] >=VLimit[0]  and Loadvrect[0] <= VLimit[1] else 'Inconclusive'])
+                                Enums.TestResult.PASS if Loadvrect[0] >=VLimit[0]  and Loadvrect[0] <= VLimit[1] else Enums.TestResult.INCONCLUSIVE])
                     Power=round(Loadvrect[0]*LoadCurrent[0],3)
                     PLimit= [round((Check['Power'] - ((Check['Power']*Check['PowerTolerance'])/100)),3), round((Check['Power'] +((Check['Power']*Check['PowerTolerance'])/100)),3)]
                     res.append([f"Measured target load power: {Power} W, Limit: {PLimit[0]} W ~ {PLimit[1]} W", 
-                                    'Pass' if Power >= PLimit[0] and Power <= PLimit[1] else 'Inconclusive'])
+                                    Enums.TestResult.PASS if Power >= PLimit[0] and Power <= PLimit[1] else Enums.TestResult.INCONCLUSIVE])
                     
                     # Check Sequence of Continuous -1,0,+1 Packets
                     count=self.ContinuousPackets([LD[2]+1,VR[2]])
-                    res.append([f'TPR sent {count} CE packets, Exp: Atleast 40 continuous CE packets','Pass' if count >= 40 else 'Inconclusive'])
+                    res.append([f'TPR sent {count} CE packets, Exp: Atleast 40 continuous CE packets',Enums.TestResult.PASS if count >= 40 else Enums.TestResult.INCONCLUSIVE])
 
                     # find the CE Range (0-3)
                     res.extend(self.CE3_Voltage([VR[2]+1,self.Flow_limit[1]],Check))
 
 
-                else:res.append([f'PRx did not regulated to its final load {Check['Load']}_ohms','Inconclusive'])
+                else:res.append([f'PRx did not regulated to its final load {Check['Load']}_ohms',Enums.TestResult.INCONCLUSIVE])
             else:res.append([f'TPR did not switched to its final load {Check['Load']}_ohms to reach Target Load Power'])
-        else : res.append([f'PRx did not entered PT Phase','Inconclusive'])
+        else : res.append([f'PRx did not entered PT Phase',Enums.TestResult.INCONCLUSIVE])
         
         return res
     
@@ -1833,22 +1834,22 @@ class CommonCTSChecks:
             if self.file_list[id]['pktType']=="Control Error" :
                 if self.file_list[id]['value'] not in ["0","+2","+3","+1"]:
                     CE3=False
-                    res.append([f'TPR sent CE packet with value { self.file_list[id]['value']} which is not in range of (0-3)','Inconclusive'])  
+                    res.append([f'TPR sent CE packet with value { self.file_list[id]['value']} which is not in range of (0-3)',Enums.TestResult.INCONCLUSIVE])  
                 StopTime=self.file_list[id]['stopTime']
             id+=1
 
         # Test Duration
         if StopTime is not None:
-            if CE3 : res.append([f' Tester sent CE packets which are in range of (0-3) only','Pass'])
+            if CE3 : res.append([f' Tester sent CE packets which are in range of (0-3) only',Enums.TestResult.PASS])
             # Measure Voltage throught the Ramping
             Values=self.MonitorVoltage(limit[0],self.Flow_limit[1]-2) 
             if Values[1] !=0 and  Values[3] !=0:
                 res.append([f' Measured max voltage U_L at {round((self.AllChannelData['Interval']*Values[0])/1000,3)} sec is {Values[1]}_V and  min voltage U_L at {round((self.AllChannelData['Interval']*Values[2])/1000,3)} sec is {Values[3]}_V , Limit [<= {Check['limit']} V] ', 
-                            'Pass' if  Values[1] <= Check['limit'] else 'Fail'])
+                            Enums.TestResult.PASS if  Values[1] <= Check['limit'] else Enums.TestResult.FAIL])
 
             Timing= round(StopTime-self.file_list[limit[0]]['startTime'],3)
-            res.append([f'Stayed {round(Timing/60,3)} mins during load voltage regulation ramp, Exp: Atleast 2 mins','Pass' if Timing/60 >=2  else 'Inconclusive'])
-        else: res.append([f'Did not found CE packets which are in range of (0-3)','Inconclusive'])
+            res.append([f'Stayed {round(Timing/60,3)} mins during load voltage regulation ramp, Exp: Atleast 2 mins',Enums.TestResult.PASS if Timing/60 >=2  else Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f'Did not found CE packets which are in range of (0-3)',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1886,12 +1887,12 @@ class CommonCTSChecks:
                             res.append([f"Measured F_op value at index@ {fop[2]} is {Fop_val[0]}kHz, Limit: [{ChkRes[2]}] kHz", ChkRes[1]])
                             ChkRes = CommonMethods.check_measure( Check['FV'][1],vrect[0])
                             res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit: [{ChkRes[2]}] Volts", ChkRes[1]])
-                        else:res.append([f'Test did not found F_op assertion','Inconclusive'])
+                        else:res.append([f'Test did not found F_op assertion',Enums.TestResult.INCONCLUSIVE])
                         break
                     id=pkt[2]+1
                 else:break
-            if len(Vrect_Pings) == 0:res.append([f'PRx could not able to find the V_rect Ping > 3V','Fail'])                    
-        else: res.append([f'Test did not found Test_Start or Test_Stop assertions','Inconclusive'])
+            if len(Vrect_Pings) == 0:res.append([f'PRx could not able to find the V_rect Ping > 3V',Enums.TestResult.FAIL])                    
+        else: res.append([f'Test did not found Test_Start or Test_Stop assertions',Enums.TestResult.INCONCLUSIVE])
         return res
 
     def Fop_UL_SignalStrength(self,CTSCheck,Check,flows,flwID):
@@ -1917,8 +1918,8 @@ class CommonCTSChecks:
                 vrect = self.CalculateVoltTwindow(pkt[2],self.AllChannelData,at=Check['t1a'][1],measure=Check['t1a'][2],winsize=Check['t1a'][0])
                 ChkRes = CommonMethods.check_measure( Check['FV'][1],vrect[0])
                 res.append([f"Measured U_L is {vrect[0]}V at index@ {pkt[2]}, Limit: [{ChkRes[2]}] Volts", ChkRes[1]])
-            else:res.append([f'Test did not found F_op Assertion','Inconclusive'])
-        else:res.append([f'Test did not found {Check['pkt'][0]}','Inconclusive'])
+            else:res.append([f'Test did not found F_op Assertion',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Test did not found {Check['pkt'][0]}',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -1934,14 +1935,14 @@ class CommonCTSChecks:
                 Twake=round((self.file_list[id]['startTime']-ping[1])*1000,3)+5.50
                 
                 if TypeCheck=='Packet' and self.file_list[id]['pktType'] == "Signal strength": 
-                    res.append([f'Measured t_wake from {round(ping[1],3)}Sec to {round(self.file_list[id]['startTime'],3)+5.5}Sec  is {Twake} mS ,Limit : {Check['Limit']}', 'Inconclusive' if Twake <Check['Limit'][0] or Twake > Check['Limit'][1] else 'Pass'])
+                    res.append([f'Measured t_wake from {round(ping[1],3)}Sec to {round(self.file_list[id]['startTime'],3)+5.5}Sec  is {Twake} mS ,Limit : {Check['Limit']}', Enums.TestResult.INCONCLUSIVE if Twake <Check['Limit'][0] or Twake > Check['Limit'][1] else Enums.TestResult.PASS])
                     break
                 else:
                     if 'Shutdown' in self.file_list[id]['pktType']:
-                        res.append([f'could not able to find the Ping packet', 'Fail'])
+                        res.append([f'could not able to find the Ping packet', Enums.TestResult.FAIL])
                     id+=1
 
-        else: res.append([f'could not able to find the Ping', 'Fail'])
+        else: res.append([f'could not able to find the Ping', Enums.TestResult.FAIL])
 
         return res
 
@@ -1963,8 +1964,8 @@ class CommonCTSChecks:
                         if TypeCheck=='Packet':
                             Limit=Check['ExpTime'][0][TC]
                             Timing=round(((self.file_list[id]['startTime']-firstPktTime)*1000) +(5.50 if TC== "Tstart" else 0),3)
-                            if TC=='Tstart':res.append([f'Measured {TC} from {firstPKt} packet at time: {round(firstPktTime,3)} Sec to {self.file_list[id]['pktType']} packet at time: {round(self.file_list[id]['startTime'],3)} Sec  is {Timing} mS, Limit:{Limit}', 'Fail' if Timing <Limit[0]-0.1 or Timing > Limit[1]+0.1 else 'Pass'])
-                            else:res.append([f'Measured {TC} from {firstPKt} packet at time: {round(firstPktTime,3)} Sec to {self.file_list[id]['pktType']} packet at time: {round(self.file_list[id]['startTime'],3)} Sec  is {Timing} mS, Limit:{Limit}', 'Fail' if Timing <Limit[0] else 'Pass'])
+                            if TC=='Tstart':res.append([f'Measured {TC} from {firstPKt} packet at time: {round(firstPktTime,3)} Sec to {self.file_list[id]['pktType']} packet at time: {round(self.file_list[id]['startTime'],3)} Sec  is {Timing} mS, Limit:{Limit}', Enums.TestResult.FAIL if Timing <Limit[0]-0.1 or Timing > Limit[1]+0.1 else Enums.TestResult.PASS])
+                            else:res.append([f'Measured {TC} from {firstPKt} packet at time: {round(firstPktTime,3)} Sec to {self.file_list[id]['pktType']} packet at time: {round(self.file_list[id]['startTime'],3)} Sec  is {Timing} mS, Limit:{Limit}', Enums.TestResult.FAIL if Timing <Limit[0] else Enums.TestResult.PASS])
                             break
                         else:id+=1
                 else: id+=1
@@ -1978,7 +1979,7 @@ class CommonCTSChecks:
             PhaseLimit=self.FindPhase(self.Flow_limit[0],"PT")
             if PhaseLimit is not None:
                 res.extend(self.GetTemperature(Check))
-            else: res.append([f'PRx did not entered PT phase','Pass'])
+            else: res.append([f'PRx did not entered PT phase',Enums.TestResult.PASS])
                         
         return res
 
@@ -1998,13 +1999,13 @@ class CommonCTSChecks:
                         if nextid is not None:
                             Tstart=round(((self.file_list[nextid]['startTime']-self.file_list[resid]['stopTime'])*1000)+5.5,2)
                             # Tsilent=round((self.file_list[nextid]['startTime']-self.file_list[resid]['stopTime'])*1000,2)
-                            # res.append([f'Measured Tsilent Timing from Response:{self.file_list[resid]['pktType']} at Id {resid} to pkt :{self.file_list[nextid]['pktType']}_{self.file_list[nextid]['value']} at Id {nextid} is {Tsilent}', 'Pass' if Tsilent >6 else 'Fail'])
-                            res.append([f'Measured t_start timing from response:{self.file_list[resid]['pktType']} at index@ {resid} to packet :{self.file_list[nextid]['pktType']}_{self.file_list[nextid]['value']} at index@ {nextid} is {Tstart} mS Limit:{Check['Limit']}', 'Fail' if Tstart >Check['Limit'][1]+0.1 or Tstart<Check['Limit'][0]-0.1 else 'Pass'])
+                            # res.append([f'Measured Tsilent Timing from Response:{self.file_list[resid]['pktType']} at Id {resid} to pkt :{self.file_list[nextid]['pktType']}_{self.file_list[nextid]['value']} at Id {nextid} is {Tsilent}', Enums.TestResult.PASS if Tsilent >6 else Enums.TestResult.FAIL])
+                            res.append([f'Measured t_start timing from response:{self.file_list[resid]['pktType']} at index@ {resid} to packet :{self.file_list[nextid]['pktType']}_{self.file_list[nextid]['value']} at index@ {nextid} is {Tstart} mS Limit:{Check['Limit']}', Enums.TestResult.FAIL if Tstart >Check['Limit'][1]+0.1 or Tstart<Check['Limit'][0]-0.1 else Enums.TestResult.PASS])
                             id=nextid+1
                         else:break
                     else:break
-            else:res.append([f'PRx did not sent {Check['enpkt'][0]} _{Check['enpkt'][1] }packet', 'Inconclusive'])
-        else:res.append([f'PRx did not sent {Check['inpkt'][0]} _{Check['inpkt'][1] }packet', 'Inconclusive'])
+            else:res.append([f'PRx did not sent {Check['enpkt'][0]} _{Check['enpkt'][1] }packet', Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not sent {Check['inpkt'][0]} _{Check['inpkt'][1] }packet', Enums.TestResult.INCONCLUSIVE])
                     
         return res
 
@@ -2019,10 +2020,10 @@ class CommonCTSChecks:
                         # Find the Load
                     LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Load}",Type="TesterMsg" ,limit=[id,self.Flow_limit[1]])
                     if len(LD)>2:
-                        res.append([f"PRx applied Load: {Load}_ohms at index@ {LD[2]}", "Pass"])
+                        res.append([f"PRx applied Load: {Load}_ohms at index@ {LD[2]}", Enums.TestResult.PASS])
                         id=LD[2]+1
                     else: 
-                        res.append([f"PRx did not applied Load: {Load}_ohms", "Inconclusive"]) 
+                        res.append([f"PRx did not applied Load: {Load}_ohms", Enums.TestResult.INCONCLUSIVE]) 
                         break
 
             # monitor current or voltage
@@ -2030,18 +2031,18 @@ class CommonCTSChecks:
             else:self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
             MaxValues=self.MonitorVoltage(id,self.Flow_limit[1]-2) 
             if MaxValues[1] !=0:
-                res.append([f'Measured max {'Voltage' if not Check['Current'] else 'Current'} at {round((self.AllChannelData['Interval']*MaxValues[0])/1000,3)}sec  is {MaxValues[1]} {Check['unit']} , Limit :{Check['limit']}', 'Fail' if MaxValues[1] <Check['limit'][0] or MaxValues[1] >Check['limit'][1] else 'Pass'] )
+                res.append([f'Measured max {'Voltage' if not Check['Current'] else 'Current'} at {round((self.AllChannelData['Interval']*MaxValues[0])/1000,3)}sec  is {MaxValues[1]} {Check['unit']} , Limit :{Check['limit']}', Enums.TestResult.FAIL if MaxValues[1] <Check['limit'][0] or MaxValues[1] >Check['limit'][1] else Enums.TestResult.PASS] )
             #Get Max, min Temperatures
             templist = []
             self.AllChannelData11= self.PlotMethod.GetAllChannelData2('12',self.JapiData)
             for temp in self.AllChannelData11['RV']['displayDataChunk']: templist.append(temp)  
-            res.append([f"Measured coil temperature is {max(templist)} °C,Measured ambient temperature is :{templist[0]} °C", "Pass"]) 
-            res.append([f"Difference in temperature is {round((max(templist)-templist[2]),2)} °C", "Pass" if round((max(templist)-templist[2]),2) <12 else 'Fail']) 
+            res.append([f"Measured coil temperature is {max(templist)} °C,Measured ambient temperature is :{templist[0]} °C", Enums.TestResult.PASS]) 
+            res.append([f"Difference in temperature is {round((max(templist)-templist[2]),2)} °C", Enums.TestResult.PASS if round((max(templist)-templist[2]),2) <12 else Enums.TestResult.FAIL]) 
             # Find Tc execution Timing
             Timing=round(((self.file_list[self.Flow_limit[1]]['stopTime']-self.file_list[self.Flow_limit[0]]['startTime'])*1000)/60000,3)
-            res.append([f'Test executed for {Timing} mins , Limit >=60 mins','Pass' if Timing>=60 else 'Inconclusive'])
+            res.append([f'Test executed for {Timing} mins , Limit >=60 mins',Enums.TestResult.PASS if Timing>=60 else Enums.TestResult.INCONCLUSIVE])
 
-        else:res.append([f'PTx did not entered into PT Phase','Inconclusive'])
+        else:res.append([f'PTx did not entered into PT Phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
    
@@ -2053,9 +2054,9 @@ class CommonCTSChecks:
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load 1000mA",Type="TesterMsg" ,limit=[PhaseLimit[0],self.Flow_limit[1]])
             if len(LD)>2:
                 Timing=round((self.file_list[self.Flow_limit[1]]['stopTime']-LD[1])*1000,2)
-                res.append([f'PRx stayed in Power Transfer Phase after applying the Load: 1000 mA {Timing}mS','Fail' if Timing < 60000 else 'Pass'])
-            else:res.append([f'PTx removed power signal before applying the Load: 1000 mA','Fail'])
-        else:res.append([f'PRx did not entered PT phase','Inconclusive'])
+                res.append([f'PRx stayed in Power Transfer Phase after applying the Load: 1000 mA {Timing}mS',Enums.TestResult.FAIL if Timing < 60000 else Enums.TestResult.PASS])
+            else:res.append([f'PTx removed power signal before applying the Load: 1000 mA',Enums.TestResult.FAIL])
+        else:res.append([f'PRx did not entered PT phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2080,13 +2081,13 @@ class CommonCTSChecks:
                         id+=1
                     
                     if CEcnt >=10:
-                        res.append([f'PRx sent continuous {CEcnt} CE packets with values "0","-1","+1"  after stabilization',"Pass"])
+                        res.append([f'PRx sent continuous {CEcnt} CE packets with values "0","-1","+1"  after stabilization',Enums.TestResult.PASS])
                         CEPkts=True
                         break
                 id+=1
-            if not CEPkts:res.append([f'PRx did not sent continuous {CEcnt} CE packets with values "0","-1","+1"  after stabilization ','Inconclusive'])
+            if not CEPkts:res.append([f'PRx did not sent continuous {CEcnt} CE packets with values "0","-1","+1"  after stabilization ',Enums.TestResult.INCONCLUSIVE])
             res.extend(self.GetTemperature(Check))
-        else:res.append([f'PRx did not entered PT phase','Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase',Enums.TestResult.INCONCLUSIVE])
 
 
         return res
@@ -2106,8 +2107,8 @@ class CommonCTSChecks:
         if len(results)>0: 
             for Res in results:
                 result,val= self.PktMethod.compare_hex_to_expected(Res[1],Check[Res[0]][0:-1],Check[Res[0]][-1])
-                res.append([f'Measured {Res[0]} is {round(Res[1],2)} nS, limits:{Check[Res[0]][0:-1]} , Comp:{Check[Res[0]][-1]}', 'Pass' if result else 'Fail'])
-        else: res.append([f' Standard deviations measurements did not found ', 'Inconclusive'])
+                res.append([f'Measured {Res[0]} is {round(Res[1],2)} nS, limits:{Check[Res[0]][0:-1]} , Comp:{Check[Res[0]][-1]}', Enums.TestResult.PASS if result else Enums.TestResult.FAIL])
+        else: res.append([f' Standard deviations measurements did not found ', Enums.TestResult.INCONCLUSIVE])
        
 
         return res
@@ -2129,9 +2130,9 @@ class CommonCTSChecks:
                     if PhaseLimit is not None:
                         PTPhaseCount+=1
                         Timing=round((self.file_list[PhaseLimit[1]]['stopTime']-self.file_list[PhaseLimit[0]]['startTime'])*1000,2)
-                        res.append([f'PTx proceed to Power Transfer phase and stayyed for {Timing}mS, Limit >= 30Sec','Pass' if Timing >=30000 else 'Inconclusive'])
-                res.append([f'PTx enters the Power Tranfer Phase {PTPhaseCount} times and maintain communications throughout the test in each repetition','Pass' if  PTPhaseCount >=3 else 'Fail'])
-            else:res.append([f'Test did not found Test_Stop ','Inconclusive'])
+                        res.append([f'PTx proceed to Power Transfer phase and stayyed for {Timing}mS, Limit >= 30Sec',Enums.TestResult.PASS if Timing >=30000 else Enums.TestResult.INCONCLUSIVE])
+                res.append([f'PTx enters the Power Tranfer Phase {PTPhaseCount} times and maintain communications throughout the test in each repetition',Enums.TestResult.PASS if  PTPhaseCount >=3 else Enums.TestResult.FAIL])
+            else:res.append([f'Test did not found Test_Stop ',Enums.TestResult.INCONCLUSIVE])
         
         return res
 
@@ -2156,14 +2157,14 @@ class CommonCTSChecks:
                     if phaseCheck is not None:
                         PTPhaseCount+=1
                         if PTPhaseCount >3:
-                            res.append([f'PRx entered PT phase more than three times','Fail'])
+                            res.append([f'PRx entered PT phase more than three times',Enums.TestResult.FAIL])
                             break
                          # Check target operating voltage reached or not
                         Regulated=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
                         if len(Regulated)>2:
                             Loadvrect = self.CalculateVoltTwindow(Regulated[2],self.AllChannelData_Volatge,at="start",measure="before")
                             res.append([f'Measured voltage is {Loadvrect[0]}V, Limit [4.116 V ~ 4.284 V]', 
-                                            'Pass' if Loadvrect[0] >= 4.116 and Loadvrect[0] <= 4.284 else 'Inconclusive'])
+                                            Enums.TestResult.PASS if Loadvrect[0] >= 4.116 and Loadvrect[0] <= 4.284 else Enums.TestResult.INCONCLUSIVE])
                             self.id =Regulated[2]+1
                             # Check Loads are applied or not
                             results,LoadFlag=self.CheckLoads(Check)
@@ -2174,27 +2175,27 @@ class CommonCTSChecks:
                                 EPT=self.PktMethod.GetPacketDetails(packet="End Power Transfer",value= "[EPT/nr]",limit=[self.id,self.Flow_limit[1]])
                                 if len(EPT)>2:
                                     Timing=round((EPT[0]-self.file_list[self.id-1]['stopTime']),3)
-                                    res.append([f'PRx  sent End_Power_Transfer packet at index@ {EPT[2]} within {Timing}_Secs from end of 3.5_ohms load at index@ {self.id-1},  Exp : Atleast after 30_Secs ','Pass' if Timing >=30 else 'Inconclusive'])
+                                    res.append([f'PRx  sent End_Power_Transfer packet at index@ {EPT[2]} within {Timing}_Secs from end of 3.5_ohms load at index@ {self.id-1},  Exp : Atleast after 30_Secs ',Enums.TestResult.PASS if Timing >=30 else Enums.TestResult.INCONCLUSIVE])
                                     # Check the PTx detached or not
                                     SD= self.PktMethod.GetPacketDetails(packet='Shutdown',Type="TesterMsg",limit=[EPT[2],self.Flow_limit[1]+1])
-                                    if len(SD)>2: res.append([f'PTx detached after End_Power_Transfer packet is sent at index@ {EPT[2]}','Pass'])
+                                    if len(SD)>2: res.append([f'PTx detached after End_Power_Transfer packet is sent at index@ {EPT[2]}',Enums.TestResult.PASS])
                                     else:
-                                        res.append([f'PTx did not detached after End_Power_Transfer packet is sent at index@ {EPT[2]}','Fail'])
+                                        res.append([f'PTx did not detached after End_Power_Transfer packet is sent at index@ {EPT[2]}',Enums.TestResult.FAIL])
                                         LoadFlag=True
 
                                 else: 
-                                    res.append([f'PRx did not sent End_Power_Transfer packet','Inconclusive'])
+                                    res.append([f'PRx did not sent End_Power_Transfer packet',Enums.TestResult.INCONCLUSIVE])
                                     LoadFlag=True
                         else:
-                            res.append([f'TPR did not regulated to its operating voltage 4.2V','Inconclusive'])
+                            res.append([f'TPR did not regulated to its operating voltage 4.2V',Enums.TestResult.INCONCLUSIVE])
                             LoadFlag=True
                     if LoadFlag: break
-                if PTPhaseCount==0 :res.append([f'TPR did not entered in to PT phase atleast one time','Inconclusive'])
-                if PTPhaseCount <=3 : res.append([f'TPR entered PT phase at most 3 Times','Pass'])
+                if PTPhaseCount==0 :res.append([f'TPR did not entered in to PT phase atleast one time',Enums.TestResult.INCONCLUSIVE])
+                if PTPhaseCount <=3 : res.append([f'TPR entered PT phase at most 3 Times',Enums.TestResult.PASS])
                 # Check Time Duration of the Test Case
                 Timing=round((Stop[0]-Start[1])/60,3)
-                res.append([f'Tester stayed {Timing} mins in contact with PTx, Limit: [Atleast 10 Mins]','Pass' if Timing >= 10 else "Inconclusive"])
-            else:res.append([f'Test did not found Test_Stop assertion','Inconclusive'])
+                res.append([f'Tester stayed {Timing} mins in contact with PTx, Limit: [Atleast 10 Mins]',Enums.TestResult.PASS if Timing >= 10 else Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'Test did not found Test_Stop assertion',Enums.TestResult.INCONCLUSIVE])
            
         return res
 
@@ -2221,8 +2222,8 @@ class CommonCTSChecks:
                             break
                         id+=1
                     Length=len(ChainLength.split("-")) if ChainLength is not None else 0
-                    res.append([f'PTx sent {Check['resp'][0]}_{Check['resp'][1]} response at index@ {AuthResp[2]} with  Certificate_Chain_Segment length of {Length} Bytes Limit :{Check['limit']}','Fail' if Length > Check['limit'][1] or Length <=Check['limit'][0] else 'Pass'])
-                else:res.append([f'PTx did not sent {Check['resp'][0]}_{Check['resp'][1]} packet','Inconclusive'])
+                    res.append([f'PTx sent {Check['resp'][0]}_{Check['resp'][1]} response at index@ {AuthResp[2]} with  Certificate_Chain_Segment length of {Length} Bytes Limit :{Check['limit']}',Enums.TestResult.FAIL if Length > Check['limit'][1] or Length <=Check['limit'][0] else Enums.TestResult.PASS])
+                else:res.append([f'PTx did not sent {Check['resp'][0]}_{Check['resp'][1]} packet',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2241,10 +2242,10 @@ class CommonCTSChecks:
                 digests=self.PktMethod.GetPacketDetails(packet="ADT",value="Digests" ,Type="Response",limit=[ADCAuth_TPT[2],self.Flow_limit[1]])
                 slot=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(digests[2],'Slots_Returned_Mask')[0]['sRawData'])
                 if slot ==1:
-                    res.append([f'PTx responded with ADC/auth packet at index@ {ADCAuth_TPT[2]} with {Length} Bytes', 'Pass' if Length== (slot*32)+2 else 'Fail'])
-                else: res.append([f'PTx responded with digests with Slots_Returned_Mask {slot} Expected: 1', 'Fail'])
-            else:res.append([f'PTx responded with ADC/auth packet at index@ {ADCAuth_TPT[2]} with {Length} Bytes', 'Pass' if Length== Check['Length'] else 'Fail'])   
-        else:res.append([f'PTx did not responded with ADC/auth packet', 'Inconclusive']) 
+                    res.append([f'PTx responded with ADC/auth packet at index@ {ADCAuth_TPT[2]} with {Length} Bytes', Enums.TestResult.PASS if Length== (slot*32)+2 else Enums.TestResult.FAIL])
+                else: res.append([f'PTx responded with digests with Slots_Returned_Mask {slot} Expected: 1', Enums.TestResult.FAIL])
+            else:res.append([f'PTx responded with ADC/auth packet at index@ {ADCAuth_TPT[2]} with {Length} Bytes', Enums.TestResult.PASS if Length== Check['Length'] else Enums.TestResult.FAIL])   
+        else:res.append([f'PTx did not responded with ADC/auth packet', Enums.TestResult.INCONCLUSIVE]) 
 
         return res
 
@@ -2264,8 +2265,8 @@ class CommonCTSChecks:
             id+=1
 
         for val in AuthDetails:
-            if len(AuthDetails[val])>0:res.append([f'Received {val} :{AuthDetails[val][0]} in the sequence','Pass' if AuthDetails[val][0]==Check[val] else 'Fail'])  
-            else:res.append([f'TPR did not received {val} bit in the sequence','Fail' if Check['BitsCheck'] else 'Inconclusive'])
+            if len(AuthDetails[val])>0:res.append([f'Received {val} :{AuthDetails[val][0]} in the sequence',Enums.TestResult.PASS if AuthDetails[val][0]==Check[val] else Enums.TestResult.FAIL])  
+            else:res.append([f'TPR did not received {val} bit in the sequence',Enums.TestResult.FAIL if Check['BitsCheck'] else Enums.TestResult.INCONCLUSIVE])
         
         return res
 
@@ -2278,12 +2279,12 @@ class CommonCTSChecks:
         if PhaseLimit is not None:
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load 820",Type="TesterMsg" ,limit=[PhaseLimit[0],self.Flow_limit[1]])
             if len(LD)>2:
-                res.append([f'Tester applied the Load: 820 Ohms at index@ {LD[2]}', 'Pass'])
+                res.append([f'Tester applied the Load: 820 Ohms at index@ {LD[2]}', Enums.TestResult.PASS])
                 #Monitor  Voltage Before Load
                 self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
                 Voltages=self.MonitorVoltage(self.Flow_limit[0],LD[2])
                 if Voltages[1] !=0:
-                    res.append([f'Measured max voltage at index@ {round((self.AllChannelData['Interval']*Voltages[0])/1000,3)}sec  is {Voltages[1]} V before the load: 820 ohms., Limit : <{Check['Voltage1']}', 'Inconclusive' if  Voltages[1] >Check['Voltage1'] else 'Pass'] )
+                    res.append([f'Measured max voltage at index@ {round((self.AllChannelData['Interval']*Voltages[0])/1000,3)}sec  is {Voltages[1]} V before the load: 820 ohms., Limit : <{Check['Voltage1']}', Enums.TestResult.INCONCLUSIVE if  Voltages[1] >Check['Voltage1'] else Enums.TestResult.PASS] )
                 # Check Positive CE pkts
                 Assertion=self.PktMethod.GetexactPacketDetails(packet="TPR_Position_Adjust_to_Incr_V_rect",Type="TesterMsg",limit=[LD[2],self.Flow_limit[1]])
                 if len(Assertion)>2:
@@ -2292,13 +2293,13 @@ class CommonCTSChecks:
                     while id < self.Flow_limit[1]:
                         if self.file_list[id]['pktType']=="Control Error" and int(self.file_list[id]['value'])>0:count+=1
                         id+=1
-                    res.append([f'Tester sent {count} positive CE packets', 'Inconclusive' if count < Check['CEcount'] else 'Pass'] )
+                    res.append([f'Tester sent {count} positive CE packets', Enums.TestResult.INCONCLUSIVE if count < Check['CEcount'] else Enums.TestResult.PASS] )
                     #Monitor Final Voltage
                     FinalVoltages=self.MonitorVoltage(Assertion[2],self.Flow_limit[1])
                     if FinalVoltages[1] !=0:
-                        res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*FinalVoltages[0])/1000,3)}sec  is {FinalVoltages[1]}V at the final step, Limit : <{Check['Voltage2']}', 'Fail' if  FinalVoltages[1] >Check['Voltage2'] else 'Pass'] )
-            else:res.append([f'PTx removed power signal before applying the Load 820 ohms','Inconclusive'])
-        else:res.append([f'PRx did not entered PT phase','Inconclusive'])
+                        res.append([f'Measured max voltage at {round((self.AllChannelData['Interval']*FinalVoltages[0])/1000,3)}sec  is {FinalVoltages[1]}V at the final step, Limit : <{Check['Voltage2']}', Enums.TestResult.FAIL if  FinalVoltages[1] >Check['Voltage2'] else Enums.TestResult.PASS] )
+            else:res.append([f'PTx removed power signal before applying the Load 820 ohms',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not entered PT phase',Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2310,33 +2311,33 @@ class CommonCTSChecks:
         ST= self.PktMethod.GetPacketDetails(packet="Test_Status",value="Execution_Started" ,Type="TesterMsg" ,limit=[0,len(self.file_list)-1])
         SP=self.PktMethod.GetPacketDetails(packet="Test_Status",value="Test_Stop",Type="TesterMsg",limit=[0,len(self.file_list)])
         if len(ST) > 2 and len(SP) > 2:
-            res.append([f"Test executed {round((SP[0]-ST[0]),3)} seconds after placing the TPR on the PTx product",'Pass' if round((SP[0]-ST[0]),3) > 28 else 'Inconclusive' ])
+            res.append([f"Test executed {round((SP[0]-ST[0]),3)} seconds after placing the TPR on the PTx product",Enums.TestResult.PASS if round((SP[0]-ST[0]),3) > 28 else Enums.TestResult.INCONCLUSIVE ])
             ILL = self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1], limit=[ST[2],SP[2]+1])
             if len(ILL)>2:
                 # Print first Ping Measurement
                 Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[ILL[2]+1,SP[2]])
                 if len(Coilpk)>2:
                     TterminateVal=round((Coilpk[1] - ILL[1]) * 1000, 3)
-                    res.append([f'TPR sent {Packet} packet at index@ {{{ILL[2]}}}' ,'Pass'])
-                    res.append([f'Measured t_terminate value is {TterminateVal} mS , Limit [<=28 mS] ','Fail' if TterminateVal > 28 else 'Pass'])  
+                    res.append([f'TPR sent {Packet} packet at index@ {{{ILL[2]}}}' ,Enums.TestResult.PASS])
+                    res.append([f'Measured t_terminate value is {TterminateVal} mS , Limit [<=28 mS] ',Enums.TestResult.FAIL if TterminateVal > 28 else Enums.TestResult.PASS])  
 
                     # Validate Remaining Ping Measurements
                     rem=self.ValidTterminate([ILL[2]+1,SP[2]],Check,Packet)
                     if len(rem)>0:res.extend(rem)
                 else:
-                    res.append([f'TPR sent {Packet} at {{{ILL[2]}}} , but did not recieved Coil_voltage pk-pk assertion before test_stop.','Pass'])
-                    res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
+                    res.append([f'TPR sent {Packet} at {{{ILL[2]}}} , but did not recieved Coil_voltage pk-pk assertion before test_stop.',Enums.TestResult.PASS])
+                    res.append([f'Measured t_terminate value is 0.0 mS',Enums.TestResult.PASS])
 
             else:
-                res.append([f'voltage drops below 200mV[pk-pk] level before reaching the end of the {Packet} data packet.','Pass'])
-                res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
+                res.append([f'voltage drops below 200mV[pk-pk] level before reaching the end of the {Packet} data packet.',Enums.TestResult.PASS])
+                res.append([f'Measured t_terminate value is 0.0 mS',Enums.TestResult.PASS])
             # Check TrestartIllegal and VRECT
             if Trestart:
                 rs=self.Trestart_Vrect(limit=[ST[2],SP[2]],DataPacketName=Packet,CTSCheck=CTSCheck)
                 if len(rs)>0:res.extend(rs)
                 
 
-        else:res.append([f'Test did not found Test_start or Test_stop assertions','Inconclusive'])  
+        else:res.append([f'Test did not found Test_start or Test_stop assertions',Enums.TestResult.INCONCLUSIVE])  
         return res
     
     def T_terminate(self,CTSCheck,Check,flows,flwID):
@@ -2359,16 +2360,16 @@ class CommonCTSChecks:
                     while id < self.Flow_limit[1]:
                         if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                             if Check['pkt'][0] in self.file_list[id]['pktType'] if Check['pkt'][1] is None else Check['pkt'][0] in self.file_list[id]['pktType'] and Check['pkt'][1] in self.file_list[id]['value']:
-                                res.append([f'TPR sent {Packet} packet after the {OP} packet at index@ {{{Start[2]}}}','Pass'])
+                                res.append([f'TPR sent {Packet} packet after the {OP} packet at index@ {{{Start[2]}}}',Enums.TestResult.PASS])
                                 count+=1
                                 break
                             else:
                                 if Check['Phase'] in ['Nego']:
                                     if Check['sp'][0] in self.file_list[id]['pktType'] and True if Check['sp'][1] is None else Check['sp'][1] in self.file_list[id]['value']:
                                         Start[2]=id
-                                    else: res.append([f'TPR did not sent {Packet} packet after {OP} packet','Inconclusive'])
+                                    else: res.append([f'TPR did not sent {Packet} packet after {OP} packet',Enums.TestResult.INCONCLUSIVE])
                                 else:
-                                    res.append([f'TPR did not sent {Packet} packet after {OP} packet','Inconclusive'])
+                                    res.append([f'TPR did not sent {Packet} packet after {OP} packet',Enums.TestResult.INCONCLUSIVE])
                         id+=1
                 if Check['Phase'] in ['PT']:
                     previousStartTime=Start[1]
@@ -2377,7 +2378,7 @@ class CommonCTSChecks:
                         if len(ILL)>2:
                             if Check.get('Timing',False):
                                 Timing=round((ILL[0]-previousStartTime)*1000,3)
-                                res.append([f"Measured timing between {Packet if count>0 else "Control Error"} packet at index@ {{{id-1}}} and {Packet} packet at index@ {{{ILL[2]}}} is {Timing}mS Limit: {Check['Timing'][0]}±{Check['Timing'][1]}Sec",'Pass' if Timing/1000 >=Check['Timing'][0]-Check['Timing'][1] and Timing/1000 <= Check['Timing'][0]+Check['Timing'][1] else 'Fail'])
+                                res.append([f"Measured timing between {Packet if count>0 else "Control Error"} packet at index@ {{{id-1}}} and {Packet} packet at index@ {{{ILL[2]}}} is {Timing}mS Limit: {Check['Timing'][0]}±{Check['Timing'][1]}Sec",Enums.TestResult.PASS if Timing/1000 >=Check['Timing'][0]-Check['Timing'][1] and Timing/1000 <= Check['Timing'][0]+Check['Timing'][1] else Enums.TestResult.FAIL])
                                 previousStartTime=ILL[0]
                             id=ILL[2]+1
                             count+=1
@@ -2393,31 +2394,31 @@ class CommonCTSChecks:
                             if len(ILL)>2:
                                 if Check.get('Timing',False):
                                     Timing=round((ILL[0]-previousStartTime)*1000,3)
-                                    res.append([f"Measured timing between {Packet} packet at index@ {{{y-1}}} and {Packet} packet at index@ {{{ILL[2]}}} is {Timing}mS Limit: {Check['Timing'][0]}±{Check['Timing'][1]}mS",'Pass' if Timing >=Check['Timing'][0]-Check['Timing'][1] and Timing <= Check['Timing'][0]+Check['Timing'][1] else 'Fail'])
+                                    res.append([f"Measured timing between {Packet} packet at index@ {{{y-1}}} and {Packet} packet at index@ {{{ILL[2]}}} is {Timing}mS Limit: {Check['Timing'][0]}±{Check['Timing'][1]}mS",Enums.TestResult.PASS if Timing >=Check['Timing'][0]-Check['Timing'][1] and Timing <= Check['Timing'][0]+Check['Timing'][1] else Enums.TestResult.FAIL])
                                     previousStartTime=ILL[0]
                                 y=ILL[2]+1
                                 count+=1
                             else:break
-                    if Check['Phase'] not in ['Config']: res.append([f'TPR sent {count} {Packet} packets in the sequence','Pass'])
+                    if Check['Phase'] not in ['Config']: res.append([f'TPR sent {count} {Packet} packets in the sequence',Enums.TestResult.PASS])
                     y=y-2 if Check['Phase'] in ['PT'] else y-1
                     # Find Tterminate
                     if Check['pkt'][2] : res.extend(self.Payload_Details(PacketName=Packet,Index=y,PayLoads= Check['pkt'][3])) 
                     Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[y,self.Flow_limit[1]])
                     if len(Coilpk)>2:
                         TterminateVal=round((Coilpk[1] - self.file_list[y]['stopTime']) * 1000, 3)
-                        res.append([f'Measured t_terminate value for {Packet} packet at index@ {y} is {TterminateVal}mS, Limit [≤ 28mS]','Fail' if TterminateVal > 28 else 'Pass']) 
+                        res.append([f'Measured t_terminate value for {Packet} packet at index@ {y} is {TterminateVal}mS, Limit [≤ 28mS]',Enums.TestResult.FAIL if TterminateVal > 28 else Enums.TestResult.PASS]) 
                           # Check TrestartIllegal and VRECT
                         if Trestart:
                             rs=self.Trestart_Vrect(limit=[self.Flow_limit[0],SP[2]],DataPacketName=Packet,CTSCheck=CTSCheck)
                             if len(rs)>0:res.extend(rs)
 
-                    else:res.append([f'PTx did not detached after the {Packet} packet at index@ {{{y}}}','Inconclusive'])
+                    else:res.append([f'PTx did not detached after the {Packet} packet at index@ {{{y}}}',Enums.TestResult.INCONCLUSIVE])
                 else:
-                    res.append([f'voltage drops below 200mV [pk-pk] level before reaching the end of the {Packet} packet.','Pass'])
-                    res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
+                    res.append([f'voltage drops below 200mV [pk-pk] level before reaching the end of the {Packet} packet.',Enums.TestResult.PASS])
+                    res.append([f'Measured t_terminate value is 0.0 mS',Enums.TestResult.PASS])
               
-            else:res.append([f'Test did not found {OP} packet','Inconclusive'])
-        else:res.append([f'Test did not found test_start or test_stop assertions','Inconclusive'])
+            else:res.append([f'Test did not found {OP} packet',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Test did not found test_start or test_stop assertions',Enums.TestResult.INCONCLUSIVE])
         return res
 
     def CheckTerminate(self,CTSCheck,Check,flows,flwID):
@@ -2427,7 +2428,7 @@ class CommonCTSChecks:
         # OP= f'{Check['sp'][0] if Check['sp'][1] is None else Check['sp'][0]+" "+Check['sp'][1]}'
         ILL = self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1], limit=self.Flow_limit)
         if len(ILL)>2:
-            res.append([f'TPR sent {Packet} at index@ {{{ILL[2]}}}','Pass'])
+            res.append([f'TPR sent {Packet} at index@ {{{ILL[2]}}}',Enums.TestResult.PASS])
             # Print first Ping Measurement
             if Check['pkt'][2] : res.extend(self.Payload_Details(PacketName=Packet,Index=ILL[2],PayLoads= Check['pkt'][3])) 
             # check Ptx detached or not
@@ -2435,18 +2436,18 @@ class CommonCTSChecks:
             id=ILL[2]+1
             while id < self.Flow_limit[1]:
                 if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
-                    res.append([f'PTx did not detached after sending {Packet} at index@ {{{ILL[2]}}}','Inconclusive'])
+                    res.append([f'PTx did not detached after sending {Packet} at index@ {{{ILL[2]}}}',Enums.TestResult.INCONCLUSIVE])
                     Detach=False
                     break
                 id+=1
             if Detach:
                 Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[ILL[2]+1,self.Flow_limit[1]])
                 TterminateVal=round((Coilpk[1] - ILL[1]) * 1000, 3)
-                res.append([f'Measured t_terminate value for packet: {Packet} is {TterminateVal}mS at {{{ILL[2]}}}, Limit[ <= {Check['Tterminate'][1]}] mS ','Fail' if TterminateVal > Check['Tterminate'][1] else 'Pass'])  
+                res.append([f'Measured t_terminate value for packet: {Packet} is {TterminateVal}mS at {{{ILL[2]}}}, Limit[ <= {Check['Tterminate'][1]}] mS ',Enums.TestResult.FAIL if TterminateVal > Check['Tterminate'][1] else Enums.TestResult.PASS])  
 
         else:
-            res.append([f'voltage drops below 200mV [pk-pk] level before reaching the end of the {Packet} data packet.','Pass'])
-            res.append([f'Measured t_terminate value is 0.0 mS','Pass'])
+            res.append([f'voltage drops below 200mV [pk-pk] level before reaching the end of the {Packet} data packet.',Enums.TestResult.PASS])
+            res.append([f'Measured t_terminate value is 0.0 mS',Enums.TestResult.PASS])
 
         return res
 
@@ -2456,35 +2457,35 @@ class CommonCTSChecks:
         self.Flow_limit = flows[flwID]['Limit']
         ID=self.PktMethod.GetPacketDetails(packet="Identification",limit=self.Flow_limit)
         if len(ID)>2:
-            res.append([f'TPR sent configuration packet at index@ {{{ID[2]}}}','Pass'])
+            res.append([f'TPR sent configuration packet at index@ {{{ID[2]}}}',Enums.TestResult.PASS])
             for Payload in Check['PayLoads']:
                 HexVal=self.PktMethod.GetPayloadDetails(ID[2],Payload['Name'])[0]['sRawData']
                 Val=self.PktMethod.hex_to_decimal(HexVal)
-                result='Inconclusive'
+                result=Enums.TestResult.INCONCLUSIVE
                 values=[int(x,16) for x in Payload['Exp'] ]if type(Payload['Exp'][0]) is not int else Payload['Exp']
                 match Payload['comp']:
                     case 'EQL':
-                        result='Pass' if Val in values else 'Inconclusive'
+                        result=Enums.TestResult.PASS if Val in values else Enums.TestResult.INCONCLUSIVE
                     case 'NEQ':
-                        result='Pass' if Val not in values else 'Inconclusive'
+                        result=Enums.TestResult.PASS if Val not in values else Enums.TestResult.INCONCLUSIVE
                     case 'ANY':
-                        result='Pass'
+                        result=Enums.TestResult.PASS
                 desp=CommonMethods.GetCompDes(Payload['Exp'],Payload['comp'])
                 res.append([f'Obtained {Payload['Name']} is {HexVal if Payload['Name']=='Manufacturer_Code' else int(Val) }, Exp : {desp}',result])
             # Check for Power Transfer Timing
             PhaseLimit=self.FindPhase(ID[2]+1,"Calib" if 'EPP' in self.Header['TestcaseID']  else 'PT')
             if PhaseLimit is not None:
                 Duration= round((self.file_list[self.Flow_limit[1]]['stopTime']-self.file_list[PhaseLimit[0]]['startTime']),3)
-                res.append([f'TPR stayed in Power Transfer phase for {Duration} Secs , Exp :>= 5 secs','Inconclusive' if Duration <5 else 'Pass' if 'EPP' in self.Header['TestcaseID'] else 'Fail' if Duration  <5 else 'Pass'])
+                res.append([f'TPR stayed in Power Transfer phase for {Duration} Secs , Exp :>= 5 secs',Enums.TestResult.INCONCLUSIVE if Duration <5 else Enums.TestResult.PASS if 'EPP' in self.Header['TestcaseID'] else Enums.TestResult.FAIL if Duration  <5 else Enums.TestResult.PASS])
                 # Rp check
                 if 'EPP' in self.Header['TestcaseID'] :
                     RP=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",limit=PhaseLimit)
                     if len(RP)>2:
                         Duration= round((RP[0]-self.file_list[self.Flow_limit[0]]['startTime']),3)
-                        res.append([f'TPR sent 16-Bit RP packet at index@ {{{RP[2]}}} within {Duration} Secs from digital ping','Fail' if Duration > 3 else 'Pass'])                      
-                    else:res.append([f'TPR did not sent 16-Bit RP packet in PT phase','Fail'])
-            else:res.append(['TPR did not entered Power Transfer phase','Inconclusive' if 'EPP' in self.Header['TestcaseID'] else 'Fail'])
-        else:res.append(['Test did not found ID Packet','Inconclusive'])
+                        res.append([f'TPR sent 16-Bit RP packet at index@ {{{RP[2]}}} within {Duration} Secs from digital ping',Enums.TestResult.FAIL if Duration > 3 else Enums.TestResult.PASS])                      
+                    else:res.append([f'TPR did not sent 16-Bit RP packet in PT phase',Enums.TestResult.FAIL])
+            else:res.append(['TPR did not entered Power Transfer phase',Enums.TestResult.INCONCLUSIVE if 'EPP' in self.Header['TestcaseID'] else Enums.TestResult.FAIL])
+        else:res.append(['Test did not found ID Packet',Enums.TestResult.INCONCLUSIVE])
         return res
 
 
@@ -2501,9 +2502,9 @@ class CommonCTSChecks:
                 if Check.get('Compliment',False):
                     slotMask=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Get_Digests[2],'Slot_Mask')[0]['sRawData'])
                     if "TEST_PTX_APX_DIG_SRM_002" in  self.TestData['TestResults']:
-                        res.append([f'Earlier slots populated mask was set to  {self.TestData['TestResults']["TEST_PTX_APX_DIG_SRM_002"]}, current slot mask was set to  {int(slotMask)} in Get_Digests packet at {{{Get_Digests[2]}}}','Pass' if int((~ self.TestData['TestResults']["TEST_PTX_APX_DIG_SRM_002"]) & 0b1111 )== int (slotMask) else 'Inconclusive'])
+                        res.append([f'Earlier slots populated mask was set to  {self.TestData['TestResults']["TEST_PTX_APX_DIG_SRM_002"]}, current slot mask was set to  {int(slotMask)} in Get_Digests packet at {{{Get_Digests[2]}}}',Enums.TestResult.PASS if int((~ self.TestData['TestResults']["TEST_PTX_APX_DIG_SRM_002"]) & 0b1111 )== int (slotMask) else Enums.TestResult.INCONCLUSIVE])
                     else:
-                        res.append([f'Test result of TEST_PTX_APX_DIG_SRM_002 is not Available.','Inconclusive'])
+                        res.append([f'Test result of TEST_PTX_APX_DIG_SRM_002 is not Available.',Enums.TestResult.INCONCLUSIVE])
                 else:
                     results=self.Payload_Details(PacketName='Get_Digests',Index=Get_Digests[2],PayLoads=Check['Get_Digests'])
                     if len(results)>0:res.extend(results)
@@ -2514,31 +2515,31 @@ class CommonCTSChecks:
                     # CTS Pass/ Fail Criteria
                     if Check.get("Authentication_Protocol_Version",False):
                         ProtocolVersion=self.PktMethod.GetPayloadDetails(Digests[2],'Authentication_Protocol_Version')[0]['sRawData']
-                        res.append([f'PTx sent Authentication Protocol version in the DIGESTS authentication response at {{{Digests[2]}}} is {ProtocolVersion}, Exp :0x01','Pass' if ProtocolVersion =='0x01' else 'Fail'])
+                        res.append([f'PTx sent Authentication Protocol version in the DIGESTS authentication response at {{{Digests[2]}}} is {ProtocolVersion}, Exp :0x01',Enums.TestResult.PASS if ProtocolVersion =='0x01' else Enums.TestResult.FAIL])
                     if Check.get('Slots_Mask',False):
                         slot_populated=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Populated_Mask')[0]['sRawData']
                         slot_returned=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Returned_Mask')[0]['sRawData']
                         if Check.get('Compare_slots',False):
                             self.TestData['TestResults'][self.Header['TestcaseID']]=int(slot_populated,16) 
                             self.TestResultsjson.update_file(self.TestData)
-                            if slot_populated == slot_returned:res.append([f'PTx sent populated mask {slot_populated} matches the returned mask {slot_returned} in the DIGESTS authentication response at {{{Digests[2]}}}', 'Pass'])
-                            else:res.append([f' PTx sent both populated mask: {slot_populated} & returned mask: {slot_returned} are not equal in the DIGESTS authentication response at {{{Digests[2]}}}','Fail'])
+                            if slot_populated == slot_returned:res.append([f'PTx sent populated mask {slot_populated} matches the returned mask {slot_returned} in the DIGESTS authentication response at {{{Digests[2]}}}', Enums.TestResult.PASS])
+                            else:res.append([f' PTx sent both populated mask: {slot_populated} & returned mask: {slot_returned} are not equal in the DIGESTS authentication response at {{{Digests[2]}}}',Enums.TestResult.FAIL])
                         else:
-                            res.append([f'PTx sent slots populated mask in the DIGESTS authentication response at {{{Digests[2]}}} is {slot_populated}, Exp: 0x01','Pass' if slot_populated =='0x01' else 'Fail'])
-                            res.append([f'PTx sent slots returned mask in the DIGESTS authentication response at {{{Digests[2]}}} is {slot_returned}, Exp: 0x01','Pass' if slot_returned =='0x01' else 'Fail'])
+                            res.append([f'PTx sent slots populated mask in the DIGESTS authentication response at {{{Digests[2]}}} is {slot_populated}, Exp: 0x01',Enums.TestResult.PASS if slot_populated =='0x01' else Enums.TestResult.FAIL])
+                            res.append([f'PTx sent slots returned mask in the DIGESTS authentication response at {{{Digests[2]}}} is {slot_returned}, Exp: 0x01',Enums.TestResult.PASS if slot_returned =='0x01' else Enums.TestResult.FAIL])
 
                     # Check Digest in Cache
                     Cache_Msg=self.PktMethod.GetPacketDetails(packet="Digest",value="not in cache",Type='TesterMsg',limit=[Digests[2]+1,self.Flow_limit[1]])
                     if len(Cache_Msg)>2:
-                        res.append([f'Digests not in cache found at {{{Cache_Msg[2]}}}','Pass'])
+                        res.append([f'Digests not in cache found at {{{Cache_Msg[2]}}}',Enums.TestResult.PASS])
                         # CTS Pass/ Fail Criteria
                         if Check.get('BytesCheck',False):
                             Bytes=self.BytesCount([Digests[2],Cache_Msg[2]])
                             if self.Header['TestcaseID'] in ['TEST_PTX_APX_DIG_DRX_001']:
                                 slot_returned=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Returned_Mask')[0]['sRawData']
-                                res.append([f'Slot returned mask was set to {int(slot_returned,16)}, Exp N=1', 'Pass' if int(slot_returned,16)==1 else 'Fail'])
-                                res.append([f'Digest Authentication response consists of {Bytes} bytes, Exp: N x 32 +2 Where N={int(slot_returned,16)} ','Pass' if Bytes == (int(slot_returned,16)*32 +2) else 'Fail'])
-                            else:res.append([f'Digest Authentication response consists of {Bytes} bytes','Pass' if Bytes ==2 else 'Fail'])
+                                res.append([f'Slot returned mask was set to {int(slot_returned,16)}, Exp N=1', Enums.TestResult.PASS if int(slot_returned,16)==1 else Enums.TestResult.FAIL])
+                                res.append([f'Digest Authentication response consists of {Bytes} bytes, Exp: N x 32 +2 Where N={int(slot_returned,16)} ',Enums.TestResult.PASS if Bytes == (int(slot_returned,16)*32 +2) else Enums.TestResult.FAIL])
+                            else:res.append([f'Digest Authentication response consists of {Bytes} bytes',Enums.TestResult.PASS if Bytes ==2 else Enums.TestResult.FAIL])
 
                         # Check Simple Flow
                         Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[Cache_Msg[2]+1,self.Flow_limit[1]])
@@ -2550,28 +2551,28 @@ class CommonCTSChecks:
                             if len(Certificate)>2:
                                 Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,self.Flow_limit[1]])
                                 if len(Chain_Msg)>2:
-                                    res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                                    res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                                     # Check Challenge Sequence
                                     Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,self.Flow_limit[1]])
                                     if len(Challenge)>2:
                                         Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                                        res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp: 0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                                        res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp: 0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                                         # check Digets Response
                                         Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[Challenge[2]+1,self.Flow_limit[1]])
                                         if len(Challenge_Auth)>2:
                                             Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,self.Flow_limit[1]])
                                             if len(Challenge_Msg)>2:
-                                                res.append([f'Challenge Auth found at {{{Challenge_Msg[2]}}}','Pass'])
-                                            else:res.append([f'Test did not found Challenge valid message', 'Inconclusive'])
-                                        else:res.append([f'PTx did not sent Challenge_Auth response', 'Inconclusive'])
-                                    else:res.append([f'TPR did not sent Challenge Request','Inconclusive'])
-                                else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                            else:res.append([f'PTx did not sent Certificate Response', 'Inconclusive'])
-                        else:res.append([f'TPR did not sent Get_Certificate Request','Inconclusive'])
-                    else:res.append([f'Test did not found Digest not in Cache message', 'Inconclusive'])
-                else:res.append([f'PTx did not sent Digests Response', 'Inconclusive'])
-            else:res.append([f'TPR did not sent Get_Digests Request','Inconclusive'])
-        else:res.append([f'Prx did not Entered PT Phase', 'Inconclusive'])
+                                                res.append([f'Challenge Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
+                                            else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.INCONCLUSIVE])
+                                        else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.INCONCLUSIVE])
+                                    else:res.append([f'TPR did not sent Challenge Request',Enums.TestResult.INCONCLUSIVE])
+                                else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                            else:res.append([f'PTx did not sent Certificate Response', Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'TPR did not sent Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
+                    else:res.append([f'Test did not found Digest not in Cache message', Enums.TestResult.INCONCLUSIVE])
+                else:res.append([f'PTx did not sent Digests Response', Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent Get_Digests Request',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Prx did not Entered PT Phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2590,9 +2591,9 @@ class CommonCTSChecks:
             for Digest in Digests_Returned[1:]:
                 count+=1
                 if Digests_Returned[0]== Digest:
-                    res.append([f'Digests 1 == Digests {count}','Pass'])
-                else: res.append([f'Digests 1 != Digests {count}','Fail'])
-        else: res.append([f'Test did not found 5 Digests Responses to validate','Inconclusive'])    
+                    res.append([f'Digests 1 == Digests {count}',Enums.TestResult.PASS])
+                else: res.append([f'Digests 1 != Digests {count}',Enums.TestResult.FAIL])
+        else: res.append([f'Test did not found 5 Digests Responses to validate',Enums.TestResult.INCONCLUSIVE])    
 
         return res
     
@@ -2614,15 +2615,15 @@ class CommonCTSChecks:
             
              #  Validate First ping
             if Limits[0] is not None:
-                res.append([f'Sequence :1','Pass'])
+                res.append([f'Sequence :1',Enums.TestResult.PASS])
                 res.extend(self.SimpleFlow_Check(Check,Limits[0]))
-            else:res.append(['Limit was not avaialble for the  first Ping','Inconclusive'])  
+            else:res.append(['Limit was not avaialble for the  first Ping',Enums.TestResult.INCONCLUSIVE])  
             #  Validate Second ping
             if Limits[1] is not None:
                 Limit=Limits[1]
-                res.append([f'Sequence :2','Pass'])
+                res.append([f'Sequence :2',Enums.TestResult.PASS])
                 res.extend(self.SimpleFlow_Check(Check,Limits[1]))
-            else:res.append(['Limit was not avaialble for the  second Ping','Inconclusive'])  
+            else:res.append(['Limit was not avaialble for the  second Ping',Enums.TestResult.INCONCLUSIVE])  
 
             if  Limits[0] is not None and  Limits[1] is not None:
                 id=0
@@ -2654,21 +2655,21 @@ class CommonCTSChecks:
                             if AuthDetails[val][0]==AuthDetails[val][1]:
                                 if val=="subject_attribute1":
                                     if AuthDetails['subject_attribute1'][0]==float(SDF_QIID):
-                                        res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]} equal to SDF QI-ID: {SDF_QIID}', 'Pass']) 
-                                    else:res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]}  not equal to SDF QI-ID: {SDF_QIID}', 'Fail']) 
+                                        res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]} equal to SDF QI-ID: {SDF_QIID}', Enums.TestResult.PASS]) 
+                                    else:res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]}  not equal to SDF QI-ID: {SDF_QIID}', Enums.TestResult.FAIL]) 
                                 else:
                                     if AuthDetails['issuer'][0]==PTX_PRMC:
-                                        res.append([f'Received  {Check[val]} in the flow is {AuthDetails[val]} equal to PTx-PTMC: {PTX_PRMC}', 'Pass']) 
-                                    else:res.append([f'Received  {Check[val]}  in the flow is {AuthDetails[val]}  not equal to PTx-PTMC: {PTX_PRMC}', 'Fail']) 
+                                        res.append([f'Received  {Check[val]} in the flow is {AuthDetails[val]} equal to PTx-PTMC: {PTX_PRMC}', Enums.TestResult.PASS]) 
+                                    else:res.append([f'Received  {Check[val]}  in the flow is {AuthDetails[val]}  not equal to PTx-PTMC: {PTX_PRMC}', Enums.TestResult.FAIL]) 
                                 
-                            else:res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]} are not equal', 'Fail']) 
-                        else:res.append([f'Received {Check[val]} are less than expected','Inconclusive'])
+                            else:res.append([f'Received {Check[val]} in the flow is {AuthDetails[val]} are not equal', Enums.TestResult.FAIL]) 
+                        else:res.append([f'Received {Check[val]} are less than expected',Enums.TestResult.INCONCLUSIVE])
                 else:
                     if len(serialnum)>1:
-                        res.append([f'Received {Check['CheckName']} in the flow is {serialnum}','Pass'   if serialnum[0]!=serialnum[1] else 'Fail']) 
-                    else:res.append([f'Received {Check['CheckName']}  are less than expected','Inconclusive'])
+                        res.append([f'Received {Check['CheckName']} in the flow is {serialnum}',Enums.TestResult.PASS   if serialnum[0]!=serialnum[1] else Enums.TestResult.FAIL]) 
+                    else:res.append([f'Received {Check['CheckName']}  are less than expected',Enums.TestResult.INCONCLUSIVE])
 
-        else: res.append([f'PTx did not sent PT-ID in the sequence','Inconclusive'])
+        else: res.append([f'PTx did not sent PT-ID in the sequence',Enums.TestResult.INCONCLUSIVE])
         return res
     
     def ContentChain(self,CTSCheck,Check,flows,flwID):
@@ -2686,15 +2687,15 @@ class CommonCTSChecks:
 
         #  Validate First ping
         if Limits[0] is not None:
-            res.append([f'Sequence :1','Pass'])
+            res.append([f'Sequence :1',Enums.TestResult.PASS])
             res.extend(self.SimpleFlow_Check(Check,Limits[0]))
-        else:res.append(['Limit was not avaialble for the  first ping','Inconclusive'])  
+        else:res.append(['Limit was not avaialble for the  first ping',Enums.TestResult.INCONCLUSIVE])  
         #  Validate Second ping
         if Limits[1] is not None:
             Limit=Limits[1]
-            res.append([f'Sequence :2','Pass'])
+            res.append([f'Sequence :2',Enums.TestResult.PASS])
             res.extend(self.SimpleFlow_Check(Check,Limits[1]))
-        else:res.append(['Limit was not avaialble for the second ping','Inconclusive'])  
+        else:res.append(['Limit was not avaialble for the second ping',Enums.TestResult.INCONCLUSIVE])  
 
         if  Limits[0] is not None and  Limits[1] is not None:
             id=0
@@ -2711,20 +2712,20 @@ class CommonCTSChecks:
             for val in AuthDetails:
                 if val=="Root_Certificate_Hash":
                     if len(AuthDetails[val])==2 and AuthDetails[val][0]==AuthDetails[val][1] and AuthDetails[val][0]==Check['CAHash']:
-                        res.append([f'Received {val} are proper in the flow: {AuthDetails[val]}','Pass'])   
-                    else:res.append([f'Received {val} are not proper in the flow: {AuthDetails[val]}','Fail'])
+                        res.append([f'Received {val} are proper in the flow: {AuthDetails[val]}',Enums.TestResult.PASS])   
+                    else:res.append([f'Received {val} are not proper in the flow: {AuthDetails[val]}',Enums.TestResult.FAIL])
                 if val =="Manufacturer_CA_Certificate":
                     if len(AuthDetails[val])==2 and AuthDetails[val][0]==AuthDetails[val][1] :
-                        res.append([f'Received {val} are proper in the flow: {AuthDetails[val]}','Pass'])
+                        res.append([f'Received {val} are proper in the flow: {AuthDetails[val]}',Enums.TestResult.PASS])
                             
-                    else:res.append([f'Received {val} are not proper in the flow: {AuthDetails[val]}','Fail'])
+                    else:res.append([f'Received {val} are not proper in the flow: {AuthDetails[val]}',Enums.TestResult.FAIL])
 
                 if val in ['Product_Unit_CA_Certificate','Manufacturer_CA_Certificate']:
                     if len(AuthDetails[val])==2 :
                         first_two = AuthDetails[val][0].split("-")[:2]
                         if first_two[0]=="30" and first_two[1]=="82":
-                            res.append([f'The first two bytes of {val} are proper {first_two}','Pass'])
-                        else: res.append([f'The first two bytes of {val} are not proper {first_two}','Fail'])
+                            res.append([f'The first two bytes of {val} are proper {first_two}',Enums.TestResult.PASS])
+                        else: res.append([f'The first two bytes of {val} are not proper {first_two}',Enums.TestResult.FAIL])
                             
                     else:res.append([f'Received only one {val} flow','Inconcluisive'])
 
@@ -2737,15 +2738,15 @@ class CommonCTSChecks:
         print(f'First ping limit: {Limits[0]} , Second ping limit : {Limits[1]}')
         #  Validate First ping
         if Limits[0] is not None:
-            res.append([f'Sequence :1','Pass'])
+            res.append([f'Sequence :1',Enums.TestResult.PASS])
             res.extend(self.SimpleFlow_Check(Check,Limits[0]))
-        else:res.append(['Limit was not avaialble for the first ping','Inconclusive'])  
+        else:res.append(['Limit was not avaialble for the first ping',Enums.TestResult.INCONCLUSIVE])  
         #  Validate Second ping
         if Limits[1] is not None:
             Limit=Limits[1]
-            res.append([f'Sequence :2','Pass'])
+            res.append([f'Sequence :2',Enums.TestResult.PASS])
             res.extend(self.SimpleFlow_Check(Check,Limits[1]))
-        else:res.append(['Limit was not avaialble for the second ping','Inconclusive'])  
+        else:res.append(['Limit was not avaialble for the second ping',Enums.TestResult.INCONCLUSIVE])  
 
         if  Limits[0] is not None and  Limits[1] is not None:
             Certificates=[]
@@ -2765,9 +2766,9 @@ class CommonCTSChecks:
                 except Exception as e:
                     print(e)
                     # Catch any parsing errors and append to res
-                    res.append([f"Leaf certificate parsing failed: {e}", "Fail"])
+                    res.append([f"Leaf certificate parsing failed: {e}", Enums.TestResult.FAIL])
             else:
-                res.append([f'Did not found more than one Certificate in the flow', 'Inconclusive'])           
+                res.append([f'Did not found more than one Certificate in the flow', Enums.TestResult.INCONCLUSIVE])           
         return res
     
 
@@ -2784,7 +2785,7 @@ class CommonCTSChecks:
         while id < len(self.Auth_file_list):
             if self.Auth_file_list[id]['pktType']=="CERTIFICATE":
                 version=self.PayloadDetails_Auth(id,'Version')[0]['sDescription']
-                if version is not None :res.append([f'Received version: {version} in the Product_CA_Certificate at index@ {{{id}}}','Pass' if int(version)==2 else 'Fail'])
+                if version is not None :res.append([f'Received version: {version} in the Product_CA_Certificate at index@ {{{id}}}',Enums.TestResult.PASS if int(version)==2 else Enums.TestResult.FAIL])
                 for payload in Check['Auth']:
                     payloadvalue=self.PayloadDetails_Auth(id,payload['Name'])[0]['sDescription']
                     if payloadvalue is not None:AuthDetails[payload['Name']].append(payloadvalue)
@@ -2792,8 +2793,8 @@ class CommonCTSChecks:
 
         for val in AuthDetails:
             if len(AuthDetails[val])>1 and AuthDetails[val][0]==AuthDetails[val][1] and AuthDetails[val][0]==Check[val]:
-                res.append([f'Received {val} are proper in the flows: {AuthDetails[val]}','Pass'])   
-            else:res.append([f'Received {val} are not proper in the flows: {AuthDetails[val]}','Fail'])
+                res.append([f'Received {val} are proper in the flows: {AuthDetails[val]}',Enums.TestResult.PASS])   
+            else:res.append([f'Received {val} are not proper in the flows: {AuthDetails[val]}',Enums.TestResult.FAIL])
                         
         return res
 
@@ -2811,8 +2812,8 @@ class CommonCTSChecks:
                 id+=1
         except Exception as e:print(e)
         if len(serialnum)>1:
-            res.append([f'Received {Check['CheckName']} in the flows are: {serialnum}','Pass'   if serialnum[0]!=serialnum[1] else 'Fail']) 
-        else:res.append([f'Received {Check['CheckName']} are less than Expected','Inconclusive']) 
+            res.append([f'Received {Check['CheckName']} in the flows are: {serialnum}',Enums.TestResult.PASS   if serialnum[0]!=serialnum[1] else Enums.TestResult.FAIL]) 
+        else:res.append([f'Received {Check['CheckName']} are less than Expected',Enums.TestResult.INCONCLUSIVE]) 
 
         return res
     
@@ -2833,7 +2834,7 @@ class CommonCTSChecks:
                     # CTS Pass/ Fail Criteria
                     if Check.get("Authentication_Protocol_Version",False):
                         ProtocolVersion=self.PktMethod.GetPayloadDetails(Certificate[2],'Authentication_Protocol_Version')[0]['sRawData']
-                        res.append([f'PTx sent Authentication protocol version in the Certificate authentication response at index@ {{{Certificate[2]}}} is {ProtocolVersion}, Exp :0x01','Pass' if ProtocolVersion =='0x01' else 'Fail'])
+                        res.append([f'PTx sent Authentication protocol version in the Certificate authentication response at index@ {{{Certificate[2]}}} is {ProtocolVersion}, Exp :0x01',Enums.TestResult.PASS if ProtocolVersion =='0x01' else Enums.TestResult.FAIL])
                     Challenge_Seq=True
                     
                     if self.Header['TestcaseID']  in ['PTX_APX_CRT_LEN_001','PTX_APX_CRT_LEN_002','PTX_APX_CRT_LEN_003','PTX_APX_CRT_OFS_001']:
@@ -2846,39 +2847,39 @@ class CommonCTSChecks:
                         if self.Header['TestcaseID']  in ['PTX_APX_CRT_OFS_001']:
                             productCertificate=self.PayloadDetails_Auth(id,"Product_Unit_CA_Certificate")
                             if productCertificate is not None:
-                                res.append([f'Product_Unit_Certificate found in CERTIFICATE response','Pass'])
-                            else:res.append([f'Product_Unit_Certificate did not found in CERTIFICATE response','Fail'])
+                                res.append([f'Product_Unit_Certificate found in CERTIFICATE response',Enums.TestResult.PASS])
+                            else:res.append([f'Product_Unit_Certificate did not found in CERTIFICATE response',Enums.TestResult.FAIL])
                             
                         else:
                             payloadvalue=self.PayloadDetails_Auth(id,"Certificate_Chain_Segment")
                             if payloadvalue is not None:  
                                 ChainLength=payloadvalue[0]['sRawData'].split("-")
-                                res.append([f'Certificate Chain Segment in the CERTIFICATE authentication response has a length of: {len(ChainLength)}, Exp: 1- {Check['Length'][1]} Bytes','Pass' if len(ChainLength) <=Check['Length'][1] and len(ChainLength)>=1 else 'Fail'])
-                            else:res.append([f'Did not found Certificate_Chain_Segment in Certificate response','Inconclusive'])
+                                res.append([f'Certificate Chain Segment in the CERTIFICATE authentication response has a length of: {len(ChainLength)}, Exp: 1- {Check['Length'][1]} Bytes',Enums.TestResult.PASS if len(ChainLength) <=Check['Length'][1] and len(ChainLength)>=1 else Enums.TestResult.FAIL])
+                            else:res.append([f'Did not found Certificate_Chain_Segment in Certificate response',Enums.TestResult.INCONCLUSIVE])
                         
                     if Challenge_Seq:
                         Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,self.Flow_limit[1]])
                         if len(Chain_Msg)>2:
-                            res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                            res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                             # Check Challenge Sequence
                             Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,self.Flow_limit[1]])
                             if len(Challenge)>2:
                                 Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                                res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at index@ {{{Challenge[2]}}}, Exp: 0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                                res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at index@ {{{Challenge[2]}}}, Exp: 0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                                 # check Digets Response
                                 Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[Challenge[2]+1,self.Flow_limit[1]])
                                 if len(Challenge_Auth)>2:
                                     Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,self.Flow_limit[1]])
                                     if len(Challenge_Msg)>2:
-                                        res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}','Pass'])
-                                    else:res.append([f'Test did not found Challenge valid message', 'Inconclusive'])
-                                else:res.append([f'PTx did not sent Challenge_Auth response', 'Inconclusive'])
-                            else:res.append([f'TPR did not sent Challenge Request','Inconclusive'])
-                        else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                else:res.append([f'PTx did not sent Certificate Response', 'Inconclusive'])
-            else:res.append([f'TPR did not sent Get_Certificate Request','Inconclusive'])
+                                        res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
+                                    else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.INCONCLUSIVE])
+                                else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.INCONCLUSIVE])
+                            else:res.append([f'TPR did not sent Challenge Request',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                else:res.append([f'PTx did not sent Certificate Response', Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
                    
-        else:res.append([f'Prx did not entered PT Phase', 'Inconclusive'])
+        else:res.append([f'Prx did not entered PT Phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2911,23 +2912,23 @@ class CommonCTSChecks:
                         if len(ChainLength)==2:
                             Offset_70=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Get_Certificate[2],'Offset70')[0]['sRawData'])
                             Offset_A8=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Get_Certificate[2],'OffsetA8')[0]['sRawData'])
-                            res.append([f'TPR sent Offset_A8 field as {int(Offset_A8)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: {ChainLength[0]}', 'Pass' if int(Offset_A8)== int(ChainLength[0]) else 'Inconclusive' ])
-                            res.append([f'TPR sent Offset_70 field as {int(Offset_70)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: {int(ChainLength[1],16)}', 'Pass' if int(Offset_70)== int(ChainLength[1],16) else 'Inconclusive' ])
-                        else:res.append(['Test did not found Chain length','Inconclusive'])
+                            res.append([f'TPR sent Offset_A8 field as {int(Offset_A8)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: {ChainLength[0]}', Enums.TestResult.PASS if int(Offset_A8)== int(ChainLength[0]) else Enums.TestResult.INCONCLUSIVE ])
+                            res.append([f'TPR sent Offset_70 field as {int(Offset_70)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: {int(ChainLength[1],16)}', Enums.TestResult.PASS if int(Offset_70)== int(ChainLength[1],16) else Enums.TestResult.INCONCLUSIVE ])
+                        else:res.append(['Test did not found Chain length',Enums.TestResult.INCONCLUSIVE])
 
                         Length_70=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Get_Certificate[2],'Length70')[0]['sRawData'])
                         Length_A8=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Get_Certificate[2],'LengthA8')[0]['sRawData'])
-                        res.append([f'TPR sent Length_A8 field as {int(Length_A8)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: 1', 'Pass' if int(Length_A8)==1 else 'Inconclusive' ])
-                        res.append([f'TPR sent Length_70 field as {int(Length_70)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: 1', 'Pass' if int(Length_70)==1 else 'Inconclusive' ])
+                        res.append([f'TPR sent Length_A8 field as {int(Length_A8)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: 1', Enums.TestResult.PASS if int(Length_A8)==1 else Enums.TestResult.INCONCLUSIVE ])
+                        res.append([f'TPR sent Length_70 field as {int(Length_70)} in the second Get_Certificate packet at index@ {{{Get_Certificate[2]}}}, Exp: 1', Enums.TestResult.PASS if int(Length_70)==1 else Enums.TestResult.INCONCLUSIVE ])
 
                         # Check Error code
                         res.extend(self.ErrorResponseCheck(Check))
-                    else:res.append([f'TPR did not sent second Get_Certificate Request','Inconclusive'])
+                    else:res.append([f'TPR did not sent second Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
 
-                else:res.append([f'PTx did not sent Certificate Response', 'Inconclusive'])
-            else:res.append([f'TPR did not sent Get_Certificate Request','Inconclusive'])
+                else:res.append([f'PTx did not sent Certificate Response', Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
 
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
     
@@ -2947,7 +2948,7 @@ class CommonCTSChecks:
                     if len(Certificate)>2:
                         Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,self.Flow_limit[1]])
                         if len(Chain_Msg)>2:
-                            res.append([f'Certificate chain valid found at index@ {{{Chain_Msg[2]}}}','Pass'])
+                            res.append([f'Certificate chain valid found at index@ {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                         # Check Challenge Sequence
                             Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,self.Flow_limit[1]])
                             if len(Challenge)>2:
@@ -2955,14 +2956,14 @@ class CommonCTSChecks:
                                 if len(results)>0:res.extend(results)
                                 # Check Error code
                                 res.extend(self.ErrorResponseCheck(Check))
-                            else:res.append([f'TPR did not sent Challenge_Request','Inconclusive'])
-                        else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                    else:res.append([f'PTx did not sent Certificate_Response', 'Inconclusive'])
+                            else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                    else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.INCONCLUSIVE])
                 else:
                     # Check Error code
                     res.extend(self.ErrorResponseCheck(Check))
-            else:res.append([f'TPR did not sent {value} Request','Inconclusive'])
-        else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+            else:res.append([f'TPR did not sent {value} Request',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -2974,7 +2975,7 @@ class CommonCTSChecks:
         if len(RP0)>2:
             # Check Flow with Caching
             Get_Digests=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Digests",limit=[RP0[2]+1,self.Flow_limit[1]])
-            res.append([f'TPR sent Get_Digests at {{{Get_Digests[2]}}}','Pass'])
+            res.append([f'TPR sent Get_Digests at {{{Get_Digests[2]}}}',Enums.TestResult.PASS])
             if len(Get_Digests)>2:
                 ADC_End=self.PktMethod.GetPacketDetails(packet="ADC",value="End" ,limit=[Get_Digests[2]+1,self.Flow_limit[1]])
                 if len(ADC_End)>2:
@@ -2982,14 +2983,14 @@ class CommonCTSChecks:
                     Digests=self.PktMethod.GetPacketDetails(packet="ADT",value='Digests', Type="Response",limit=[Get_Digests[2]+1,self.Flow_limit[1]])
                     if len(Digests)>2:
                         # CTS Pass/ Fail Criteria
-                        res.append([f'PTx sent DIGEST_Response at {{{Digests[2]}}}','Pass'])
+                        res.append([f'PTx sent DIGEST_Response at {{{Digests[2]}}}',Enums.TestResult.PASS])
                         ATN=self.PktMethod.GetPacketDetails(packet="ATN",Type="Response",limit=[Digests[2],ADC_End[2]])
                         Timing=round((ATN[0]-ADC_End[1])*1000,2)
-                        res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit[<= {Check['limit']} mS]','Fail' if Timing > Check['limit'] else 'Pass'])
+                        res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit[<= {Check['limit']} mS]',Enums.TestResult.FAIL if Timing > Check['limit'] else Enums.TestResult.PASS])
                         # Check Digest in Cache
                         Cache_Msg=self.PktMethod.GetPacketDetails(packet="Digest",value="not in cache",Type='TesterMsg',limit=[Digests[2]+1,self.Flow_limit[1]])
                         if len(Cache_Msg)>2:
-                            res.append([f'Digests not in cache found at {{{Cache_Msg[2]}}}','Pass'])
+                            res.append([f'Digests not in cache found at {{{Cache_Msg[2]}}}',Enums.TestResult.PASS])
                             # Check Simple Flow
                             Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[Cache_Msg[2]+1,self.Flow_limit[1]])
                             if len(Get_Certificate)>2:
@@ -3000,29 +3001,29 @@ class CommonCTSChecks:
                                 if len(Certificate)>2:
                                     Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,self.Flow_limit[1]])
                                     if len(Chain_Msg)>2:
-                                        res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                                        res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                                         # Check Challenge Sequence
                                         Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,self.Flow_limit[1]])
                                         if len(Challenge)>2:
                                             Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                                            res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp :0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                                            res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp :0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                                             # check Digets Response
                                             Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[Challenge[2]+1,self.Flow_limit[1]])
                                             if len(Challenge_Auth)>2:
                                                 Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,self.Flow_limit[1]])
                                                 if len(Challenge_Msg)>2:
-                                                    res.append([f'Challenge Auth found at {{{Challenge_Msg[2]}}}','Pass'])
-                                                else:res.append([f'Test did not found Challenge valid message', 'Inconclusive'])
-                                            else:res.append([f'PTx did not sent Challenge_Auth Response', 'Inconclusive'])
-                                        else:res.append([f'TPR did not sent Challenge Request','Inconclusive'])
-                                    else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                                else:res.append([f'PTx did not sent Certificate_Response', 'Inconclusive'])
-                            else:res.append([f'TPR did not sent Get_Certificate Request','Inconclusive'])
-                        else:res.append([f'Test did not found Digest Not in Cache message', 'Inconclusive'])
-                    else:res.append([f'PTx did not sent Digests_Response', 'Fail'])
-                else:res.append([f'Prx did not sent ADC_End packet','Inconclusive'])
-            else:res.append([f'TPR did not sent Get_Digests Request','Inconclusive'])
-        else:res.append([f'Prx did not entered PT phase', 'Inconclusive'])
+                                                    res.append([f'Challenge Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
+                                                else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.INCONCLUSIVE])
+                                            else:res.append([f'PTx did not sent Challenge_Auth Response', Enums.TestResult.INCONCLUSIVE])
+                                        else:res.append([f'TPR did not sent Challenge Request',Enums.TestResult.INCONCLUSIVE])
+                                    else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                                else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.INCONCLUSIVE])
+                            else:res.append([f'TPR did not sent Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'Test did not found Digest Not in Cache message', Enums.TestResult.INCONCLUSIVE])
+                    else:res.append([f'PTx did not sent Digests_Response', Enums.TestResult.FAIL])
+                else:res.append([f'Prx did not sent ADC_End packet',Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent Get_Digests Request',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Prx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -3044,19 +3045,19 @@ class CommonCTSChecks:
                     if len(Certificate)>2:
                         # CTS Pass/ Fail Criteria
                         if self.Header['TestcaseID']  in ['PTX_APX_TIM_002']:
-                            res.append([f'PTx sent CERTIFICATE Response  at {{{Certificate[2]}}}','Pass'])
+                            res.append([f'PTx sent CERTIFICATE Response  at {{{Certificate[2]}}}',Enums.TestResult.PASS])
                             ATN=self.PktMethod.GetPacketDetails(packet="ATN",Type="Response",limit=[Certificate[2],ADC_End[2]])
                             Timing=round((ATN[0]-ADC_End[1])*1000,2)
-                            res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit [<= {Check['limit']} mS]','Fail' if Timing > Check['limit'] else 'Pass'])
+                            res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit [<= {Check['limit']} mS]',Enums.TestResult.FAIL if Timing > Check['limit'] else Enums.TestResult.PASS])
 
                         Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,self.Flow_limit[1]])
                         if len(Chain_Msg)>2:
-                            res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                            res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                             # Check Challenge Sequence
                             Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,self.Flow_limit[1]])
                             if len(Challenge)>2:
                                 Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                                res.append([f'TPR sent slot number : {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp: 0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                                res.append([f'TPR sent slot number : {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp: 0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                                 ADC_End=self.PktMethod.GetPacketDetails(packet="ADC",value="End" ,limit=[Challenge[2]+1,self.Flow_limit[1]])
                                 if len(ADC_End)>2:
                                     # Check Certificate Response
@@ -3064,23 +3065,23 @@ class CommonCTSChecks:
                                     if len(Challenge_Auth)>2:
                                         # CTS Pass/ Fail Criteria
                                         if self.Header['TestcaseID']  in ['PTX_APX_TIM_003']:
-                                            res.append([f'PTx sent CHALLENGE_AUTH response at {{{Challenge_Auth[2]}}}','Pass'])
+                                            res.append([f'PTx sent CHALLENGE_AUTH response at {{{Challenge_Auth[2]}}}',Enums.TestResult.PASS])
                                             ATN=self.PktMethod.GetPacketDetails(packet="ATN",Type="Response",limit=[Challenge_Auth[2],ADC_End[2]])
                                             Timing=round((ATN[0]-ADC_End[1])*1000,2)
-                                            res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit[<= {Check['limit']} mS]','Fail' if Timing > Check['limit'] else 'Pass'])
+                                            res.append([f'Measured timing t_Cert_Ready between ADC_End at {{{ADC_End[2]}}} to ATN response at {{{ATN[2]}}} is {Timing}mS, Limit[<= {Check['limit']} mS]',Enums.TestResult.FAIL if Timing > Check['limit'] else Enums.TestResult.PASS])
                                         Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,self.Flow_limit[1]])
                                         if len(Challenge_Msg)>2:
-                                            res.append([f'Challenge_Auth message found at {{{Challenge_Msg[2]}}}','Pass'])
-                                        else:res.append([f'Test did not found Challenge valid message', 'Inconclusive'])
-                                    else:res.append([f'PTx did not sent Challenge_Auth response', 'Fail' if self.Header['TestcaseID']  in ['PTX_APX_TIM_003'] else 'Inconclusive' ])
-                                else:res.append([f'PRx did not sent ADC_End packet after Challenge packet at {{{Challenge[2]}}}','Inconclusive'])
+                                            res.append([f'Challenge_Auth message found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
+                                        else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.INCONCLUSIVE])
+                                    else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.FAIL if self.Header['TestcaseID']  in ['PTX_APX_TIM_003'] else Enums.TestResult.INCONCLUSIVE ])
+                                else:res.append([f'PRx did not sent ADC_End packet after Challenge packet at {{{Challenge[2]}}}',Enums.TestResult.INCONCLUSIVE])
                                
-                            else:res.append([f'TPR did not sent Challenge_Request','Inconclusive'])
-                        else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                    else:res.append([f'PTx did not sent Certificate_Response', 'Fail' if self.Header['TestcaseID']  in ['PTX_APX_TIM_002'] else 'Inconclusive' ])
-                else:res.append([f'PRx did not sent ADC_End packet','Inconclusive'])
-            else:res.append([f'TPR did not sent Get_Certificate request','Inconclusive'])
-        else:res.append([f'Prx did not entered PT phase', 'Inconclusive'])
+                            else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                    else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.FAIL if self.Header['TestcaseID']  in ['PTX_APX_TIM_002'] else Enums.TestResult.INCONCLUSIVE ])
+                else:res.append([f'PRx did not sent ADC_End packet',Enums.TestResult.INCONCLUSIVE])
+            else:res.append([f'TPR did not sent Get_Certificate request',Enums.TestResult.INCONCLUSIVE])
+        else:res.append([f'Prx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
         return res
     
     def NDS_Check(self,CTSCheck,Check,flows,flwID):
@@ -3091,56 +3092,56 @@ class CommonCTSChecks:
       
         #  Validate First ping
         if Limits[0] is not None:
-            res.append([f'Sequence :1','Pass'])
+            res.append([f'Sequence :1',Enums.TestResult.PASS])
             res.extend(self.SimpleFlow_Check(Check,Limits[0]))
 
-        else:res.append(['Limit was not avaialble for the first ping','Inconclusive'])
+        else:res.append(['Limit was not avaialble for the first ping',Enums.TestResult.INCONCLUSIVE])
 
         #  Validate Second ping
         if Limits[1] is not None:
             Limit=Limits[1]
-            res.append([f'Sequence :2','Pass'])
+            res.append([f'Sequence :2',Enums.TestResult.PASS])
             RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=Limit)
             if len(RP0)>2:
 
                 # Check Challenge Sequence
                 Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[RP0[2]+1,Limit[1]])
                 if len(Challenge)>2:
-                    res.append([f'TPR sent Challenge packet at {{{Challenge[2]}}}','Pass'])
+                    res.append([f'TPR sent Challenge packet at {{{Challenge[2]}}}',Enums.TestResult.PASS])
                     Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                    res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp :0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                    res.append([f'TPR sent slot number: {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}}, Exp :0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                     # check Digets Response
                     Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[Challenge[2]+1,Limit[1]])
                     if len(Challenge_Auth)>2:
-                        res.append([f'PTx sent Challenge_Auth response at {{{Challenge_Auth[2]}}}','Pass'])
+                        res.append([f'PTx sent Challenge_Auth response at {{{Challenge_Auth[2]}}}',Enums.TestResult.PASS])
                         Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,Limit[1]])
                         if len(Challenge_Msg)>2:
-                            res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}','Pass'])
+                            res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
                             # Check Simple Flow
                             Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[Challenge_Msg[2]+1,Limit[1]])
                             if len(Get_Certificate)>2:
-                                res.append([f'TPR sent Get_Certificate packet at {{{Get_Certificate[2]}}}','Pass'])
+                                res.append([f'TPR sent Get_Certificate packet at {{{Get_Certificate[2]}}}',Enums.TestResult.PASS])
                                 results=self.Payload_Details(PacketName='Get_Certificate',Index=Get_Certificate[2],PayLoads=Check['Get_Certificate'])
                                 if len(results)>0:res.extend(results)
                                 # Check Certificate Response
                                 Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value='Certificate', Type="Response",limit=[Get_Certificate[2]+1,Limit[1]])
                                 if len(Certificate)>2:
-                                    res.append([f'PTx sent CERTIFICATE response at {{{Certificate[2]}}}','Pass'])
+                                    res.append([f'PTx sent CERTIFICATE response at {{{Certificate[2]}}}',Enums.TestResult.PASS])
                                     Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,Limit[1]])
                                     if len(Chain_Msg)>2:
-                                        res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                                        res.append([f'Certificate chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                                     
-                                    else:res.append([f'Test did not found Certificate chain valid message', 'Inconclusive'])
-                                else:res.append([f'PTx did not sent Certificate_Response', 'Inconclusive'])
-                            else:res.append([f'TPR did not sent Get_Certificate request','Inconclusive'])
+                                    else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
+                                else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.INCONCLUSIVE])
+                            else:res.append([f'TPR did not sent Get_Certificate request',Enums.TestResult.INCONCLUSIVE])
 
-                        else:res.append([f'Test did not found Challenge valid message', 'Fail'])
-                    else:res.append([f'PTx did not sent Challenge_Auth response', 'Inconclusive'])
-                else:res.append([f'TPR did not sent Challenge_Request','Inconclusive'])
+                        else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.FAIL])
+                    else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.INCONCLUSIVE])
+                else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
 
-            else:res.append([f'PRx did not entered PT phase', 'Inconclusive'])
+            else:res.append([f'PRx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
 
-        else:res.append(['Limit was not avaialble for the  second ping','Inconclusive'])  
+        else:res.append(['Limit was not avaialble for the  second ping',Enums.TestResult.INCONCLUSIVE])  
 
         # Validate ChallengeAuth Responses from Two Pings
 
@@ -3159,13 +3160,13 @@ class CommonCTSChecks:
             id+=1
         
         if len(Signatures['Signature_r'])>1 and len(Signatures['Signature_s'])>1:
-            res.append([f'Signature_r values in both responses are {Signatures['Signature_r'][0]}, {Signatures['Signature_r'][1]}','Pass'])
-            res.append([f'Signature_s values in both responses are {Signatures['Signature_s'][0]}, {Signatures['Signature_s'][1]}','Pass'])
+            res.append([f'Signature_r values in both responses are {Signatures['Signature_r'][0]}, {Signatures['Signature_r'][1]}',Enums.TestResult.PASS])
+            res.append([f'Signature_s values in both responses are {Signatures['Signature_s'][0]}, {Signatures['Signature_s'][1]}',Enums.TestResult.PASS])
             if Signatures['Signature_r'][0]!=Signatures['Signature_r'][1] and Signatures['Signature_s'][0]!=Signatures['Signature_s']:
-                res.append([f'Signatures contained in two Challenge_Auth responses are different','Pass'])
-            else: res.append([f'Signatures contained in two Challenge_Auth responses are same','Fail'])
+                res.append([f'Signatures contained in two Challenge_Auth responses are different',Enums.TestResult.PASS])
+            else: res.append([f'Signatures contained in two Challenge_Auth responses are same',Enums.TestResult.FAIL])
 
-        else:res.append([f'Test did not found Signature_r or Signature_s in challenge_Auth response','Inconclusive'])
+        else:res.append([f'Test did not found Signature_r or Signature_s in challenge_Auth response',Enums.TestResult.INCONCLUSIVE])
 
         return res
     
@@ -3182,24 +3183,24 @@ class CommonCTSChecks:
                 # Check Simple Flow
                 Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[id,self.Flow_limit[1]])
                 if len(Get_Certificate)>2:
-                    res.append([f'Get_Certificate packet found at {{{Get_Certificate[2]}}}','Pass'])
+                    res.append([f'Get_Certificate packet found at {{{Get_Certificate[2]}}}',Enums.TestResult.PASS])
                     GetCertificate=True
                     # Check Certificate Response
                     Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value='Certificate', Type="Response",limit=[Get_Certificate[2]+1,self.Flow_limit[1]])
                     if len(Certificate)>2:
-                        res.append([f'CERTIFICATE response found at {{{Certificate[2]}}}','Pass'])
+                        res.append([f'CERTIFICATE response found at {{{Certificate[2]}}}',Enums.TestResult.PASS])
                         ProtocolVersion=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Certificate[2],'Authentication_Protocol_Version')[0]['sRawData'])
                         certifiacte_Header=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Certificate[2],'Certificate')[0]['sRawData'])
                         if certifiacte_Header and ProtocolVersion:
-                            res.append([f'Certificate response header starts with: 0x{int(ProtocolVersion)}{int(certifiacte_Header)}, Exp : 0x12', 'Pass' if ProtocolVersion==1 and certifiacte_Header==2 else 'Fail'])
-                        else:res.append([f'Did not found header in Certificate response at {{{Certificate[2]}}}','Inconclusive'])
+                            res.append([f'Certificate response header starts with: 0x{int(ProtocolVersion)}{int(certifiacte_Header)}, Exp : 0x12', Enums.TestResult.PASS if ProtocolVersion==1 and certifiacte_Header==2 else Enums.TestResult.FAIL])
+                        else:res.append([f'Did not found header in Certificate response at {{{Certificate[2]}}}',Enums.TestResult.INCONCLUSIVE])
                         while lid < len(self.Auth_file_list):
                             if self.Auth_file_list[lid]['pktType']=="CERTIFICATE":
                                 payloadvalue=self.PayloadDetails_Auth(lid,"Certificate_Chain_Segment")
                                 if payloadvalue is not None:  
                                     ChainLength=len(payloadvalue[0]['sRawData'].split("-")) - CerificateLength
                                     CerificateLength+=ChainLength
-                                    res.append([f'Certificate_Chain segment in the CERTIFICATE authentication response has a length of: {ChainLength}, Exp: 1- {Check['Length'][1]} Bytes','Pass' if ChainLength <=Check['Length'][1] and ChainLength>=1 else 'Fail'])
+                                    res.append([f'Certificate_Chain segment in the CERTIFICATE authentication response has a length of: {ChainLength}, Exp: 1- {Check['Length'][1]} Bytes',Enums.TestResult.PASS if ChainLength <=Check['Length'][1] and ChainLength>=1 else Enums.TestResult.FAIL])
                                 else:
                                     # check whether it was last or not . if Last skip it
                                     Cid=lid+1
@@ -3214,19 +3215,19 @@ class CommonCTSChecks:
                                         if len(AuthResp)>2:
                                             Bytes=self.file_list[AuthResp[2]]['value'].split(':')[1].replace('}','')
                                             ChainLength=int("".join([c for c in Bytes if c.isdigit()]))-1
-                                            res.append([f'Certificate_Chain segment in the CERTIFICATE authentication response has a length of: {ChainLength}, Exp: 1- {Check['Length'][1]} Bytes','Pass' if ChainLength <=Check['Length'][1] and ChainLength>=1 else 'Fail'])
-                                    else:res.append([f'Did not found Certificate_Chain_Segment in Certificate response','Inconclusive'])
+                                            res.append([f'Certificate_Chain segment in the CERTIFICATE authentication response has a length of: {ChainLength}, Exp: 1- {Check['Length'][1]} Bytes',Enums.TestResult.PASS if ChainLength <=Check['Length'][1] and ChainLength>=1 else Enums.TestResult.FAIL])
+                                    else:res.append([f'Did not found Certificate_Chain_Segment in Certificate response',Enums.TestResult.INCONCLUSIVE])
                                 lid+=1
                                 break
                             else:lid+=1
                      
                         id=Certificate[2]+1
                     else:
-                        res.append([f'PTx did not sent CERTIFICATE response after Get_Certificate at {{{Get_Certificate[2]}}} ', 'Inconclusive'])
+                        res.append([f'PTx did not sent CERTIFICATE response after Get_Certificate at {{{Get_Certificate[2]}}} ', Enums.TestResult.INCONCLUSIVE])
                         id=Get_Certificate[2]+1
                         break
                 else:
-                    if not GetCertificate: res.append([f'TPR did not sent Get_Certificate request','Inconclusive'])
+                    if not GetCertificate: res.append([f'TPR did not sent Get_Certificate request',Enums.TestResult.INCONCLUSIVE])
                     break
             
             try:
@@ -3239,29 +3240,29 @@ class CommonCTSChecks:
                         WPC_root = self.PayloadDetails_Auth(aid, "Root_Certificate_Hash")
                         if WPC_root is not None:
                             modified_WPC_root = WPC_root[0]['sRawData'].strip().replace("-"," ")
-                            res.append([f"Received complete certificate chain is {Full_certificate}", "Pass"])
-                            res.append([f"WPC Root is {WPC_root}", "Pass"])
+                            res.append([f"Received complete certificate chain is {Full_certificate}", Enums.TestResult.PASS])
+                            res.append([f"WPC Root is {WPC_root}", Enums.TestResult.PASS])
             
                             Manufacturee_certificate = self.PayloadDetails_Auth(aid, "Manufacturer_CA_Certificate")
                             if Manufacturee_certificate is not None:
                                 modified_Manufacturee_certificate = Manufacturee_certificate[0]['sRawData'].strip().replace("-"," ")
-                                res.append([f"Manufacturer certificate is {Manufacturee_certificate}", "Pass"])
+                                res.append([f"Manufacturer certificate is {Manufacturee_certificate}", Enums.TestResult.PASS])
                 
                                 if modified_WPC_root in modified_full_certificate and modified_Manufacturee_certificate in modified_full_certificate:
-                                    res.append([f"Certificate chain is signed by WPC root certificate key", "Pass"])
+                                    res.append([f"Certificate chain is signed by WPC root certificate key", Enums.TestResult.PASS])
                                 else:
-                                    res.append([f"Certificate chain is not signed by WPC root certificate key", "Fail"])
+                                    res.append([f"Certificate chain is not signed by WPC root certificate key", Enums.TestResult.FAIL])
                             else:
-                                res.append([f"Did not received Manufacturer_CA_Certificate", "Inconclusive"])
+                                res.append([f"Did not received Manufacturer_CA_Certificate", Enums.TestResult.INCONCLUSIVE])
 
                         else:
-                            res.append([f"Did not received WPC root chain", "Inconclusive"])
+                            res.append([f"Did not received WPC root chain", Enums.TestResult.INCONCLUSIVE])
                                 
                         break
                     aid-=1
     
             except Exception as e:
-                res.append(f'Error - {e}','Inconclusive')
+                res.append(f'Error - {e}',Enums.TestResult.INCONCLUSIVE)
 
       
         return res
@@ -3283,8 +3284,8 @@ class CommonCTSChecks:
             TwoBytes=True
             for i in range(len(policyval)):
                 if policyval[i]!=extensionval[i]:TwoBytes=False
-            res.append([f'Extensions.2.extnValue sub-object of the wpc-qi-policy extension (policy value) has bits is: {extensionval}, Exp: {policyval}','Fail' if not TwoBytes else 'Pass'])
-        else:res.append([f'Extensions.2.extnValue is not received in the Auth_Sequence','Inconclusive'])
+            res.append([f'Extensions.2.extnValue sub-object of the wpc-qi-policy extension (policy value) has bits is: {extensionval}, Exp: {policyval}',Enums.TestResult.FAIL if not TwoBytes else Enums.TestResult.PASS])
+        else:res.append([f'Extensions.2.extnValue is not received in the Auth_Sequence',Enums.TestResult.INCONCLUSIVE])
                         
         return res
 
@@ -3303,7 +3304,7 @@ class CommonCTSChecks:
             Values=self.MonitorVoltage(id,self.Flow_limit[1]-2) 
             if Values[1] !=0 and  Values[3] !=0:
                 res.append([f' Measured Max {Check['Name']} Val at {round((self.AllChannelData['Interval']*Values[0])/1000,3)} sec is {Values[1]} {Check['unit']} and  Min {Check['Name']} Val  at {round((self.AllChannelData['Interval']*Values[2])/1000,3)} sec is {Values[3]} {Check['unit']} , Limit : {Check['limit'][0]} {Check['unit']} ~ {Check['limit'][1]} {Check['unit']} ', 
-                            'Pass' if Values[3] >= Check['limit'][0] and Values[1] <= Check['limit'][1] else 'Inconclusive'])
+                            Enums.TestResult.PASS if Values[3] >= Check['limit'][0] and Values[1] <= Check['limit'][1] else Enums.TestResult.INCONCLUSIVE])
 
             # Find Ambient and Coil Temperature
             self.AllChannelData12= self.PlotMethod.GetAllChannelData2('12',self.JapiData) # Coil Temperature Plot
@@ -3314,12 +3315,12 @@ class CommonCTSChecks:
             for temp in self.AllChannelData11['RV']['displayDataChunk']: templist1.append(temp)  
             for temp in self.AllChannelData12['RV']['displayDataChunk']:  templist2.append(temp)  
 
-            res.append([f"Measured coil temperature is {max(templist2)} °C ,Measured ambient temperature is {min(templist1)} °C ", "Pass"]) 
-            res.append([f"Difference in temperature is {round(max(templist2)-min(templist1),2)} °C", "Pass" if round(max(templist2)-min(templist1),2) <12 else 'Fail']) 
+            res.append([f"Measured coil temperature is {max(templist2)} °C ,Measured ambient temperature is {min(templist1)} °C ", Enums.TestResult.PASS]) 
+            res.append([f"Difference in temperature is {round(max(templist2)-min(templist1),2)} °C", Enums.TestResult.PASS if round(max(templist2)-min(templist1),2) <12 else Enums.TestResult.FAIL]) 
                 
         # Find Tc execution Timing
         Timing=round(((self.file_list[self.Flow_limit[1]]['stopTime']-self.file_list[self.Flow_limit[0]]['startTime'])*1000)/60000,3)
-        res.append([f'Test executed for {Timing} mins , Exp [>=60 mins]','Pass' if Timing>=60 else 'Inconclusive'])
+        res.append([f'Test executed for {Timing} mins , Exp [>=60 mins]',Enums.TestResult.PASS if Timing>=60 else Enums.TestResult.INCONCLUSIVE])
         return res
     
     def CheckLoads(self,Check):
@@ -3330,25 +3331,25 @@ class CommonCTSChecks:
                 # Find the Load
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Load}",Type="TesterMsg" ,limit=[self.id,self.Flow_limit[1]])
             if len(LD)>2:
-                # res.append([f"Prx Applied Load: {Load} Ohms at id :{LD[2]}", "Pass"])
+                # res.append([f"Prx Applied Load: {Load} Ohms at id :{LD[2]}", Enums.TestResult.PASS])
                 LoadCE=self.PktMethod.GetPacketDetails2(packet="Control Error",value=["0","+1","-1"] ,limit=[LD[2]+1, self.Flow_limit[1]])
                 if len(LoadCE)>2:
                     vrect = self.CalculateVoltTwindow(LoadCE[2],self.AllChannelData_Volatge,at="start",measure="before")
                     LoadResistance=round(vrect[0]/(self.CalculateVoltTwindow(LoadCE[2],self.AllChannelData,at="start",measure="before"))[0],3)
                     RLimit=[round((Load - ((Load*Check['LoadTolerance'])/100)),3), round((Load +((Load*Check['LoadTolerance'])/100)),3)]
                     res.append([f"Measured load resistance: {LoadResistance}_ohms, Limit: {RLimit[0]} Ohms ~ {RLimit[1]}_ohms", 
-                                    'Pass' if LoadResistance >= RLimit[0] and LoadResistance <= RLimit[1] else 'Inconclusive'])
+                                    Enums.TestResult.PASS if LoadResistance >= RLimit[0] and LoadResistance <= RLimit[1] else Enums.TestResult.INCONCLUSIVE])
                     # Measure Timing
                     Timing=round((LD[0]-self.file_list[self.id-1]['stopTime']),3)
                     if Load ==16 :res.append([f'TPR switched to {Load}_ohms within {round(Timing/60,3)} mins after target operating load, Exp: Atleast after 1 mins ' , 
-                                                'Pass' if Timing /60 > 1 else 'Inconclusive'])
-                    else: res.append([f'TPR switched to {Load}_ohms within {Timing} Secs before the previous load, Exp: Atleast after 10 Secs ' , 'Pass' if Timing > 10 else 'Inconclusive'])
+                                                Enums.TestResult.PASS if Timing /60 > 1 else Enums.TestResult.INCONCLUSIVE])
+                    else: res.append([f'TPR switched to {Load}_ohms within {Timing} Secs before the previous load, Exp: Atleast after 10 Secs ' , Enums.TestResult.PASS if Timing > 10 else Enums.TestResult.INCONCLUSIVE])
                     self.id=LD[2]+1
                 else: 
-                    res.append([f'TPR did not regulated after applying {Load}_ohms','Inconclusive'])
+                    res.append([f'TPR did not regulated after applying {Load}_ohms',Enums.TestResult.INCONCLUSIVE])
                     LoadFlag=True
             else: 
-                res.append([f"PRx did not applied {Load}_ohms", "Inconclusive"]) 
+                res.append([f"PRx did not applied {Load}_ohms", Enums.TestResult.INCONCLUSIVE]) 
                 LoadFlag=True
             if LoadFlag :break
 
@@ -3371,8 +3372,8 @@ class CommonCTSChecks:
                 EPT = self.PktMethod.GetPacketDetails(packet=Check['EPT'][0], value=Check['EPT'][1], limit=[id,Limit[1]])
                 if len(EPT)>2:
                     Timing=round((EPT[0]-time_start)*1000,2)
-                    res.append([f'TPR sent {PktName} at index@ {{{EPT[2]}}}','Pass'])
-                    res.append([f'TPR sent {PktName} within {Timing} mS from {self.file_list[id-1]['pktType']} at index@ {{{id-1}}}', 'Pass' if Timing >= 2000 and Timing <=8000 else 'Inconclusive'])  
+                    res.append([f'TPR sent {PktName} at index@ {{{EPT[2]}}}',Enums.TestResult.PASS])
+                    res.append([f'TPR sent {PktName} within {Timing} mS from {self.file_list[id-1]['pktType']} at index@ {{{id-1}}}', Enums.TestResult.PASS if Timing >= 2000 and Timing <=8000 else Enums.TestResult.INCONCLUSIVE])  
                     time_start=EPT[1] 
                     EPTpkt=True
                     id=EPT[2]+1                
@@ -3394,12 +3395,12 @@ class CommonCTSChecks:
                                 continue
                         Timing=round((NextPing[0]-self.file_list[EPTid]['stopTime'])*1000,3)
                         unit = f'{round(Timing,3)} mS' if 'RST' in self.Header['TestcaseID'] else f'{round(Timing/1000,3)} Secs'
-                        res.append([f'PTx initiated next ping at {{{NextPing[2]}}}, Measured t_nextping from end of End Power Transfer packet is :{unit}, Limit :{Check['Desc']}', 'Pass' if Timing >= Check['TnextPing'][0] and Timing <=Check['TnextPing'][1] else 'Fail'])
+                        res.append([f'PTx initiated next ping at {{{NextPing[2]}}}, Measured t_nextping from end of End Power Transfer packet is :{unit}, Limit :{Check['Desc']}', Enums.TestResult.PASS if Timing >= Check['TnextPing'][0] and Timing <=Check['TnextPing'][1] else Enums.TestResult.FAIL])
                         break
                     else:break
-                if not NextPingMsg:res.append([f'PTx did not initiated next ping after {PktName} at index@ {{{EPTid}}}', 'Pass'])
-            else: res.append([f'TPR did not sent {PktName}','Inconclusive'])
-        else:res.append(['TPR did not enter PT phase','Inconclusive'])
+                if not NextPingMsg:res.append([f'PTx did not initiated next ping after {PktName} at index@ {{{EPTid}}}', Enums.TestResult.PASS])
+            else: res.append([f'TPR did not sent {PktName}',Enums.TestResult.INCONCLUSIVE])
+        else:res.append(['TPR did not enter PT phase',Enums.TestResult.INCONCLUSIVE])
         return res
 
     def ValidateChainNames(self,CertData,Seq):
@@ -3421,7 +3422,7 @@ class CommonCTSChecks:
                 oid = attr["type"].dotted
                 value = attr["value"].native
                 if oid in seen:
-                    res.append([f"Duplicate OID: {oid}- in seq {Seq}", "Fail"])
+                    res.append([f"Duplicate OID: {oid}- in seq {Seq}", Enums.TestResult.FAIL])
                     continue
                 else: seen.add(oid)
 
@@ -3430,20 +3431,20 @@ class CommonCTSChecks:
                 else: length = len(str(value).encode())
 
                 if oid not in rules:
-                    res.append([f"Unexpected OID: {oid}- in seq {Seq}",'Fail'])
+                    res.append([f"Unexpected OID: {oid}- in seq {Seq}",Enums.TestResult.FAIL])
                     continue
                 else:
                     name, min_len, max_len = rules[oid]
                     if min_len <= length <= max_len:
-                        res.append([f"{name} length ({length} bytes) is in range [{min_len}, {max_len}] - in seq {Seq}", "Pass"])
+                        res.append([f"{name} length ({length} bytes) is in range [{min_len}, {max_len}] - in seq {Seq}", Enums.TestResult.PASS])
                     else:
-                        res.append([f"{name} length ({length} bytes) not in range [{min_len}, {max_len}]- in seq {Seq}", "Fail"])
+                        res.append([f"{name} length ({length} bytes) not in range [{min_len}, {max_len}]- in seq {Seq}", Enums.TestResult.FAIL])
 
         # Validate all Names recived or not
         for oid in rules:
-            if oid not in seen:res.append([f"Missing OID: {oid} in seq {Seq}", "Fail"])
+            if oid not in seen:res.append([f"Missing OID: {oid} in seq {Seq}", Enums.TestResult.FAIL])
 
-        return res  if len(res)>0 else ['Did not found any data in seq {Seq}','Inconclusive']     
+        return res  if len(res)>0 else ['Did not found any data in seq {Seq}',Enums.TestResult.INCONCLUSIVE]     
 
     def BytesCount(self,limit):
         id=limit[0]
@@ -3465,38 +3466,38 @@ class CommonCTSChecks:
                 # Check Simple Flow
                 Get_Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value="Get_Certificate",limit=[RP0[2]+1,Limit[1]])
                 if len(Get_Certificate)>2:
-                    res.append([f'TPR sent Get_Certificate packet at index@ {{{Get_Certificate[2]}}}','Pass'])
+                    res.append([f'TPR sent Get_Certificate packet at index@ {{{Get_Certificate[2]}}}',Enums.TestResult.PASS])
                     results=self.Payload_Details(PacketName='Get_Certificate',Index=Get_Certificate[2],PayLoads=Check['Get_Certificate'])
                     if len(results)>0:res.extend(results)
                     # Check Certificate Response
                     Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value='Certificate', Type="Response",limit=[Get_Certificate[2]+1,Limit[1]])
                     if len(Certificate)>2:
-                        res.append([f'PTx sent CERT response at index@ {{{Certificate[2]}}}','Pass'])
+                        res.append([f'PTx sent CERT response at index@ {{{Certificate[2]}}}',Enums.TestResult.PASS])
                         Chain_Msg=self.PktMethod.GetPacketDetails(packet="Certificate_Chain",value="-Valid",Type='TesterMsg',limit=[Certificate[2]+1,Limit[1]])
                         if len(Chain_Msg)>2:
-                            res.append([f'Certificate_chain valid found at {{{Chain_Msg[2]}}}','Pass'])
+                            res.append([f'Certificate_chain valid found at {{{Chain_Msg[2]}}}',Enums.TestResult.PASS])
                             # Check Challenge Sequence
                             Challenge=self.PktMethod.GetPacketDetails(packet="ADT",value="Challenge",limit=[Chain_Msg[2]+1,Limit[1]])
                             if len(Challenge)>2:
-                                res.append([f'TPR sent Challenge packet at {{{Challenge[2]}}}','Pass'])
+                                res.append([f'TPR sent Challenge packet at {{{Challenge[2]}}}',Enums.TestResult.PASS])
                                 Slot_Number=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(Challenge[2],'Slot_Number')[0]['sRawData'])
-                                res.append([f'TPR sent slot_number : {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}} , Exp :0','Pass' if Slot_Number ==0 else 'Inconclusive'])
+                                res.append([f'TPR sent slot_number : {int(Slot_Number)} in the Challenge packet at {{{Challenge[2]}}} , Exp :0',Enums.TestResult.PASS if Slot_Number ==0 else Enums.TestResult.INCONCLUSIVE])
                                 # check Digets Response
                                 Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[Challenge[2]+1,Limit[1]])
                                 if len(Challenge_Auth)>2:
-                                    res.append([f'PTx sent Challenge_Auth response at {{{Challenge_Auth[2]}}}','Pass'])
+                                    res.append([f'PTx sent Challenge_Auth response at {{{Challenge_Auth[2]}}}',Enums.TestResult.PASS])
                                     Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,Limit[1]])
                                     if len(Challenge_Msg)>2:
-                                        res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}','Pass'])
-                                    else:res.append([f'Test did not found Challenge valid message', 'Fail' if self.Header['TestcaseID'] in ['TEST_PTX_APX_CHA_NDS_001'] else 'Inconclusive'])
-                                else:res.append([f'PTx did not sent Challenge_Auth response', 'Inconclusive'])
-                            else:res.append([f'TPR did not sent Challenge_Request','Inconclusive'])
-                        else:res.append([f'Test did not found CERT_chain valid message', 'Inconclusive'])
-                    else:res.append([f'PTx did not sent Certificate response', 'Inconclusive'])
-                else:res.append([f'TPR did not sent Get_Certificate Request','Inconclusive'])
+                                        res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
+                                    else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.FAIL if self.Header['TestcaseID'] in ['TEST_PTX_APX_CHA_NDS_001'] else Enums.TestResult.INCONCLUSIVE])
+                                else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.INCONCLUSIVE])
+                            else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
+                        else:res.append([f'Test did not found CERT_chain valid message', Enums.TestResult.INCONCLUSIVE])
+                    else:res.append([f'PTx did not sent Certificate response', Enums.TestResult.INCONCLUSIVE])
+                else:res.append([f'TPR did not sent Get_Certificate Request',Enums.TestResult.INCONCLUSIVE])
             
-            else:res.append([f'Prx did not entered PT Phase', 'Inconclusive'])
-        except Exception as e :res.append([e,'Inconclusive'])
+            else:res.append([f'Prx did not entered PT Phase', Enums.TestResult.INCONCLUSIVE])
+        except Exception as e :res.append([e,Enums.TestResult.INCONCLUSIVE])
 
         return res
 
@@ -3514,17 +3515,17 @@ class CommonCTSChecks:
                     ErrorData=self.GetAuthPayloadDetails(id,"Error_Data","B1","[7:0]")[0]['sRawData']
                     if ErrorCode and ErrorData is not None: 
                         if 'UPE' in self.Header['TestcaseID']:
-                            res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 2 , Error data as {int(ErrorData,16)} -- Exp : 1 in the Error_response' , 'Pass' if int(ErrorCode,16) ==2 and int(ErrorData,16)==1 else 'Fail'])
+                            res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 2 , Error data as {int(ErrorData,16)} -- Exp : 1 in the Error_response' , Enums.TestResult.PASS if int(ErrorCode,16) ==2 and int(ErrorData,16)==1 else Enums.TestResult.FAIL])
                         else:
                             if 'IRE_001' in self.Header['TestcaseID']:
-                                res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 , Error data as {int(ErrorData,16)} -- Exp : 0 in the Error_response' , 'Pass' if int(ErrorCode,16) ==1 and int(ErrorData,16)==0 else 'Fail'])
-                            else:res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 (INVALID_REQUEST) in the Error_response', 'Pass' if int(ErrorCode,16) ==1 else 'Fail'])
+                                res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 , Error data as {int(ErrorData,16)} -- Exp : 0 in the Error_response' , Enums.TestResult.PASS if int(ErrorCode,16) ==1 and int(ErrorData,16)==0 else Enums.TestResult.FAIL])
+                            else:res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 (INVALID_REQUEST) in the Error_response', Enums.TestResult.PASS if int(ErrorCode,16) ==1 else Enums.TestResult.FAIL])
                     
-                    else:res.append([f'Test did not found Error_Code OR Error data field in Error_response','Inconclusive'])
+                    else:res.append([f'Test did not found Error_Code OR Error data field in Error_response',Enums.TestResult.INCONCLUSIVE])
                     break
                 id+=1
         except Exception as e:print(e)
-        if not PktFound: res.append([f'PTx did not sent Error_response','Inconclusive'])  
+        if not PktFound: res.append([f'PTx did not sent Error_response',Enums.TestResult.INCONCLUSIVE])  
         return res
             
     def FirstPing(self,LastPing):
@@ -3614,7 +3615,7 @@ class CommonCTSChecks:
             ILL = self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1], limit=[id,limit[1]])
             if len(ILL)>2:
                 if Check['pkt'][2] : 
-                    res.append([f'TPR sent {DataPacketName} Packet at index@ {{{ILL[2]}}}','Pass'])
+                    res.append([f'TPR sent {DataPacketName} Packet at index@ {{{ILL[2]}}}',Enums.TestResult.PASS])
                     res.extend(self.Payload_Details(PacketName=DataPacketName,Index=ILL[2],PayLoads= Check['pkt'][3])) 
                 Coilpk=self.PktMethod.GetPacketDetails(packet="CoilVoltpkpk", Type="TesterMsg",limit=[ILL[2]+1,limit[1]])
                 if len(Coilpk)>2:
@@ -3626,8 +3627,8 @@ class CommonCTSChecks:
         if TterminateList:
             min_item = min(TterminateList, key=lambda x: x[-1])
             max_item = max(TterminateList, key=lambda x: x[-1])
-            res.append([f"Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec at index@ {{{max_item[2]}}} is {max_item[-1]}mS , Limit: <= {Check['Tterminate'][1]} mS", 'Fail' if  max_item[-1] > Check['Tterminate'][1] else 'Pass'])
-            res.append([f"Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec at index@ {{{min_item[2]}}} is {min_item[-1]}mS , Limit:<= {Check['Tterminate'][1]} mS", 'Fail' if  min_item[-1] > Check['Tterminate'][1] else 'Pass'])
+            res.append([f"Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec at index@ {{{max_item[2]}}} is {max_item[-1]}mS , Limit: <= {Check['Tterminate'][1]} mS", Enums.TestResult.FAIL if  max_item[-1] > Check['Tterminate'][1] else Enums.TestResult.PASS])
+            res.append([f"Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec at index@ {{{min_item[2]}}} is {min_item[-1]}mS , Limit:<= {Check['Tterminate'][1]} mS", Enums.TestResult.FAIL if  min_item[-1] > Check['Tterminate'][1] else Enums.TestResult.PASS])
 
         return res
 
@@ -3668,13 +3669,13 @@ class CommonCTSChecks:
             min_item = min(TrestartList, key=lambda x: x[-1])
             max_item = max(TrestartList, key=lambda x: x[-1])
             max_Vrect= max(Vrectlist, key=lambda x: x[-1])
-            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec is {max_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  max_item[-1] > 500 else 'Pass'])
-            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec is {min_item[-1]}mS, Limit[≤ 500mS]', 'Fail' if  min_item[-1] > 500 else 'Pass'])
-            res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at ping {{{max_Vrect[0]}}}, Limit[≤ 19V]", "Fail" if max_Vrect[-1] > 19 else "Pass"])
+            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec is {max_item[-1]}mS, Limit[≤ 500mS]', Enums.TestResult.FAIL if  max_item[-1] > 500 else Enums.TestResult.PASS])
+            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec is {min_item[-1]}mS, Limit[≤ 500mS]', Enums.TestResult.FAIL if  min_item[-1] > 500 else Enums.TestResult.PASS])
+            res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at ping {{{max_Vrect[0]}}}, Limit[≤ 19V]", Enums.TestResult.FAIL if max_Vrect[-1] > 19 else Enums.TestResult.PASS])
         elif len(TrestartList)==1:
-            res.append([f'Measured t_restart_after_illegal from {TrestartList[0][0]}Sec to {TrestartList[0][1]}Sec is {TrestartList[0][-1]}mS, Limit[≤ 500mS] ', 'Fail' if  TrestartList[0][-1] > 500 else 'Pass'])
-            res.append([f"Measured V_RECT is {Vrectlist[0][-1]}V at ping {{{Vrectlist[0][0]}}}, Limit[≤ 19V]", "Fail" if Vrectlist[0][-1] > 19 else "Pass"])
-        else:res.append([f'Test did not found any t_restart_after_illegal or V_RECT measurements','Inconclusive'])
+            res.append([f'Measured t_restart_after_illegal from {TrestartList[0][0]}Sec to {TrestartList[0][1]}Sec is {TrestartList[0][-1]}mS, Limit[≤ 500mS] ', Enums.TestResult.FAIL if  TrestartList[0][-1] > 500 else Enums.TestResult.PASS])
+            res.append([f"Measured V_RECT is {Vrectlist[0][-1]}V at ping {{{Vrectlist[0][0]}}}, Limit[≤ 19V]", Enums.TestResult.FAIL if Vrectlist[0][-1] > 19 else Enums.TestResult.PASS])
+        else:res.append([f'Test did not found any t_restart_after_illegal or V_RECT measurements',Enums.TestResult.INCONCLUSIVE])
 
         return res
     
@@ -3703,7 +3704,7 @@ class CommonCTSChecks:
                                 vrect = self.CalculateVoltTwindow(NextPing_details[2],self.AllChannelData,at="start",measure="after",winsize=[22,33])
                                 Vrectlist.append([NextPing_details[2],vrect[0]])
                             else:
-                                res.append([f'PTx did not initated next ping after the packet {DataPacketName} at index@ {ExpectedPacket_Details[2]}','Inconclusive'])
+                                res.append([f'PTx did not initated next ping after the packet {DataPacketName} at index@ {ExpectedPacket_Details[2]}',Enums.TestResult.INCONCLUSIVE])
 
                     start_id = detach_details[2]+1
                 else:break 
@@ -3712,15 +3713,15 @@ class CommonCTSChecks:
         if TterminateList:
             min_item = min(TterminateList, key=lambda x: x[-1])
             max_item = max(TterminateList, key=lambda x: x[-1])
-            res.append([f'Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec for the {DataPacketName} packet at index@ {max_item[2]} is {max_item[-1]}mS , Limit: {TterminateLimit}', 'Fail' if  max_item[-1] > TterminateLimit[1] else 'Pass'])
-            res.append([f'Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec for the {DataPacketName} packet at index@ {min_item[2]} is {min_item[-1]}mS , Limit: {TterminateLimit}', 'Fail' if  min_item[-1] > TterminateLimit[1] else 'Pass'])
+            res.append([f'Measured max t_terminate from {max_item[0]}Sec to {max_item[1]}Sec for the {DataPacketName} packet at index@ {max_item[2]} is {max_item[-1]}mS , Limit: {TterminateLimit}', Enums.TestResult.FAIL if  max_item[-1] > TterminateLimit[1] else Enums.TestResult.PASS])
+            res.append([f'Measured min t_terminate from {min_item[0]}Sec to {min_item[1]}Sec for the {DataPacketName} packet at index@ {min_item[2]} is {min_item[-1]}mS , Limit: {TterminateLimit}', Enums.TestResult.FAIL if  min_item[-1] > TterminateLimit[1] else Enums.TestResult.PASS])
         if TrestartList and Trestart:
             min_item = min(TrestartList, key=lambda x: x[-1])
             max_item = max(TrestartList, key=lambda x: x[-1])
             max_Vrect= max(Vrectlist, key=lambda x: x[-1])
-            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec at index@ {max_item[2]} is {max_item[-1]}mS , Limit <=500', 'Fail' if  max_item[-1] > 500 else 'Pass'])
-            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec at index@ {min_item[2]} is {min_item[-1]}mS , Limit <=500', 'Fail' if  min_item[-1] > 500 else 'Pass'])
-            res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at  index @ {max_Vrect[0]}, Limit <=19V", "Fail" if max_Vrect[-1] > 19 else "Pass"])
+            res.append([f'Measured max t_restart_after_illegal from {max_item[0]}Sec to {max_item[1]}Sec at index@ {max_item[2]} is {max_item[-1]}mS , Limit <=500', Enums.TestResult.FAIL if  max_item[-1] > 500 else Enums.TestResult.PASS])
+            res.append([f'Measured min t_restart_after_illegal from {min_item[0]}Sec to {min_item[1]}Sec at index@ {min_item[2]} is {min_item[-1]}mS , Limit <=500', Enums.TestResult.FAIL if  min_item[-1] > 500 else Enums.TestResult.PASS])
+            res.append([f"Measured max V_RECT is {max_Vrect[-1]}V at  index @ {max_Vrect[0]}, Limit <=19V", Enums.TestResult.FAIL if max_Vrect[-1] > 19 else Enums.TestResult.PASS])
 
         return TterminateList,res
     
@@ -3730,11 +3731,11 @@ class CommonCTSChecks:
         NextPing_details=self.PktMethod.GetPacketDetails(packet="Ping", Type="TesterMsg",limit=[CoilPkpk[2]+1, len(self.file_list)-1])
         if len(NextPing_details)>2:
             Trestart=round(( NextPing_details[0] - CoilPkpk[1]) * 1000, 3)
-            res.append([f"Measured t_restart_after_illegal from {CoilPkpk[1]}Sec to {NextPing_details[0]}Sec is {Trestart}mS at  index@ {NextPing_details[2]}, Limit <=500", "Fail" if Trestart > 500 else "Pass"])
+            res.append([f"Measured t_restart_after_illegal from {CoilPkpk[1]}Sec to {NextPing_details[0]}Sec is {Trestart}mS at  index@ {NextPing_details[2]}, Limit <=500", Enums.TestResult.FAIL if Trestart > 500 else Enums.TestResult.PASS])
             vrect = self.CalculateVoltTwindow(NextPing_details[2],self.AllChannelData,at="start",measure="after",winsize=[22,33])
-            res.append([f"Measured  V_RECT is {vrect[0]}V at  index@ {NextPing_details[2]}, Limit <=19V", "Fail" if vrect[0] > 19 else "Pass"])
+            res.append([f"Measured  V_RECT is {vrect[0]}V at  index@ {NextPing_details[2]}, Limit <=19V", Enums.TestResult.FAIL if vrect[0] > 19 else Enums.TestResult.PASS])
         else:
-            res.append([f'PTx did not initated next ping after the packet {DataPacketName} at index@ {PktId} ','Inconclusive'])
+            res.append([f'PTx did not initated next ping after the packet {DataPacketName} at index@ {PktId} ',Enums.TestResult.INCONCLUSIVE])
         return res
 
     #Packet Payload function
@@ -3747,13 +3748,13 @@ class CommonCTSChecks:
                 raw_data = payload.get('sRawData')
                 if raw_data:
                     result, actual_val = self.PktMethod.compare_hex_to_expected(raw_hex=raw_data, expected_values=PayLoads[Pd_id].get("Exp"),comparator= PayLoads[Pd_id].get("comp", "EQL"),Type=PayLoads[Pd_id].get("Type","DEC"))
-                    status = ( "Pass" if result else (  "Inconclusive" if PayLoads[Pd_id].get("Inconclusive_Check", False) else "Fail" ) )
+                    status = ( Enums.TestResult.PASS if result else (  Enums.TestResult.INCONCLUSIVE if PayLoads[Pd_id].get("Inconclusive_Check", False) else Enums.TestResult.FAIL ) )
                     if (not PayLoads[Pd_id].get("Result_check",True) and not result) or PayLoads[Pd_id].get("Result_check",True):
                         desp=CommonMethods.GetCompDes(PayLoads[Pd_id].get("Exp"),PayLoads[Pd_id].get("comp"))
                         res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} field with value {actual_val} for the {PacketName} data packet , Exp:{desp}', status])
                         # res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} Field with Val {actual_val}  for the  {PacketName} datapacket at Id @{Index}, Exp:{PayLoads[Pd_id].get("Exp")},Comp :{PayLoads[Pd_id].get("comp")}.', status])
                     Check=True
-            if not Check:res.append([f'{'PRx'if Receiver else 'PTx'} did not sent expected {PayLoads[Pd_id].get("Name")} in the {PacketName} data packet at index@ {Index}, Exp:{PayLoads[Pd_id].get("Exp")} , Comp :{PayLoads[Pd_id].get("comp")}.','Fail'])   
+            if not Check:res.append([f'{'PRx'if Receiver else 'PTx'} did not sent expected {PayLoads[Pd_id].get("Name")} in the {PacketName} data packet at index@ {Index}, Exp:{PayLoads[Pd_id].get("Exp")} , Comp :{PayLoads[Pd_id].get("comp")}.',Enums.TestResult.FAIL])   
             Pd_id+=1
         return res
 
@@ -3896,13 +3897,13 @@ class CommonCTSChecks:
                             id=ADC_End_TPT[2]+1
                             if not self.GetAuthSeqStatus():
                                 seq=True
-                                results.append([f'PRx & PTx sucessfully completed Authentication {Authvalue1} Chain sequence from index@ {ADC_Auth[2]} to index@ {ADC_End_TPT[2]}', 'Pass']) 
-                            else: results.append([f'Complete Data Transport stream or proper Bytes in the  Authentication sequence-{Authvalue2} is not Found', 'Inconclusive'])   
-                        else:results.append([f'PTx did not closed {Authvalue2} Authentication sequence', 'Inconclusive'])                                                        
-                    else:results.append([f'PTx did not initiated {Authvalue2} Authentication sequence', 'Inconclusive'])
-                else:results.append([f'Prx did not closed Authentication sequence', 'Inconclusive']) 
-            else:results.append([f'Prx did not sent {Authvalue1}', 'Inconclusive']) 
-        else:results.append([f'Prx did not initiated Authentication:{Authvalue1} sequence', 'Inconclusive'])
+                                results.append([f'PRx & PTx sucessfully completed Authentication {Authvalue1} Chain sequence from index@ {ADC_Auth[2]} to index@ {ADC_End_TPT[2]}', Enums.TestResult.PASS]) 
+                            else: results.append([f'Complete Data Transport stream or proper Bytes in the  Authentication sequence-{Authvalue2} is not Found', Enums.TestResult.INCONCLUSIVE])   
+                        else:results.append([f'PTx did not closed {Authvalue2} Authentication sequence', Enums.TestResult.INCONCLUSIVE])                                                        
+                    else:results.append([f'PTx did not initiated {Authvalue2} Authentication sequence', Enums.TestResult.INCONCLUSIVE])
+                else:results.append([f'Prx did not closed Authentication sequence', Enums.TestResult.INCONCLUSIVE]) 
+            else:results.append([f'Prx did not sent {Authvalue1}', Enums.TestResult.INCONCLUSIVE]) 
+        else:results.append([f'Prx did not initiated Authentication:{Authvalue1} sequence', Enums.TestResult.INCONCLUSIVE])
         return results,id,seq
     
 
@@ -3923,20 +3924,20 @@ class CommonCTSChecks:
             if resp is not None:
                 if ResponseTimgcheck and ExpPkt[ResTimngId][0]['Result_check']:
                     ResponseTime= round(( self.file_list[resp[1]]['startTime']-self.file_list[PktorResId]['stopTime'])*1000,3)
-                    results.append([f'Measured response time between {ExpPktDataPacket} and {resp[0]} is {ResponseTime}mS, Limit[3mS ≤ t_response ≤ 10mS] ','Fail'if ResponseTime < ExpPkt[ResTimngId][0]['ExpTime'][0]-ExpPkt[ResTimngId][0]['ExpTime'][1] or ResponseTime >ExpPkt[ResTimngId][0]['ExpTime'][0]+ExpPkt[ResTimngId][0]['ExpTime'][1] else "Pass"])
+                    results.append([f'Measured response time between {ExpPktDataPacket} and {resp[0]} is {ResponseTime}mS, Limit[3mS ≤ t_response ≤ 10mS] ',Enums.TestResult.FAIL if ResponseTime < ExpPkt[ResTimngId][0]['ExpTime'][0]-ExpPkt[ResTimngId][0]['ExpTime'][1] or ResponseTime >ExpPkt[ResTimngId][0]['ExpTime'][0]+ExpPkt[ResTimngId][0]['ExpTime'][1] else Enums.TestResult.PASS])
                 RespresPkt=False
                 if Responsecheck:
                     for ExpRes in ExpPkt[ResponseIndex][0]['ExpResp']: 
                         if self.packet_matches(packet_id=resp[1],Pkt=ExpRes[0],PktVal=ExpRes[1]):
                             if ExpPkt[ResponseIndex][0]['Result_check']: 
-                                results.append([f'PTx responded with {resp[0]} for the {ExpPktDataPacket} data packet at index@ {PktorResId}','Pass'])
+                                results.append([f'PTx responded with {resp[0]} for the {ExpPktDataPacket} data packet at index@ {PktorResId}',Enums.TestResult.PASS])
                                 if ExpRes[2]:
                                     res=self.Payload_Details(PacketName=resp[0],Index=resp[1],PayLoads=ExpRes[3],Receiver=False)
                                     if len(res)>0:results.extend(res) 
                             RespresPkt=True
                         if RespresPkt:break   
-                if not RespresPkt and ExpPkt[ResponseIndex][0]['Result_check'] and Responsecheck: results.append([f'PTx responded with {resp[0]} for the {ExpPktDataPacket} data packet at index@ {PktorResId}','Fail'])
-            else: results.append([f'PTx did not sent any response for the {ExpPktDataPacket} data packet','Fail'])
+                if not RespresPkt and ExpPkt[ResponseIndex][0]['Result_check'] and Responsecheck: results.append([f'PTx responded with {resp[0]} for the {ExpPktDataPacket} data packet at index@ {PktorResId}',Enums.TestResult.FAIL])
+            else: results.append([f'PTx did not sent any response for the {ExpPktDataPacket} data packet',Enums.TestResult.FAIL])
 
         return results
 
@@ -4077,6 +4078,6 @@ class CommonCTSChecks:
         # print(self.AllChannelData11)
         for temp in self.AllChannelData11['RV']['displayDataChunk']:
             templist.append(temp)
-        if len(templist)>0:res.append([f"Found max FOD temperature {max(templist)} °C and minimum temperature {min(templist)} °C, limit: <= {Check['expected'][0]} °C","Pass" if max(templist)<=Check['expected'][0] else 'Fail'])
-        else: res.append([f"Temperature data not found","Fail"])   
+        if len(templist)>0:res.append([f"Found max FOD temperature {max(templist)} °C and minimum temperature {min(templist)} °C, limit: <= {Check['expected'][0]} °C",Enums.TestResult.PASS if max(templist)<=Check['expected'][0] else Enums.TestResult.FAIL])
+        else: res.append([f"Temperature data not found",Enums.TestResult.FAIL])   
         return res

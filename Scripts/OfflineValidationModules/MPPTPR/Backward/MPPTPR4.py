@@ -5,6 +5,7 @@ import traceback
 # import csv
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
+from Enums import Enums
 from OfflineValidationModules.MPPTPR.MPPTPR4_CommonHelper import CommonCTSChecks
 
 # from pathlib import Path
@@ -108,49 +109,49 @@ class CTSChecks_MPP_TPR4():
 
                     
                     AllMeasures[f"{CTSCheck}_SEQ"] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
-                    AllMeasures[f'{CTSCheck}_res']='Fail'
+                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
 
                     AllMeasures[f'{CTSCheck}_remarks']='NA'
                     if Check.get('expected') and Check['expected'] in ["OffsetReneg2"]:
                         tempRes = AllMeasures[f"{CTSCheck}_Details"]
                         throttle_failcnt = 0
                         for item in tempRes:
-                            if item[1]=="Fail" and "not throttled" in item[0]:
+                            if item[1]==Enums.TestResult.FAIL and "not throttled" in item[0]:
                                 throttle_failcnt+=1
                                 if throttle_failcnt>=3:
-                                    AllMeasures[f'{CTSCheck}_res']="Fail"
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                     break
-                                else: AllMeasures[f'{CTSCheck}_res']="Pass"
+                                else: AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
 
                             else:
-                                if 'Inconclusive' in [item[1] for item in tempRes]:
+                                if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                    AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                 else:
                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                    AllMeasures[f'{CTSCheck}_res']="Pass"
-                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                         AllMeasures[f'{CTSCheck}_Details']=tempRes
                     
                     else:
                         #by default all the checks has sub-checks ensure the sub-checks results for main check pass / fail 
                         AllMeasures[f"{CTSCheck}_SEQ"] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
-                        AllMeasures[f'{CTSCheck}_res']='Fail'
+                        AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                         AllMeasures[f'{CTSCheck}_remarks']='NA'
                         if len(AllMeasures[f"{CTSCheck}_Details"]) >0:
                             tempRes = AllMeasures[f"{CTSCheck}_Details"]
                             # print('Tempres:',tempRes)
-                            if 'Fail' in [item[1] for item in tempRes]:
+                            if Enums.TestResult.FAIL in [item[1] for item in tempRes]:
                                 if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                AllMeasures[f'{CTSCheck}_res']="Fail"
+                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                             else:
-                                if 'Inconclusive' in [item[1] for item in tempRes]:
+                                if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                    AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                 else:
                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                    AllMeasures[f'{CTSCheck}_res']="Pass"
-                            AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                            AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                             AllMeasures[f'{CTSCheck}_Details']=tempRes
                     
                     #Update Final Result
@@ -158,12 +159,12 @@ class CTSChecks_MPP_TPR4():
                         # print("Header:",self.Header)
                         if self.Header['TCresult'] == 'NA':
                             self.Header['TCresult'] = AllMeasures[str(CTSCheck)+'_res']
-                        elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                            self.Header['TCresult']='Fail'
-                        elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Pass') or (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                            self.Header['TCresult']='Inconclusive'
-                        elif (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res']=='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res']=='Pass'):
-                            self.Header['TCresult']='Fail' #Add remarks for the test fail
+                        elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            self.Header['TCresult']=Enums.TestResult.FAIL
+                        elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            self.Header['TCresult']=Enums.TestResult.INCONCLUSIVE
+                        elif (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                            self.Header['TCresult']=Enums.TestResult.FAIL #Add remarks for the test fail
                     
                     # Update TestResult to Not-Run if SW result is NotRun
                     if self.Header['SWresult']=="Not Run":self.Header['TCresult']='NA'
@@ -182,23 +183,23 @@ class CTSChecks_MPP_TPR4():
             ECAP = self.PktMethod.GetPacketDetails(packet=self.ECAP_pkt,limit=[pkt_exit[2],0],Type="Response")
             if len(ECAP)>2:
                 renegpwr = float(self.PktMethod.GetPayloadDetails(ECAP[2],"Negotiable_Load_Power")[0]['sDescription'].split(":")[1].split("W")[0].strip())
-                res.append([f"Negotiable_Load_Power in ECAP is {renegpwr}W", "Pass"])
+                res.append([f"Negotiable_Load_Power in ECAP is {renegpwr}W", Enums.TestResult.PASS])
 
                 reqload = renegpwr*(Check['TargetLoadPercent'])/100
-                res.append([f"{Check['TargetLoadPercent']}% of Negotiable_Load_Power is {reqload}W", "Pass"])
+                res.append([f"{Check['TargetLoadPercent']}% of Negotiable_Load_Power is {reqload}W", Enums.TestResult.PASS])
 
                 renegload = self.PktMethod.GetPacketDetails(packet=f"Set_Load {int(reqload*1000)}mW",limit=[ECAP[2],end],Type='TesterMsg')
                 # print("renegload:",renegload)
                 if len(renegload)>2:
-                    res.append([f"Set_Load {int(reqload*1000)}mW found at {round(renegload[0],3)}sec","Pass"])
+                    res.append([f"Set_Load {int(reqload*1000)}mW found at {round(renegload[0],3)}sec",Enums.TestResult.PASS])
                     self.GetInitailVoltage(Check['flow'],[renegload[2],end])
                     
                     irect = self.PktMethod.CalculateVoltTwindow(self.stability,self.AllChannelData3)
                     vrect = self.PktMethod.CalculateVoltTwindow(self.stability,self.AllChannelData)
                     power = round(vrect[0]*irect[0],3)
                     # print("vrect:",vrect,"irect:",irect,"power:",power)
-                    res.append([f"Prect after control stabilization is {power} W at {round(self.file_list[self.stability]['startTime'],3)} sec, Expected: >= {reqload}W", "Pass" if power>=reqload else "Fail"])
-                # else: res.append([f"Set_Load {int(reqload*1000)}mW not found", "Fail"])
+                    res.append([f"Prect after control stabilization is {power} W at {round(self.file_list[self.stability]['startTime'],3)} sec, Expected: >= {reqload}W", Enums.TestResult.PASS if power>=reqload else Enums.TestResult.FAIL])
+                # else: res.append([f"Set_Load {int(reqload*1000)}mW not found", Enums.TestResult.FAIL])
 
                     #2.Find PLA packts has power offset
                     duration_flag = False
@@ -213,9 +214,9 @@ class CTSChecks_MPP_TPR4():
                                 if 'exp_resp' in Check:
                                     if 'Response' in self.PktMethod.GetPacketType(Pktresp):
                                         if self.file_list[Pktresp]['pktType'] in Check["exp_resp"]:
-                                            res.append([f"{self.file_list[Pktresp]['pktType']} response received for PLA packet at index@{Pktresp}, Expected: {Check["exp_resp"]}", "Pass"])
-                                        else: res.append([f"{self.file_list[Pktresp]['pktType']} response received for PLA packet at index@{Pktresp}, Expected: {Check["exp_resp"]}", "Fail"])
-                                else: res.append([f"{self.file_list[Pktresp]['pktType']} response received to PLA_2 packet at {round(TempPkt2[0],3)} sec", "Pass"])
+                                            res.append([f"{self.file_list[Pktresp]['pktType']} response received for PLA packet at index@{Pktresp}, Expected: {Check["exp_resp"]}", Enums.TestResult.PASS])
+                                        else: res.append([f"{self.file_list[Pktresp]['pktType']} response received for PLA packet at index@{Pktresp}, Expected: {Check["exp_resp"]}", Enums.TestResult.FAIL])
+                                else: res.append([f"{self.file_list[Pktresp]['pktType']} response received to PLA_2 packet at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
                                 
 
                             TempPkt3 = self.PktMethod.GetPacketDetails(packet="Power Offset",limit=[TempPkt2[2],TempPkt2[2]-5],Type="TesterMsg")
@@ -235,11 +236,11 @@ class CTSChecks_MPP_TPR4():
                                 if 'FixedOffsetValues' in Check:
                                     # # print(RP_Offset,Prect_Offset)
                                     if RP_Offset!=Check['FixedOffsetValues']['RP'] or Prect_Offset!=Check['FixedOffsetValues']['Prect']:
-                                        res.append([f"PLA offset issue at {round(TempPkt2[0],3)}: RP Offset:{RP_Offset}W Expected :{Check['FixedOffsetValues']['RP']}, Prect Offset:{Prect_Offset}W Expected :{Check['FixedOffsetValues']['Prect']}W","Fail"])
+                                        res.append([f"PLA offset issue at {round(TempPkt2[0],3)}: RP Offset:{RP_Offset}W Expected :{Check['FixedOffsetValues']['RP']}, Prect Offset:{Prect_Offset}W Expected :{Check['FixedOffsetValues']['Prect']}W",Enums.TestResult.FAIL])
                                 #Ensure that the offset calculations are correct
-                                PLARes = "Pass" if Prect_Rcv == round((Prect_Actual-(Prect_Offset)),3) and RP_Rcvd == round((RP_Actual-(RP_Offset)),3) else "Fail"
-                                if PLARes=="Fail":res.append([f"PLA Power Calculation issue at {round(TempPkt2[0],3)}sec with Perct={Prect_Rcv}W and RP={RP_Rcvd}W,Prect_Offset={Prect_Offset}W and RP_offset={RP_Offset}W, Prect_Actual = {Prect_Actual}W and RP_Actual={RP_Actual}W",PLARes])
-                                else: res.append([f"Prect_Actual:{Prect_Actual}W is matching with Prect_Rcv:{Prect_Rcv}W after applying Prect_Offset:{Prect_Offset}W and RP_Actual:{RP_Actual}W is matching with RP_Rcvd:{RP_Rcvd}W after applying RP_Offset:{RP_Offset}W","Pass"])
+                                PLARes = Enums.TestResult.PASS if Prect_Rcv == round((Prect_Actual-(Prect_Offset)),3) and RP_Rcvd == round((RP_Actual-(RP_Offset)),3) else Enums.TestResult.FAIL
+                                if PLARes==Enums.TestResult.FAIL:res.append([f"PLA Power Calculation issue at {round(TempPkt2[0],3)}sec with Perct={Prect_Rcv}W and RP={RP_Rcvd}W,Prect_Offset={Prect_Offset}W and RP_offset={RP_Offset}W, Prect_Actual = {Prect_Actual}W and RP_Actual={RP_Actual}W",PLARes])
+                                else: res.append([f"Prect_Actual:{Prect_Actual}W is matching with Prect_Rcv:{Prect_Rcv}W after applying Prect_Offset:{Prect_Offset}W and RP_Actual:{RP_Actual}W is matching with RP_Rcvd:{RP_Rcvd}W after applying RP_Offset:{RP_Offset}W",Enums.TestResult.PASS])
                                 
                                 
                                 # PLA response
@@ -248,7 +249,7 @@ class CTSChecks_MPP_TPR4():
                                     x += 1
                                 
                                 # if 'Response' in self.PktMethod.GetPacketType(x):
-                                #     res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet", "Pass"])
+                                #     res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet", Enums.TestResult.PASS])
                                     
 
                                 # Throttle check  
@@ -266,11 +267,11 @@ class CTSChecks_MPP_TPR4():
                                     
                                     
                                     if pwr_diff <= 50:    #P2-P1 <= 50mW --> Throttle
-                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
-                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Fail"])
+                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
+                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.FAIL])
                                     
                                 elif 'ACK' in self.file_list[x]['pktType']:
-                                    res.append([f"PTx not throttled while sending ACK to PLA packet at {round(TempPkt2[0],3)} sec", "Pass"])
+                                    res.append([f"PTx not throttled while sending ACK to PLA packet at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
                                 
                                 
                                 #check PLA until
@@ -293,19 +294,19 @@ class CTSChecks_MPP_TPR4():
                         if Check['Remove_Power']:
                             if len(sd)> 2:
                                 removepwr = True
-                                res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
-                            else: res.append([f"PTx does not removed power", "Fail"])
+                                res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.PASS])
+                            else: res.append([f"PTx does not removed power", Enums.TestResult.FAIL])
                         else:
                             if len(sd)> 2:
                                 removepwr = True
-                                res.append([f"PTx removed power at {round(sd[0],3)} sec", "Fail"])
-                            else: res.append([f"PTx does not removed power", "Pass"])
+                                res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.FAIL])
+                            else: res.append([f"PTx does not removed power", Enums.TestResult.PASS])
 
                     if 'CheckDuration' in Check:
                         if not removepwr:
                             if duration_flag:
-                                res.append([f"TPR monitored PLA packets for at least 1 minute after stabilizing.", "Pass"])
-                            else: res.append([f"TPR monitored PLA packets for only {round(duration,3)} sec after stabilizing.", "Fail"])
+                                res.append([f"TPR monitored PLA packets for at least 1 minute after stabilizing.", Enums.TestResult.PASS])
+                            else: res.append([f"TPR monitored PLA packets for only {round(duration,3)} sec after stabilizing.", Enums.TestResult.FAIL])
 
         return res
 

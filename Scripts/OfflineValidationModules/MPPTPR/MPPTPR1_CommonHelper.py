@@ -8,6 +8,7 @@ import zipfile
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
+from Enums import Enums
 from datetime import datetime,date
 
 # from collections import deque
@@ -67,22 +68,22 @@ class CommonCTSChecks():
             # ept = self.PktMethod.GetPacketDetails(packet="End Power Transfer",limit=[ideal_pkt[2],Flow_limit[1]])
             sd = self.PktMethod.GetPacketDetails(packet="Shutdown",limit=[ideal_pkt[2],len(self.file_list)-1],Type="TesterMsg")
             if len(sd)>2:
-                res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
+                res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.PASS])
                 tdiff1 = round(sd[1] - ideal_pkt[1],3)
                 if tdiff1 <= 5:
-                   res.append([f"Power removed after {tdiff1} seconds from the stabilization.", "Pass"]) 
+                   res.append([f"Power removed after {tdiff1} seconds from the stabilization.", Enums.TestResult.PASS]) 
 
                 else:
                     ept = self.PktMethod.GetPacketDetails(packet="End Power Transfer",limit=[ideal_pkt[2],Flow_limit[1]])
                     if len(ept)>2:
-                        res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", "Pass"])
+                        res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", Enums.TestResult.PASS])
                         tdiff2 = round(ept[1] - ideal_pkt[1],3)
-                        res.append([f"Power removed after {tdiff2} seconds from the stabilization.", "Pass"]) 
+                        res.append([f"Power removed after {tdiff2} seconds from the stabilization.", Enums.TestResult.PASS]) 
                     else: 
-                        res.append(["TPR didn't sent End Power Transfer packet after 5 min from stabilization", "Fail"])
-            else: res.append([f"Power not removed.", "Fail"])
+                        res.append(["TPR didn't sent End Power Transfer packet after 5 min from stabilization", Enums.TestResult.FAIL])
+            else: res.append([f"Power not removed.", Enums.TestResult.FAIL])
         else:
-            res.append(["Stabilization not found.", "Fail"])
+            res.append(["Stabilization not found.", Enums.TestResult.FAIL])
             
 
 
@@ -90,26 +91,26 @@ class CommonCTSChecks():
 
         #     if len(sd)>2 or len(ept)>2:
         #         if len(ept)>2:
-        #             res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", "Pass"])
+        #             res.append([f"TPR sent End Power Transfer at {round(ept[0],3)} sec", Enums.TestResult.PASS])
         #         elif len(sd)>2:
-        #             res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
+        #             res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.PASS])
 
         #         tdiff = round(max(sd[0],ept[0]) - ideal_pkt[1],3)
         #         if tdiff>=5:
-        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", "Pass"])   
+        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", Enums.TestResult.PASS])   
         #         else:
-        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", "Fail"])
+        #             res.append([f"Power removed after {tdiff} seconds from the first XCE packet after stabilization. Expected: >= 5 seconds", Enums.TestResult.FAIL])
 
         #     else: 
-        #         res.append(["End Power Transfer not happened after stabilization", "Fail"])
+        #         res.append(["End Power Transfer not happened after stabilization", Enums.TestResult.FAIL])
         # else: 
-        #     res.append(["Extended Control Error packet not found after stabilization", "Fail"])
+        #     res.append(["Extended Control Error packet not found after stabilization", Enums.TestResult.FAIL])
                 
                 
                 
             # if len(ept) > 2:
-            #     res.append([f"End Power Transfer (EPT/rst) found at {round(ept[0],3)} sec", "Pass"])
-            # else: res.append([f"End Power Transfer (EPT/rst) not found", "Fail"])
+            #     res.append([f"End Power Transfer (EPT/rst) found at {round(ept[0],3)} sec", Enums.TestResult.PASS])
+            # else: res.append([f"End Power Transfer (EPT/rst) not found", Enums.TestResult.FAIL])
         
 
 
@@ -138,7 +139,7 @@ class CommonCTSChecks():
                                 id = sd[2]
                                 ChkRes = CommonMethods.check_measure([127.5, 128.5], fop, 0)
                                 res.append([f"Measured FOP_{cnt} is {ChkRes[3]} kHz at {round(fop_pkt[0], 3)}sec, , Expected: {ChkRes[2]} kHz", ChkRes[1]])
-                                res.append([f"Signal strength Packet found at {round(ss[0], 3)} sec", "Pass"])
+                                res.append([f"Signal strength Packet found at {round(ss[0], 3)} sec", Enums.TestResult.PASS])
                                 vrect_max = self.PktMethod.CalculateVoltTwindow(ss[2], self.AllChannelData, winsize=[9, 11], max=True)[0]
                                 vrects.append(vrect_max)
                                 ChkRes3 = CommonMethods.check_measure([4, 8.5] if cnt == 1 else [4, 13], vrect_max, 0)
@@ -146,13 +147,13 @@ class CommonCTSChecks():
                                 
                                 cnt += 1
                             elif cnt == 1:
-                                res.append([f"Signal strength Packet not found", "Fail"])
+                                res.append([f"Signal strength Packet not found", Enums.TestResult.FAIL])
                         # elif cnt == 1:
-                        #     res.append([f"FOP: packet not found", "Fail"])
+                        #     res.append([f"FOP: packet not found", Enums.TestResult.FAIL])
                     elif cnt == 1:
-                        res.append([f"Shutdown packet not found", "Fail"])
+                        res.append([f"Shutdown packet not found", Enums.TestResult.FAIL])
                 elif cnt == 1:
-                    res.append([f"Ping Detected packet not found", "Fail"])
+                    res.append([f"Ping Detected packet not found", Enums.TestResult.FAIL])
                 id += 1
             if cnt == 2:
                 ChkRes2 = CommonMethods.check_measure([4, 13], vrects[0], 0)
@@ -168,14 +169,14 @@ class CommonCTSChecks():
             if len(ss) > 2:
                 ChkRes = CommonMethods.check_measure([359.46, 360.54], fop, 0)
                 res.append([f"Measured FOP is {ChkRes[3]} kHz at {round(fop_pkt[0], 3)}sec, , Expected: {ChkRes[2]} kHz", ChkRes[1]])
-                res.append([f"Signal strength Packet found at {round(ss[0], 3)} sec", "Pass"])
+                res.append([f"Signal strength Packet found at {round(ss[0], 3)} sec", Enums.TestResult.PASS])
                 vrect_max = self.PktMethod.CalculateVoltTwindow(ss[2], self.AllChannelData, winsize=[9, 11], max=True)[0]
                 ChkRes3 = CommonMethods.check_measure([7, 13], vrect_max, 0)
                 res.append([f"Measured Vrect_ping is {ChkRes3[3]} V, Expected: {ChkRes3[2]} V", ChkRes3[1]])
             else:
-                res.append([f"Signal strength Packet not found", "Fail"])
+                res.append([f"Signal strength Packet not found", Enums.TestResult.FAIL])
         else:
-            res.append([f"FOP: packet not found", "Fail"])
+            res.append([f"FOP: packet not found", Enums.TestResult.FAIL])
 
 
         return res
@@ -196,9 +197,9 @@ class CommonCTSChecks():
                 if len(TempPkt1) > 2:
                     if "typ" in pkt:
                         print("pkt:", pkt['typ'])
-                        res.append([f"{pkt['typ']} {pkt['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", "Pass"])
+                        res.append([f"{pkt['typ']} {pkt['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", Enums.TestResult.PASS])
                         tdiff = round(TempPkt1[0]-first_xce[0],3)
-                        res.append([f"TPR sent {pkt['typ']} {pkt['packet1'][0]} packet in {tdiff} sec, Expected: 2 to 8 sec", "Pass" if 2<=tdiff<=8 else "Fail"])
+                        res.append([f"TPR sent {pkt['typ']} {pkt['packet1'][0]} packet in {tdiff} sec, Expected: 2 to 8 sec", Enums.TestResult.PASS if 2<=tdiff<=8 else Enums.TestResult.FAIL])
                     TempPkt2 = self.PktMethod.GetPacketDetails(packet=pkt['packet2'][0],value=pkt['packet2'][2] if len(pkt['packet2']) == 3 else None,limit=[TempPkt1[2] + 1, limit[1] + 1],Type=pkt['packet2'][1])
                 
                     if len(TempPkt2) > 2:
@@ -206,11 +207,11 @@ class CommonCTSChecks():
                         ChkRes = CommonMethods.check_measure(pkt['exp'], Tresult, pkt['comp'])
                         res.append([f"The Measured {pkt['chk']} between {pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ''} and {pkt['packet2'][0]} {pkt['packet2'][2] if len(pkt['packet2']) == 3 else ''}: {ChkRes[3]} ms, Limit: {ChkRes[2]} ms", ChkRes[1]])
                     else:
-                        res.append([f"{pkt['packet2'][0]} {pkt['packet2'][2] if len(pkt['packet2']) == 3 else ''} not found", "Pass"])
+                        res.append([f"{pkt['packet2'][0]} {pkt['packet2'][2] if len(pkt['packet2']) == 3 else ''} not found", Enums.TestResult.PASS])
                 else:
-                    res.append([f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ''} not found", "Pass"])
+                    res.append([f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ''} not found", Enums.TestResult.PASS])
         else:
-            res.append([f"PT phase not found","Inconclusive"])
+            res.append([f"PT phase not found",Enums.TestResult.INCONCLUSIVE])
         return res
     def FOP(self, Flow_limit, Check):
         res = []
@@ -262,26 +263,26 @@ class CommonCTSChecks():
                         while x < end:
                             if self.file_list[x]['description'] == "PT":
                                 res.append(
-                                    [f'PT Phase started at {round(self.file_list[x]["startTime"], 3)}sec after re-attach', "Pass"])
+                                    [f'PT Phase started at {round(self.file_list[x]["startTime"], 3)}sec after re-attach', Enums.TestResult.PASS])
                                 break
                             x += 1
                         else:
-                            res.append([f'PT Phase not started after re-attach', "Fail"])
+                            res.append([f'PT Phase not started after re-attach', Enums.TestResult.FAIL])
                     if "Vrect_max" in pkt:
                         ss = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[TempPkt1[2], end], Type="Packet")
                         if len(ss) > 2:
-                            res.append([f"Signal strengt packet found at {round(ss[0], 3)} Sec", "Pass"])
+                            res.append([f"Signal strengt packet found at {round(ss[0], 3)} Sec", Enums.TestResult.PASS])
                             self.AllChannelData = self.PlotMethod.GetAllChannelData2('2', self.JapiData)
                             vrect_max = self.PktMethod.CalculateVoltTwindow(ss[2], self.AllChannelData, winsize=[9, int((ss[0] - refpkt[1]) * 1000)], max=True)[0]
                             ChkRes = CommonMethods.check_measure(pkt['Vrect_max'][1], vrect_max, pkt['Vrect_max'][0])
                             res.append(
                                 [f"Measured Vrect_max is {ChkRes[3]} V, measured between {round(refpkt[1], 3)} Sec to {round((ss[0] - 0.009), 3)} Sec, Expected : {ChkRes[2]} V", ChkRes[1]])
                         else:
-                            res.append([f"Signal strengt packet not found", "Fail"])
+                            res.append([f"Signal strengt packet not found", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"{pkt['packet1'][0]} packet not found", "Fail"])
+                    res.append([f"{pkt['packet1'][0]} packet not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"{pkt['refpkt'][0]} packet not found", "Fail"])
+                res.append([f"{pkt['refpkt'][0]} packet not found", Enums.TestResult.FAIL])
 
 
         return res
@@ -289,29 +290,29 @@ class CommonCTSChecks():
         res = []
         XCE = self.PktMethod.GetPacketDetails(packet="Extended Control Error", limit=Flow_limit, Type="Packet")
         if len(XCE) > 2:
-            res.append([f'PT Phase started at {round(XCE[0], 3)} sec', "Pass"])
+            res.append([f'PT Phase started at {round(XCE[0], 3)} sec', Enums.TestResult.PASS])
             limit1 = [Flow_limit[0], len(self.file_list) - 1]
             TempPkt1 = self.PktMethod.GetPacketDetails(packet=Check['expected'][0]['packet1'][0],value=Check['expected'][0]['packet1'][1],limit=[Flow_limit[1], XCE[2]],Type=Check['expected'][0]['packet1'][2])
             if len(TempPkt1) > 2:
-                res.append([f'{Check["expected"][0]["packet1"][0]} {Check["expected"][0]["packet1"][1]} {Check["expected"][0]["packet1"][2]} found at {round(TempPkt1[0], 3)} sec', "Pass"])
+                res.append([f'{Check["expected"][0]["packet1"][0]} {Check["expected"][0]["packet1"][1]} {Check["expected"][0]["packet1"][2]} found at {round(TempPkt1[0], 3)} sec', Enums.TestResult.PASS])
                 sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[TempPkt1[2], Flow_limit[1] + 1], Type="TesterMsg")
                 if len(sd) > 2:
                     if sd[0] - TempPkt1[1] >= 60:
-                        res.append([f'PTx does not stop power for {sd[0] - TempPkt1[1]}, Expected: within 1 minute', "Inconclusive"])
+                        res.append([f'PTx does not stop power for {sd[0] - TempPkt1[1]}, Expected: within 1 minute', Enums.TestResult.INCONCLUSIVE])
                 else:
-                    res.append([f'Shutdown not found', "Fail"])
+                    res.append([f'Shutdown not found', Enums.TestResult.FAIL])
                 TempPkt2 = self.PktMethod.GetPacketDetails(packet=Check['expected'][0]['packet2'][0],value=Check['expected'][0]['packet2'][1],limit=[TempPkt1[2], limit1[1]],Type=Check['expected'][0]['packet2'][2])
                 fop = self.PktMethod.GetPacketDetails(value='FOP:',limit=[TempPkt1[2], limit1[1]],Type="TesterMsg")
                 if len(TempPkt2) > 2 and len(fop) > 2:
-                    res.append([f'{Check["expected"][0]["packet2"][0]} {Check["expected"][0]["packet2"][2]} found at {round(TempPkt2[0], 3)} sec', "Pass"])
+                    res.append([f'{Check["expected"][0]["packet2"][0]} {Check["expected"][0]["packet2"][2]} found at {round(TempPkt2[0], 3)} sec', Enums.TestResult.PASS])
                     ChkRes = CommonMethods.check_measure(Check['expected'][0]['exp'], (TempPkt2[0] - TempPkt1[1]) * 1000, Check['expected'][0]['comp'])
                     res.append([f'Measured Tnextping is {round(ChkRes[3], 3)} ms, Expected: {ChkRes[2]} ms', ChkRes[1]])
                 else:
-                    res.append([f'PTx unable to reping after sending EPT data packet', "Inconclusive"])
+                    res.append([f'PTx unable to reping after sending EPT data packet', Enums.TestResult.INCONCLUSIVE])
             else:
-                res.append([f'{Check["expected"][0]["packet1"][0]} {Check["expected"][0]["packet1"][1]} {Check["expected"][0]["packet1"][2]} not found', "Inconclusive"])
+                res.append([f'{Check["expected"][0]["packet1"][0]} {Check["expected"][0]["packet1"][1]} {Check["expected"][0]["packet1"][2]} not found', Enums.TestResult.INCONCLUSIVE])
         else:
-            res.append([f'PT Phase not started', "Inconclusive"])
+            res.append([f'PT Phase not started', Enums.TestResult.INCONCLUSIVE])
 
 
         return res
@@ -323,11 +324,11 @@ class CommonCTSChecks():
             TempPkt1 = self.PktMethod.GetPacketDetails(packet=pkt['packet1'][0], limit=[id, end], Type=pkt['packet1'][1])
             print("TempPkt1:",TempPkt1)
             if len(TempPkt1) > 2:
-                res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", "Pass"])
+                res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", Enums.TestResult.PASS])
                 TempPkt2 = self.PktMethod.GetPacketDetailswithPhase(packet=pkt['packet2'][0], limit=[TempPkt1[2] + 1, end + 1], Type=pkt['packet2'][1], Phase=pkt.get("Phase"))
                 print("TempPkt2:",TempPkt2)
                 if len(TempPkt2) > 2:
-                    res.append([f"{pkt['packet2'][0]} packet found at {round(TempPkt2[0], 3)} sec", "Pass"])
+                    res.append([f"{pkt['packet2'][0]} packet found at {round(TempPkt2[0], 3)} sec", Enums.TestResult.PASS])
                     if 'Response' in self.GetPacketType(TempPkt2[2] + 1) and self.file_list[TempPkt2[2] + 1]['pktType'] in ['ACK', 'NAK']:
                         Tresult = round((self.file_list[TempPkt2[2] + 1]['startTime'] - TempPkt1[1]) * 1000, 3)
                         ChkRes = CommonMethods.check_measure(pkt['exp'], Tresult, pkt['comp'])
@@ -357,14 +358,14 @@ class CommonCTSChecks():
             if len(TempPkt1) > 2:
                 resp = self.PktMethod.GetPacketResponse2(TempPkt1[2], [TempPkt1[2] + 1, Flow_limit[1]])
                 if "Nego" in self.file_list[TempPkt1[2]]['description']:
-                    res.append([f"{Check['expected'][0]['packet'][0]} packet received in Neg phase at index@{TempPkt1[2]}", "Pass"])
+                    res.append([f"{Check['expected'][0]['packet'][0]} packet received in Neg phase at index@{TempPkt1[2]}", Enums.TestResult.PASS])
                     if resp is not None:
                         if 'ND' in self.file_list[resp]['pktType']:
-                            res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} packet in Neg phase", "Pass"])
+                            res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} packet in Neg phase", Enums.TestResult.PASS])
                         else:
-                            res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} packet in Neg phase", "Fail"])
+                            res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} packet in Neg phase", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"Response not received for {Check['expected'][0]['packet'][0]} in Neg phase", "Fail"])
+                        res.append([f"Response not received for {Check['expected'][0]['packet'][0]} in Neg phase", Enums.TestResult.FAIL])
 
 
                 if "PT" in self.file_list[TempPkt1[2]]['description']:
@@ -376,20 +377,20 @@ class CommonCTSChecks():
                         tdiff = round((TempPkt1[0] - Prev_pkt[0]),3)
                     
                     Prev_pkt = TempPkt1
-                    res.append([f"{Check['expected'][0]['packet'][0]} packet received in PT phase at index@{TempPkt1[2]}", "Pass"])
+                    res.append([f"{Check['expected'][0]['packet'][0]} packet received in PT phase at index@{TempPkt1[2]}", Enums.TestResult.PASS])
 
                     if tdiff is not None:
                         if 2 <= tdiff <= 8:
-                            # res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, from {"first XCE packet" if in_pt_cnt == 0 else "previous {Check['expected'][0]['packet'][0]} packet"}, Expected: 2 to 8 sec", "Pass"])
-                            res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, "f"from {'first XCE packet' if in_pt_cnt == 0 else f'previous {Check['expected'][0]['packet'][0]} packet'}, "f"Expected: 2 to 8 sec","Pass"])
+                            # res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, from {"first XCE packet" if in_pt_cnt == 0 else "previous {Check['expected'][0]['packet'][0]} packet"}, Expected: 2 to 8 sec", Enums.TestResult.PASS])
+                            res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, "f"from {'first XCE packet' if in_pt_cnt == 0 else f'previous {Check['expected'][0]['packet'][0]} packet'}, "f"Expected: 2 to 8 sec",Enums.TestResult.PASS])
                         else:
-                            # res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, Expected: 2 to 8 sec", "Fail"])
-                            res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, "f"from {'first XCE packet' if in_pt_cnt == 0 else f'previous {Check['expected'][0]['packet'][0]} packet'}, "f"Expected: 2 to 8 sec","Fail"])
+                            # res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, Expected: 2 to 8 sec", Enums.TestResult.FAIL])
+                            res.append([f"TPR sent {Check['expected'][0]['packet'][0]} packet in {tdiff} sec, "f"from {'first XCE packet' if in_pt_cnt == 0 else f'previous {Check['expected'][0]['packet'][0]} packet'}, "f"Expected: 2 to 8 sec",Enums.TestResult.FAIL])
                     in_pt_cnt += 1
                     if resp is None:
-                        res.append([f"Response not received for {Check['expected'][0]['packet'][0]} in PT phase", "Pass"])
+                        res.append([f"Response not received for {Check['expected'][0]['packet'][0]} in PT phase", Enums.TestResult.PASS])
                     else:
-                        res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} in PT phase", "Fail"])
+                        res.append([f"{self.file_list[resp]['pktType']} response received for {Check['expected'][0]['packet'][0]} in PT phase", Enums.TestResult.FAIL])
                 id = TempPkt1[2]
             id += 1
 
@@ -407,7 +408,7 @@ class CommonCTSChecks():
             if len(TempPkt1) > 2:
                 templimit2 = [TempPkt1[2], templimit[0]]
             else:
-                res.append([f"{Check['expected'][0]['refpkt'][0]} not found", "Fail"])
+                res.append([f"{Check['expected'][0]['refpkt'][0]} not found", Enums.TestResult.FAIL])
                 templimit2 = templimit
         else:
             templimit2 = templimit
@@ -415,14 +416,14 @@ class CommonCTSChecks():
         if len(TempPkt2) > 2:
             TempPkt3 = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[TempPkt2[2], templimit[1]], Type="TesterMsg")
             if len(TempPkt3) > 2:
-                res.append([f"Ping Detected TesterMsg found at {round(TempPkt3[0], 3)} sec", "Pass"])
+                res.append([f"Ping Detected TesterMsg found at {round(TempPkt3[0], 3)} sec", Enums.TestResult.PASS])
                 Tresult1 = round((TempPkt3[0] - TempPkt2[1]) * 1000, 3)
                 ChkRes1 = CommonMethods.check_measure([500], Tresult1, "LTEQL")
                 res.append(
                     [f"The Measured {Check['expected'][0]['chk']} between Shutdown and Ping detected is: {ChkRes1[3]} ms, Limit: {ChkRes1[2]} ms", ChkRes1[1]])
                 TempPkt4 = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[TempPkt3[2] + 1, templimit[1]], Type="Packet")
                 if len(TempPkt4) > 2:
-                    res.append([f"Signal Strength packet found at {round(TempPkt4[0], 3)} sec", "Pass"])
+                    res.append([f"Signal Strength packet found at {round(TempPkt4[0], 3)} sec", Enums.TestResult.PASS])
                     fop = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[TempPkt3[2] + 1, TempPkt4[2]], Type="TesterMsg")
                     if len(fop) > 2:
                         fopval = float(self.file_list[fop[2]]['value'].split(":")[1].split(" ")[0])
@@ -435,13 +436,13 @@ class CommonCTSChecks():
                         res.append(
                             [f"Measured Vrect_max is {ChkRes3[3]} V between {round(TempPkt2[1], 3)} sec to {round((TempPkt4[0]) - 0.009, 3)} Sec, Limit: {ChkRes3[2]} V", ChkRes3[1]])
                     else:
-                        res.append([f"Fop TesterMsg not found", "Fail"])
+                        res.append([f"Fop TesterMsg not found", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"Signal strength Packet not found", "Fail"])
+                    res.append([f"Signal strength Packet not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"Ping Detected TesterMsg not found", "Fail"])
+                res.append([f"Ping Detected TesterMsg not found", Enums.TestResult.FAIL])
         else:
-            res.append([f"Shutdown TesterMsg not found", "Fail"])
+            res.append([f"Shutdown TesterMsg not found", Enums.TestResult.FAIL])
 
 
         return res
@@ -451,36 +452,36 @@ class CommonCTSChecks():
         end = Flow_limit[1]
         while id < Flow_limit[1]:
             if "Nego" in self.file_list[id]['description']:
-                res.append([f"Entered to Negotiation phase at {round(self.file_list[id]['startTime'], 3)} sec", "Pass"])
+                res.append([f"Entered to Negotiation phase at {round(self.file_list[id]['startTime'], 3)} sec", Enums.TestResult.PASS])
                 break
             id += 1
         else:
-            res.append([f"Negotiation phase not observed", "Fail"])
+            res.append([f"Negotiation phase not observed", Enums.TestResult.FAIL])
         
         if "EDS_pkts" in Check:
             EDS_TPR = self.PktMethod.GetPacketDetails(packet="Enabled Data Streams", limit=Flow_limit, Type="Packet")
             if len(EDS_TPR) > 2:
-                res.append([f"Enabled Data Streams packet found at {round(EDS_TPR[0], 3)} sec with following data:", "Pass"])
+                res.append([f"Enabled Data Streams packet found at {round(EDS_TPR[0], 3)} sec with following data:", Enums.TestResult.PASS])
 
                 QI_desc = self.PktMethod.GetPayloadDetails(EDS_TPR[2], "Streams_Bitmask")[0]['sDescription'].strip()
                 QI_value = self.PktMethod.GetPayloadDetails(EDS_TPR[2], "Streams_Bitmask")[0]['sRawData'].strip()
 
                 if QI_desc == "QI Authentication" and QI_value == "0x02":
-                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", "Pass"])
+                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", Enums.TestResult.PASS])
                 else:
-                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", "Fail"])
+                    res.append([f"Streams_Bitmask: {QI_desc}-{QI_value}, Expected: QI Authentication-0x02", Enums.TestResult.FAIL])
 
                 if "resp_check" in Check['EDS_pkts']:
                     respid = self.PktMethod.GetPacketResponse2(EDS_TPR[2], [EDS_TPR[2]+1, Flow_limit[1]])
                     if respid is not None:
                         if "Enabled Data Streams" in self.file_list[respid]['pktType']:
-                            res.append([f"PTx responded with Enabled Data Streams response at {round(self.file_list[respid]['startTime'],3)} sec", "Pass"])
+                            res.append([f"PTx responded with Enabled Data Streams response at {round(self.file_list[respid]['startTime'],3)} sec", Enums.TestResult.PASS])
                         else:
-                            res.append([f"PTx responded with {self.file_list[respid]['pktType']} at {round(self.file_list[respid]['startTime'],3)} sec", "Fail"])
+                            res.append([f"PTx responded with {self.file_list[respid]['pktType']} at {round(self.file_list[respid]['startTime'],3)} sec", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"PTx not responded", 'Fail'])
+                        res.append([f"PTx not responded", Enums.TestResult.FAIL])
             else:
-                res.append([f"TPR not sent Enabled Data Streams packet", 'Fail'])
+                res.append([f"TPR not sent Enabled Data Streams packet", Enums.TestResult.FAIL])
 
         if Check['expected'][0].get('chk'):
             if "Illegal" in Check['expected'][0]['chk']:
@@ -488,19 +489,19 @@ class CommonCTSChecks():
                     packet=Check['expected'][0]['packet1'][0], limit=[id, end], Type=Check['expected'][0]['packet1'][1])
                 if len(TempPkt1) > 2:
                     res.append(
-                        [f"Illegal {Check['expected'][0]['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", "Pass"])
+                        [f"Illegal {Check['expected'][0]['packet1'][0]} packet found at {round(TempPkt1[0], 3)} sec", Enums.TestResult.PASS])
                     for nxt_pkt in Check['expected'][0]['packet2']:
                         TempPkt2 = self.PktMethod.GetPacketDetails(packet=nxt_pkt[0], limit=[TempPkt1[2] + 1, end + 1], Type=nxt_pkt[1])
                         if len(TempPkt2) > 2:
-                            res.append([f"{nxt_pkt[0]} packet found at {round(TempPkt2[0], 3)} sec", "Pass"])
+                            res.append([f"{nxt_pkt[0]} packet found at {round(TempPkt2[0], 3)} sec", Enums.TestResult.PASS])
                             Tresult = round((TempPkt2[0] - TempPkt1[1]) * 1000, 3)
                             ChkRes = CommonMethods.check_measure(Check['expected'][0]['exp'], Tresult, Check['expected'][0]['comp'])
                             res.append(
                                 [f"The Measured Tterminate between illegal {Check['expected'][0]['packet1'][0]} and {nxt_pkt[0]} is: {ChkRes[3]} ms, Limit: {ChkRes[2]} ms", ChkRes[1]])
                         else:
-                            res.append([f"{nxt_pkt[0]} packet not found", "Fail"])
+                            res.append([f"{nxt_pkt[0]} packet not found", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"Illegal {Check['expected'][0]['packet1'][0]} packet not found", "Fail"])
+                    res.append([f"Illegal {Check['expected'][0]['packet1'][0]} packet not found", Enums.TestResult.FAIL])
 
 
             if "PWRmatch" in Check['expected'][0]['chk']:
@@ -511,23 +512,23 @@ class CommonCTSChecks():
                     ECAPnpwr = float(self.PktMethod.GetPayloadDetails(ECAP[2], "Negotiable_Load_Power")[0]['sDescription'].split(":")[1].split("W")[0].strip())
                     if SDFppwr == ECAPppwr:
                         res.append(
-                            [f"PTx DUT potential load power is {ECAPppwr} W is matching with SDF poentail power:{SDFppwr} W", "Pass"])
+                            [f"PTx DUT potential load power is {ECAPppwr} W is matching with SDF poentail power:{SDFppwr} W", Enums.TestResult.PASS])
                     else:
                         res.append(
-                            [f"Mismatch in PTx DUT potential load power is {ECAPppwr} W with SDF poentail power:{SDFppwr} W", "Fail"])
+                            [f"Mismatch in PTx DUT potential load power is {ECAPppwr} W with SDF poentail power:{SDFppwr} W", Enums.TestResult.FAIL])
                     srq = self.PktMethod.GetPacketDetails(packet="SRQ", value="Extended Power Level Selection:", limit=[ECAP[2], end])
                     if len(srq) > 2:
                         srenpwr = float(self.PktMethod.GetPayloadDetails(srq[2], "Load_Power_low")[0]['sDescription'].split(":")[1].split("W")[0].strip())
                         if ECAPnpwr == srenpwr:
                             res.append(
-                                [f"PTx DUT negotiable load power is {ECAPnpwr} W is matching with SRQ_Extended Power Level Selection load power:{srenpwr} W", "Pass"])
+                                [f"PTx DUT negotiable load power is {ECAPnpwr} W is matching with SRQ_Extended Power Level Selection load power:{srenpwr} W", Enums.TestResult.PASS])
                         else:
                             res.append(
-                                [f"Mismatch in PTx DUT potential load power is {ECAPnpwr} W with SRQ_Extended Power Level Selection load power:{srenpwr} W", "Fail"])
+                                [f"Mismatch in PTx DUT potential load power is {ECAPnpwr} W with SRQ_Extended Power Level Selection load power:{srenpwr} W", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"SRQ_Extended Power Level Selection: packet not found", "Fail"])
+                        res.append([f"SRQ_Extended Power Level Selection: packet not found", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"{self.ECAP_pkt} packet not found", "Fail"])
+                    res.append([f"{self.ECAP_pkt} packet not found", Enums.TestResult.FAIL])
         return res
 
     def Entry_init(self,Flow_limit,Check):
@@ -554,25 +555,25 @@ class CommonCTSChecks():
                             id2 = pd[2]
                             while id2 < sd[2]:
                                 if self.file_list[id2]['isTesterPkt'] == True and self.file_list[id2]['isFWTestermessage'] == False:
-                                    # res.append([f"Ping detected at {round(pd[0],3)} sec", "Pass"])
+                                    # res.append([f"Ping detected at {round(pd[0],3)} sec", Enums.TestResult.PASS])
                                     # res.append([f"Fop is {ChkRes[3]} kHz found at {round(fop[0], 3)} sec, Limit: {ChkRes[2]} kHz", ChkRes[1]])
-                                    res.append([f"TPR responded with {self.file_list[id2]['pktType']} to the digital ping 128kHz at {round(self.file_list[id2]['startTime'], 3)}sec", "Pass"])
+                                    res.append([f"TPR responded with {self.file_list[id2]['pktType']} to the digital ping 128kHz at {round(self.file_list[id2]['startTime'], 3)}sec", Enums.TestResult.PASS])
 
                                     # Neg phase
                                     x = id2
                                     y = sd[2]
                                     while x < y:
                                         if "Nego" in self.file_list[x]['description']:
-                                            res.append([f"Entered to Negotiation phase at {round(self.file_list[x]['startTime'], 3)} sec", "Pass"])
+                                            res.append([f"Entered to Negotiation phase at {round(self.file_list[x]['startTime'], 3)} sec", Enums.TestResult.PASS])
                                             break
                                         x += 1
                                     else:
-                                        res.append([f"Negotiation phase not observed", "Fail"])
+                                        res.append([f"Negotiation phase not observed", Enums.TestResult.FAIL])
 
                                     srqen = self.PktMethod.GetPacketDetails(packet="SRQ", value="End Negotiation", limit=[id2, sd[2]], Type="Packet")
                                     if len(srqen) > 2:
                                         srqvalue = int(self.file_list[srqen[2]]['value'].split(":")[1].split("}")[0])
-                                        res.append([f"SRQ Count {response_cnt}: SRQ - End Negotiation packet with SRQ/en : {srqvalue} found at {round(srqen[0], 3)} sec", "Pass"])
+                                        res.append([f"SRQ Count {response_cnt}: SRQ - End Negotiation packet with SRQ/en : {srqvalue} found at {round(srqen[0], 3)} sec", Enums.TestResult.PASS])
                                         seqcnt_val.append(srqvalue)
                                         if response_cnt >= 2:
                                             break
@@ -582,13 +583,13 @@ class CommonCTSChecks():
                                         if len(coilre) > 2:
                                             useract1 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coilre[2], end], Type="TesterMsg")
                                             if len(useract1) > 2:
-                                                res.append([f"TPR removed from PTx surface at {round(useract1[0],3)} sec", "Pass"])
+                                                res.append([f"TPR removed from PTx surface at {round(useract1[0],3)} sec", Enums.TestResult.PASS])
                                                 t1 = self.file_list[useract1[2]]['stopTime']
                                                 coilpl = self.PktMethod.GetPacketDetails(packet="Coil_Place_On_Base_Station", limit=[useract1[2], end], Type="TesterMsg")
                                                 if len(coilpl) > 2:
                                                     useract2 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coilpl[2], end], Type="TesterMsg")
                                                     if len(useract2) > 2:
-                                                        res.append([f"TPR placed on PTx surface at {round(useract2[0],3)} sec", "Pass"])
+                                                        res.append([f"TPR placed on PTx surface at {round(useract2[0],3)} sec", Enums.TestResult.PASS])
                                                         t2 = self.file_list[useract2[2]]['startTime']
                                                         Trpchk = CommonMethods.check_measure([5, 10], round(t2 - t1, 3), 0)
                                                         res.append([f"Tremoveplace is: {Trpchk[3]} sec, limit: {Trpchk[2]} sec", Trpchk[1]])
@@ -601,28 +602,28 @@ class CommonCTSChecks():
                         if response_cnt > 2:
                             break
                     # else:
-                    #     res.append([f"Fop TesterMsg not found", "Fail"])
+                    #     res.append([f"Fop TesterMsg not found", Enums.TestResult.FAIL])
                     start =sd[2]   
             #     else:
-            #         res.append([f"Shutdown not found in the digital ping", "Fail"])
+            #         res.append([f"Shutdown not found in the digital ping", Enums.TestResult.FAIL])
             # else:
-            #     res.append([f"digital ping not found", "Fail"])
+            #     res.append([f"digital ping not found", Enums.TestResult.FAIL])
 
             start += 1
         if len(seqcnt_val) == 2:
             if seqcnt_val[0] == seqcnt_val[1]:
-                res.append([f"SRQ count 1 is matching with SRQ count 2", "Pass"])
+                res.append([f"SRQ count 1 is matching with SRQ count 2", Enums.TestResult.PASS])
             else:
-                res.append([f"Mismatch in SRQ/en count values, SRQ/en count1:{seqcnt_val[0]}, SRQ/en count2:{seqcnt_val[1]}", "Pass"])
+                res.append([f"Mismatch in SRQ/en count values, SRQ/en count1:{seqcnt_val[0]}, SRQ/en count2:{seqcnt_val[1]}", Enums.TestResult.PASS])
         else:
-            res.append([f"2 128khHz digital ping sequences not found", "Fail"])
+            res.append([f"2 128khHz digital ping sequences not found", Enums.TestResult.FAIL])
         return res
 
     def DigitalPing_response(self,Flow_limit):
         res = []
         pd = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[Flow_limit[0], Flow_limit[1]], Type="TesterMsg")
         if len(pd) > 2:
-            res.append([f"Digital ping found at {round(self.file_list[pd[2]]['startTime'], 3)}sec", "Pass"])
+            res.append([f"Digital ping found at {round(self.file_list[pd[2]]['startTime'], 3)}sec", Enums.TestResult.PASS])
             sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[pd[2], Flow_limit[1]+2], Type="TesterMsg")
             if len(sd) > 2:
                 fop = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[pd[2], sd[2]], Type="TesterMsg")
@@ -632,15 +633,15 @@ class CommonCTSChecks():
                 id2 = pd[2]
                 while id2 < sd[2]:
                     if self.file_list[id2]['isTesterPkt'] == True and self.file_list[id2]['isFWTestermessage'] == False:
-                        res.append([f"TPR responded with {self.file_list[id2]['pktType']} at {round(self.file_list[id2]['startTime'], 3)}sec", "Pass"])
+                        res.append([f"TPR responded with {self.file_list[id2]['pktType']} at {round(self.file_list[id2]['startTime'], 3)}sec", Enums.TestResult.PASS])
                         break
                     id2 += 1
                 else:
-                    res.append([f"TPR not responded to  digital ping 128 kHz from {round(pd[0], 3)} sec to {round(sd[0], 3)} sec", "Fail"])
+                    res.append([f"TPR not responded to  digital ping 128 kHz from {round(pd[0], 3)} sec to {round(sd[0], 3)} sec", Enums.TestResult.FAIL])
             else:
-                res.append([f"Shutdown not found in the digital ping", "Fail"])
+                res.append([f"Shutdown not found in the digital ping", Enums.TestResult.FAIL])
         else:
-            res.append([f"digital ping not found", "Fail"])
+            res.append([f"digital ping not found", Enums.TestResult.FAIL])
 
         return res
 
@@ -681,7 +682,7 @@ class CommonCTSChecks():
                     break
                 x = RMS_pkt[2]+1
             else:
-                # res.append([f"RMS_Data packet not found", "Fail"])
+                # res.append([f"RMS_Data packet not found", Enums.TestResult.FAIL])
                 break
         return vrect
 
@@ -705,31 +706,31 @@ class CommonCTSChecks():
                             vrect1 = self.RMS_voltage(id,TempPkt1,Flow_limit,pkt['packet1'])
                             print("vrect1:",vrect1)
                             if vrect1 is not None:
-                                res.append([f"Measured {pkt['packet1']['uro_type']} is {vrect1} mV", "Pass"])
+                                res.append([f"Measured {pkt['packet1']['uro_type']} is {vrect1} mV", Enums.TestResult.PASS])
                             else: 
-                                res.append([f"RMS_Data packet not found", "Fail"])
+                                res.append([f"RMS_Data packet not found", Enums.TestResult.FAIL])
                             
                             if pkt.get('pkt1_resp'):
                                 respid = self.PktMethod.GetPacketResponse2(TempPkt1[2], [TempPkt1[2]+1, Flow_limit[1]])
                                 if respid is not None:
                                     if self.file_list[respid]['pktType'] == pkt['pkt1_resp']:
-                                        res.append([f"Received response for {pkt['packet1']['packet'][0]} is: {self.file_list[respid]['pktType']}", "Pass"])
+                                        res.append([f"Received response for {pkt['packet1']['packet'][0]} is: {self.file_list[respid]['pktType']}", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"Received response for {pkt['packet1']['packet'][0]} is: {self.file_list[respid]['pktType']}, expected: {pkt['pkt1_resp']}", "Inconclusive"])
+                                        res.append([f"Received response for {pkt['packet1']['packet'][0]} is: {self.file_list[respid]['pktType']}, expected: {pkt['pkt1_resp']}", Enums.TestResult.INCONCLUSIVE])
                                 else:
-                                    res.append([f"Response for {pkt['packet1']['packet'][0]} packet not found", "Fail"])
+                                    res.append([f"Response for {pkt['packet1']['packet'][0]} packet not found", Enums.TestResult.FAIL])
 
                             if pkt.get('t1b'):
                                 vrect2 = self.RMS_voltage(id,TempPkt1,Flow_limit,pkt['t1b'])
                                 print("vrect2:",vrect2)
                                 if vrect2 is not None:
-                                    res.append([f"Measured {pkt['t1b']['uro_type']} is {vrect2} mV", "Pass"])
+                                    res.append([f"Measured {pkt['t1b']['uro_type']} is {vrect2} mV", Enums.TestResult.PASS])
                                     ChkRes = CommonMethods.check_measure(pkt['exp'], round(abs(vrect1 - vrect2), 3), pkt['comp'])
                                     res.append([f"The Measured |{pkt['packet1']['uro_type']}-{pkt['t1b']['uro_type']}| is: {ChkRes[3]} mV, Limit: {ChkRes[2]} mV", ChkRes[1]])
                                     id = TempPkt1[2] + 1
                                     start += 1
                                 else: 
-                                    res.append([f"RMS_Data packet not found", "Fail"])
+                                    res.append([f"RMS_Data packet not found", Enums.TestResult.FAIL])
                                         
                             if pkt.get('packet2'):
                                 # TempPkt2 = self.PktMethod.GetPacketDetails(packet=pkt['packet2']['packet'][0], limit=[TempPkt1[2] + 1, Flow_limit[1]], Type=pkt['packet2']['packet'][2])
@@ -741,8 +742,8 @@ class CommonCTSChecks():
                                     vrect2 = self.RMS_voltage(id,TempPkt2,Flow_limit,pkt['packet2'])
                                     print("vrect2:",vrect2)
                                     if vrect2 is not None:
-                                        res.append([f"Measured {pkt['packet2']['uro_type']} is {vrect2} mV", "Pass"])
-                                        # res.append([f"Measured Uro2 is {vrect2} V at {pkt['packet2']['packet'][0]} at {self.PktMethod.Timeconvert(TempPkt2[0])}", "Pass"])
+                                        res.append([f"Measured {pkt['packet2']['uro_type']} is {vrect2} mV", Enums.TestResult.PASS])
+                                        # res.append([f"Measured Uro2 is {vrect2} V at {pkt['packet2']['packet'][0]} at {self.PktMethod.Timeconvert(TempPkt2[0])}", Enums.TestResult.PASS])
                                         ChkRes = CommonMethods.check_measure(pkt['exp'], round(abs(vrect1 - vrect2), 3), pkt['comp'])
                                         res.append([f"The Measured |{pkt['packet1']['uro_type']}-{pkt['packet2']['uro_type']}| is: {ChkRes[3]} mV, Limit: {ChkRes[2]} mV", ChkRes[1]])
                                         if pkt.get('pkt2_resp'):
@@ -752,7 +753,7 @@ class CommonCTSChecks():
                                         id = TempPkt2[2] + 1
                                         start += 1
                                     else: 
-                                        res.append([f"RMS_Data packet not found", "Fail"])
+                                        res.append([f"RMS_Data packet not found", Enums.TestResult.FAIL])
                         else: break
                         if start == pkt['cnt']:
                             break
@@ -794,7 +795,7 @@ class CommonCTSChecks():
         #                 TempPkt1 = self.PktMethod.GetPacketDetails(packet=pkt['packet1'][0], value=pkt['packet1'][1], limit=[id, Flow_limit[1]], Type=pkt['packet1'][2])
         #                 if len(TempPkt1) > 2:
         #                     vrect1 = self.CalculateVoltTwindow(TempPkt1[2], self.AllChannelData, at=pkt['t1a'][1], measure=pkt['t1a'][2], winsize=pkt['t1a'][0])
-        #                     res.append([f"Measured Uro1 is {vrect1[0]} V at {pkt['packet1'][0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}", "Pass"])
+        #                     res.append([f"Measured Uro1 is {vrect1[0]} V at {pkt['packet1'][0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}", Enums.TestResult.PASS])
         #                     if pkt.get('pkt1_resp'):
         #                         resp_pkt = self.file_list[TempPkt1[2] + 1]['pktType']
         #                         ChkRes = CommonMethods.check_measure(pkt['pkt1_resp'], resp_pkt, comp="EQL")
@@ -802,7 +803,7 @@ class CommonCTSChecks():
         #                     if pkt.get('t1b'):
         #                         vrect2 = self.CalculateVoltTwindow(TempPkt1[2], self.AllChannelData, at=pkt['t1b'][1], measure=pkt['t1b'][2], winsize=pkt['t1b'][0])
         #                         ChkRes = CommonMethods.check_measure(pkt['exp'], round(abs((vrect1[0] - vrect2[0]) * 1000), 3), pkt['comp'])
-        #                         res.append([f"Measured Uro2 is {vrect2[0]} V at {pkt['packet1'][0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}", "Pass"])
+        #                         res.append([f"Measured Uro2 is {vrect2[0]} V at {pkt['packet1'][0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}", Enums.TestResult.PASS])
         #                         res.append([f"The Measured |Uro1-Uro2| is: {ChkRes[3]} mV, Limit: {ChkRes[2]} mV", ChkRes[1]])
         #                         id = TempPkt1[2] + 1
         #                         start += 1
@@ -810,7 +811,7 @@ class CommonCTSChecks():
         #                         TempPkt2 = self.PktMethod.GetPacketDetails(packet=pkt['packet2'][0], limit=[TempPkt1[2] + 1, Flow_limit[1]], Type=pkt['packet2'][2])
         #                         if len(TempPkt2) > 2:
         #                             vrect2 = self.CalculateVoltTwindow(TempPkt2[2], self.AllChannelData, at=pkt['t2a'][1], measure=pkt['t2a'][2], winsize=pkt['t2a'][0])
-        #                             res.append([f"Measured Uro2 is {vrect2[0]} V at {pkt['packet2'][0]} at {self.PktMethod.Timeconvert(TempPkt2[0])}", "Pass"])
+        #                             res.append([f"Measured Uro2 is {vrect2[0]} V at {pkt['packet2'][0]} at {self.PktMethod.Timeconvert(TempPkt2[0])}", Enums.TestResult.PASS])
         #                             ChkRes = CommonMethods.check_measure(pkt['exp'], round(abs((vrect1[0] - vrect2[0]) * 1000), 3), pkt['comp'])
         #                             res.append([f"The Measured |Uro1-Uro2| is: {ChkRes[3]} mV, Limit: {ChkRes[2]} mV", ChkRes[1]])
         #                             if pkt.get('pkt2_resp'):
@@ -842,16 +843,16 @@ class CommonCTSChecks():
                 while id < limit[1]:
                     TempPkt = self.PktMethod.GetPacketDetails(packet=pkt['packet'][0], value=pkt['packet'][1], limit=[id, limit[1]], Type=pkt['packet'][2])
                     if len(TempPkt) > 2:
-                        res.append([f"{pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} found at {round(TempPkt[0], 3)} sec after {pkt['refpkt'][0]}", "Fail"])
+                        res.append([f"{pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} found at {round(TempPkt[0], 3)} sec after {pkt['refpkt'][0]}", Enums.TestResult.FAIL])
                         id = TempPkt[2]
                         Pktcount += 1
                     id += 1
             else:
-                res.append([f"{pkt['refpkt'][0]} {pkt['refpkt'][1] if pkt['refpkt'][1] is not None else ''} {pkt['refpkt'][2]} not found", 'Pass'])
+                res.append([f"{pkt['refpkt'][0]} {pkt['refpkt'][1] if pkt['refpkt'][1] is not None else ''} {pkt['refpkt'][2]} not found", Enums.TestResult.PASS])
             if Pktcount > 0:
-                res.append([f"Received {Pktcount} {pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} after {pkt['refpkt'][0]}", "Fail"])
+                res.append([f"Received {Pktcount} {pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} after {pkt['refpkt'][0]}", Enums.TestResult.FAIL])
             else:
-                res.append([f"{pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} not found after {pkt['refpkt'][0]} {pkt['refpkt'][1] if pkt['refpkt'][1] is not None else ''}", "Pass"])
+                res.append([f"{pkt['packet'][0]} {pkt['packet'][1] if pkt['packet'][1] is not None else ''} {pkt['packet'][2]} not found after {pkt['refpkt'][0]} {pkt['refpkt'][1] if pkt['refpkt'][1] is not None else ''}", Enums.TestResult.PASS])
 
 
         return res
@@ -859,8 +860,8 @@ class CommonCTSChecks():
     def InitialVoltage(self,Flow_limit,Check):
         res = []
         if self.initialVolt is not None:
-            res.append([f"The Measured voltage is {self.initialVolt}V at {round(self.file_list[self.stability]['startTime'],2)}sec","Pass"])
-        else:res.append(["Stabilization not found","Fail"])
+            res.append([f"The Measured voltage is {self.initialVolt}V at {round(self.file_list[self.stability]['startTime'],2)}sec",Enums.TestResult.PASS])
+        else:res.append(["Stabilization not found",Enums.TestResult.FAIL])
         return res
 
     def FOPresent(self, Flow_limit, Check):
@@ -882,18 +883,18 @@ class CommonCTSChecks():
                     if self.file_list[respid]['pktType'] == "NAK":
                         nakcnt += 1
                         res.append(
-                            [f"NAK response received for Power Loss Accounting packet at {round(PLA[0], 3)} sec", 'Pass'])
+                            [f"NAK response received for Power Loss Accounting packet at {round(PLA[0], 3)} sec", Enums.TestResult.PASS])
                         res.append(
-                            [f"NAK received for Power Loss Accounting packet before RFO inserting at {self.PktMethod.Timeconvert(self.file_list[respid]['startTime'])}", 'Fail'])
+                            [f"NAK received for Power Loss Accounting packet before RFO inserting at {self.PktMethod.Timeconvert(self.file_list[respid]['startTime'])}", Enums.TestResult.FAIL])
                         break
                 id = PLA[2]
             id += 1
         if nakcnt == 0:
-            res.append([f"NAK not received for Power Loss Accounting packet before RFO inserting", 'Pass'])
+            res.append([f"NAK not received for Power Loss Accounting packet before RFO inserting", Enums.TestResult.PASS])
 
         # After inserting RFO
         if len(UA)> 2:
-            res.append([f'RFO insertion started from {round(UA[0],3)} sec', 'Pass'])
+            res.append([f'RFO insertion started from {round(UA[0],3)} sec', Enums.TestResult.PASS])
             self.AllChannelData = self.PlotMethod.GetAllChannelData('2',self.JapiData)
             self.AllChannelData3= self.PlotMethod.GetAllChannelData('3',self.JapiData)
             id = UA[2]
@@ -915,7 +916,7 @@ class CommonCTSChecks():
                 if len(TempPkt2)>2:
                     Pktresp = self.PktMethod.GetPacketResponse2(TempPkt2[2],[TempPkt2[2]+1,limit[1]])
                     # if Pktresp is not None:
-                    #     res.append([f"{self.file_list[Pktresp]['pktType']} response received to PLA_2 packet at {round(TempPkt2[0],3)} sec", "Pass"])
+                    #     res.append([f"{self.file_list[Pktresp]['pktType']} response received to PLA_2 packet at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
                         
                     # PLA response
                     x = TempPkt2[2]+1
@@ -946,8 +947,8 @@ class CommonCTSChecks():
 
                                 
                             # last_NAK = x
-                            res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
-                        else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
+                            res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
+                        else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
 
                         if Consecutive_NAK_cnt >= 2:
                             
@@ -980,47 +981,47 @@ class CommonCTSChecks():
                     
                     id = TempPkt2[2]
                 else:
-                    # res.append([f"Removed the applied POFFSET from {round(TempPkt2[0],3)} sec", "Pass"]) 
+                    # res.append([f"Removed the applied POFFSET from {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS]) 
                     break
                 id += 1
 
             # print("v1x:",v1x,"v2x:",v2x,"max_drop:",max_drop,"tx:",tx,"t1:",(tx+19)/1000,"t2:",(tx+40)/1000)
             # print("throttle_cnt:",throttle_cnt)
             if max_drop < 1:
-                res.append([f"During PTx-DUT power throttling, Maximum Vrect drop: {round(max_drop,3)} V found at PLA @index {max_drop_PLA}, with the following measurements:, Limit: Vrect drop < 1V", "Pass"])
+                res.append([f"During PTx-DUT power throttling, Maximum Vrect drop: {round(max_drop,3)} V found at PLA @index {max_drop_PLA}, with the following measurements:, Limit: Vrect drop < 1V", Enums.TestResult.PASS])
                 
             else: 
-                res.append([f"During PTx-DUT power throttling, Maximum Vrect drop: {round(max_drop,3)} V found at PLA @index {max_drop_PLA}, with the following measurements:, Limit: Vrect drop < 1V", "Fail"])
-            res.append([f"Vrect_1 :{round(v1x,3)}V measured at {round((tx+19)/1000,3)}s , Vrect_2 :{round(v2x,3)}V measured at {round((tx+40)/1000,3)}s", "Pass"])
-            res.append([f"Power Loss Accounting packets count where PTx throttled: {throttle_cnt}", "Pass"])
+                res.append([f"During PTx-DUT power throttling, Maximum Vrect drop: {round(max_drop,3)} V found at PLA @index {max_drop_PLA}, with the following measurements:, Limit: Vrect drop < 1V", Enums.TestResult.FAIL])
+            res.append([f"Vrect_1 :{round(v1x,3)}V measured at {round((tx+19)/1000,3)}s , Vrect_2 :{round(v2x,3)}V measured at {round((tx+40)/1000,3)}s", Enums.TestResult.PASS])
+            res.append([f"Power Loss Accounting packets count where PTx throttled: {throttle_cnt}", Enums.TestResult.PASS])
 
             #Check for execution time from Throttling # min 1 min
             t_diff = self.file_list[Flow_limit[1]]['startTime'] - t_start
             print("t_diff:",t_diff)
             if t_diff >= 60:
-                res.append([f"Testing continued for more than 1 min from the point of stopping RFO movement.","Pass"])
+                res.append([f"Testing continued for more than 1 min from the point of stopping RFO movement.",Enums.TestResult.PASS])
 
             elif t_diff < 60:
                 atn = self.PktMethod.GetPacketDetails(packet="ATN",limit=[last_NAK,limit[1]],Type="Response")
                 if len(atn) > 2:
-                    res.append([f"PTx sent ATN packet after power throttling at {round(atn[0],3)} sec", "Pass"])
+                    res.append([f"PTx sent ATN packet after power throttling at {round(atn[0],3)} sec", Enums.TestResult.PASS])
                     reneg = self.PktMethod.GetPacketDetails(packet="Renegotiate",limit=[atn[2],limit[1]])
                     if len(reneg) > 2:
-                        res.append([f"TPR sent Renegotiate packet after power throttling at {round(reneg[0],3)} sec", "Pass"])
+                        res.append([f"TPR sent Renegotiate packet after power throttling at {round(reneg[0],3)} sec", Enums.TestResult.PASS])
                         respid = self.PktMethod.GetPacketResponse2(reneg[2],[reneg[2]+1,limit[1]])
                         if respid is not None:
                             if 'ACK' in self.file_list[respid]['pktType']:
-                                res.append([f"PTx sent ACK response to Renegotiate packet after power throttling at {round(self.file_list[respid]['startTime'],3)} sec", "Pass"])
+                                res.append([f"PTx sent ACK response to Renegotiate packet after power throttling at {round(self.file_list[respid]['startTime'],3)} sec", Enums.TestResult.PASS])
                             else:
-                                res.append([f"PTx not sent ACK response to Renegotiate packet after power throttling at {round(self.file_list[respid]['startTime'],3)} sec", "Fail"])
+                                res.append([f"PTx not sent ACK response to Renegotiate packet after power throttling at {round(self.file_list[respid]['startTime'],3)} sec", Enums.TestResult.FAIL])
                         else:
-                            res.append([f"No response received for Renegotiate packet after power throttling", "Fail"])
+                            res.append([f"No response received for Renegotiate packet after power throttling", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"PTx not sent Renegotiate packet after power throttling", "Fail"])
+                        res.append([f"PTx not sent Renegotiate packet after power throttling", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"PTx not initiated renegotiation with ATN after power throttling", "Fail"])
+                    res.append([f"PTx not initiated renegotiation with ATN after power throttling", Enums.TestResult.FAIL])
             else: 
-                res.append([f"Testing continued for more than 1 min from the point of stopping RFO movement and PTx not initiated renegotiation with ATN after power throttling", "Fail"])
+                res.append([f"Testing continued for more than 1 min from the point of stopping RFO movement and PTx not initiated renegotiation with ATN after power throttling", Enums.TestResult.FAIL])
 
             if last_NAK != 0:
                 id2 = last_NAK
@@ -1030,18 +1031,18 @@ class CommonCTSChecks():
                         respid2 = self.PktMethod.GetPacketResponse2(safe_pla[2],[safe_pla[2]+1,limit[1]])
                         if respid2 is not None:
                             if "ACK" in self.file_list[respid2]['pktType']:
-                                res.append([f"PTx-DUT sends NAKs to Power Loss Accounting until a new stable power level is reached, then sends an ACK at {round(safe_pla[0],3)} sec", "Pass"])
+                                res.append([f"PTx-DUT sends NAKs to Power Loss Accounting until a new stable power level is reached, then sends an ACK at {round(safe_pla[0],3)} sec", Enums.TestResult.PASS])
                                 break
                         else:
-                            res.append([f"No response received for Power Loss Accounting at {round(safe_pla[0],3)} sec", "Fail"])
+                            res.append([f"No response received for Power Loss Accounting at {round(safe_pla[0],3)} sec", Enums.TestResult.FAIL])
                         id2 = safe_pla[2]
                     else:
-                        res.append([f"Stable power is not reached.", "Fail"])
+                        res.append([f"Stable power is not reached.", Enums.TestResult.FAIL])
                     id2 += 1
                 else: 
-                    res.append([f"ACK is not received to Power Loss Accounting after renegotiation", "Fail"])
+                    res.append([f"ACK is not received to Power Loss Accounting after renegotiation", Enums.TestResult.FAIL])
             else:
-                res.append([f"No NAK Response received to Power Loss Accounting packets while inserting RFO", "Fail"])
+                res.append([f"No NAK Response received to Power Loss Accounting packets while inserting RFO", Enums.TestResult.FAIL])
 
 
 
@@ -1073,18 +1074,18 @@ class CommonCTSChecks():
             get_cert = self.GetAuthPacketDetails(packet="GET_CERTIFICATE", limit=[id,auth_limit[1]], Type="Packet")
             # print("get_cert: ", get_cert)
             if len(get_cert) > 2:
-                res.append([f"GET_CERTIFICATE packet found at {self.PktMethod.Timeconvert(get_cert[0])}", "Pass"])
+                res.append([f"GET_CERTIFICATE packet found at {self.PktMethod.Timeconvert(get_cert[0])}", Enums.TestResult.PASS])
                 cert_resp = self.GetAuthPacketDetails(packet="CERTIFICATE", limit=[get_cert[2],auth_limit[1]], Type="Response")
                 # print("cert_resp: ", cert_resp)
                 if len(cert_resp) > 2:
-                    res.append([f"CERTIFICATE response found at {self.PktMethod.Timeconvert(cert_resp[0])} with following details", "Pass"])
+                    res.append([f"CERTIFICATE response found at {self.PktMethod.Timeconvert(cert_resp[0])} with following details", Enums.TestResult.PASS])
                     header_Payload = self.Auth_file_list[cert_resp[2]]['header_Payload']['sFieldType'].split(":")[-1].strip()
                     if "header_start" in Check:
                         header_start_val = header_Payload.split()[0]
                         if header_start_val == Check['header_start']:
-                            res.append([f"Certificate response starts with header {header_start_val}, Expected:{Check['header_start']}", "Pass"])
+                            res.append([f"Certificate response starts with header {header_start_val}, Expected:{Check['header_start']}", Enums.TestResult.PASS])
                         else:
-                            res.append([f"Certificate response starts with header {header_start_val}, Expected:{Check['header_start']}", "Fail"])
+                            res.append([f"Certificate response starts with header {header_start_val}, Expected:{Check['header_start']}", Enums.TestResult.FAIL])
 
                     cert_length = len(header_Payload.split(" "))-1
                     Fianl_len = cert_length-prev_len
@@ -1092,15 +1093,15 @@ class CommonCTSChecks():
                     prev_len = cert_length
                     
                     # Certificate_Chain_Segment = self.GetAuthPayloadDetails(cert_resp[2], "Certificate_Chain_Segment", f"B1_B{upper_byte}", "[7:0")[0]['sRawData']
-                    # res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}", "Pass"])
+                    # res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}", Enums.TestResult.PASS])
                     # cert_chain_len = len(Certificate_Chain_Segment.split("-"))
                     if 1 <= Fianl_len <= Check['expected']:
-                        res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}, Expected: [1-{Check['expected']}]", "Pass"])
+                        res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}, Expected: [1-{Check['expected']}]", Enums.TestResult.PASS])
                     else:
-                        res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}, Expected: [1-{Check['expected']}]", "Fail"])
+                        res.append([f"Length of Certificate_Chain_Segment: {Fianl_len}, Expected: [1-{Check['expected']}]", Enums.TestResult.FAIL])
                     id = cert_resp[2]
                 else:
-                    res.append(["CERTIFICATE response not found", "Fail"])
+                    res.append(["CERTIFICATE response not found", Enums.TestResult.FAIL])
           
             id += 1
 
@@ -1109,25 +1110,25 @@ class CommonCTSChecks():
             if len(Final_certificate)>2:
                 Full_certificate = self.Auth_file_list[Final_certificate[2]]['header_Payload']['sFieldType'].split(":")[-1].strip()
                 modified_full_certificate = Full_certificate.replace("0x","").strip()
-                res.append([f"Received complete certificate chain is: {Full_certificate}", "Pass"])
+                res.append([f"Received complete certificate chain is: {Full_certificate}", Enums.TestResult.PASS])
 
                 # WPC_root = self.GetAuthPayloadDetails(Final_certificate[2], "Root_Certificate_Hash", "B3_B34", "[7:0")[0]['sRawData'].strip()
                 WPC_root = self.PayloadDetails_Auth(Final_certificate[2], "Root_Certificate_Hash")[0]['sRawData'].strip()
                 modified_WPC_root = WPC_root.replace("-"," ")
-                res.append([f"WPC Root is: {WPC_root}", "Pass"])
+                res.append([f"WPC Root is: {WPC_root}", Enums.TestResult.PASS])
 
                 # Manufacturee_certificate = self.GetAuthPayloadDetails(Final_certificate[2], "Manufacturer_CA_Certificate", "B35_B331", "[7:0")[0]['sRawData'].strip()
                 Manufacturee_certificate = self.PayloadDetails_Auth(Final_certificate[2], "Manufacturer_CA_Certificate")[0]['sRawData'].strip()
                 modified_Manufacturee_certificate = Manufacturee_certificate.replace("-"," ")
-                res.append([f"Manufacturer certificate is: {Manufacturee_certificate}", "Pass"])
+                res.append([f"Manufacturer certificate is: {Manufacturee_certificate}", Enums.TestResult.PASS])
 
                 if modified_WPC_root in modified_full_certificate and modified_Manufacturee_certificate in modified_full_certificate:
-                    res.append([f"Certificate chain is signed by WPC root certificate key", "Pass"])
+                    res.append([f"Certificate chain is signed by WPC root certificate key", Enums.TestResult.PASS])
                 else:
-                    res.append([f"Certificate chain is not signed by WPC root certificate key", "Fail"])
+                    res.append([f"Certificate chain is not signed by WPC root certificate key", Enums.TestResult.FAIL])
                 
             else:
-                res.append(["Complete certificate chain not found", "Fail"])
+                res.append(["Complete certificate chain not found", Enums.TestResult.FAIL])
 
         return res
     
@@ -1146,7 +1147,7 @@ class CommonCTSChecks():
                         if cert1 == Check['Certificate1']:
                             sadc1 = self.PktMethod.GetPacketDetails(packet="SADC",value="Close Stream", limit=[sadt1[2],Flow_limit[1]], Type="Packet")
                             if len(sadc1)>2:
-                                res.append([f"{cert1}: SDAC Close Stream packet ending is observed at {round(sadc1[1],3)} sec", "Pass"])
+                                res.append([f"{cert1}: SDAC Close Stream packet ending is observed at {round(sadc1[1],3)} sec", Enums.TestResult.PASS])
                                 t1 = sadc1[1]
                                 
                                 sadt2 = self.PktMethod.GetPacketDetails(packet="SADT", limit=[sadc1[2],Flow_limit[1]], Type="Response")
@@ -1159,18 +1160,18 @@ class CommonCTSChecks():
                                             if len(sadc2)>2:
                                                 atn = self.PktMethod.GetPacketDetails(packet="ATN", limit=[sadc2[2],sadc1[2]], Type="Response")
                                                 if len(atn)>2:
-                                                    res.append([f"ATN response for {cert2} is observed at {round(atn[1],3)} sec", "Pass"])
+                                                    res.append([f"ATN response for {cert2} is observed at {round(atn[1],3)} sec", Enums.TestResult.PASS])
                                                     t2 = atn[0]
                                                     t_diff = t2-t1
                                                     if t_diff <= 3:
-                                                        res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", "Pass"])
+                                                        res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", Enums.TestResult.PASS])
                                                     else:
-                                                        res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", "Fail"])
+                                                        res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", Enums.TestResult.FAIL])
                                                     break
-                                                else: res.append([f"ATN response for {cert2} not found", "Fail"])
-                                            else: res.append([f"SADC Open Stream response for {cert2} not found", "Fail"])
-                                else: res.append([f"SADT response for {cert2} not found", "Fail"])
-                            else: res.append([f"SADC Close Stream packet for {cert1} not found", "Fail"])       
+                                                else: res.append([f"ATN response for {cert2} not found", Enums.TestResult.FAIL])
+                                            else: res.append([f"SADC Open Stream response for {cert2} not found", Enums.TestResult.FAIL])
+                                else: res.append([f"SADT response for {cert2} not found", Enums.TestResult.FAIL])
+                            else: res.append([f"SADC Close Stream packet for {cert1} not found", Enums.TestResult.FAIL])       
                     else: id = sadt1[2]
                                      
             id += 1
@@ -1196,7 +1197,7 @@ class CommonCTSChecks():
         #             if cert1 == Check['Certificate1']:
         #                 sadc1 = self.PktMethod.GetPacketDetails(packet="SADC",value="Close Stream", limit=[sadt1[2],Flow_limit[1]], Type="Packet")
         #                 if len(sadc1)>2:
-        #                     res.append([f"{cert1}: SDAC Close Stream packet ending is observed at {round(sadc1[1],3)} sec", "Pass"])
+        #                     res.append([f"{cert1}: SDAC Close Stream packet ending is observed at {round(sadc1[1],3)} sec", Enums.TestResult.PASS])
         #                     t1 = sadc1[1]
 
         #                     sadt2 = self.PktMethod.GetPacketDetails(packet="SADT", limit=[sadc1[2],Flow_limit[1]], Type="Response")
@@ -1207,13 +1208,13 @@ class CommonCTSChecks():
         #                             if len(sadc2)>2:
         #                                 atn = self.PktMethod.GetPacketDetails(packet="ATN", limit=[sadc2[2],sadc1[2]], Type="Response")
         #                                 if len(atn)>2:
-        #                                     res.append([f"ATN response for {cert2} is observed at {round(atn[1],3)} sec", "Pass"])
+        #                                     res.append([f"ATN response for {cert2} is observed at {round(atn[1],3)} sec", Enums.TestResult.PASS])
         #                                     t2 = atn[0]
         #                                     t_diff = t2-t1
         #                                     if t_diff <= 3:
-        #                                         res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", "Pass"])
+        #                                         res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", Enums.TestResult.PASS])
         #                                     else:
-        #                                         res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", "Fail"])
+        #                                         res.append([f"Measured t_{Check['Certificate2']}Ready is {round(t_diff*1000,3)} mS, Expected: ≤ 3 Seconds", Enums.TestResult.FAIL])
         #                                     break
                 
                                      
@@ -1257,7 +1258,7 @@ class CommonCTSChecks():
             authpkt = self.GetAuthPacketDetails(packet=chk['Packet'][0], value=chk['Packet'][1], limit=auth_limit, Type=chk['Packet'][2])
             if len(authpkt) > 2:
                 print("authpkt:",authpkt)
-                res.append([f"In {chk['CertType']}, {chk['Packet'][0]}_{chk['Packet'][1] if chk['Packet'][1] is not None else ''} {chk['Packet'][2]} found at {self.PktMethod.Timeconvert(authpkt[0])}", "Pass"])
+                res.append([f"In {chk['CertType']}, {chk['Packet'][0]}_{chk['Packet'][1] if chk['Packet'][1] is not None else ''} {chk['Packet'][2]} found at {self.PktMethod.Timeconvert(authpkt[0])}", Enums.TestResult.PASS])
                 for ck in chk['Checks']:
                     # authpayload = self.GetAuthPayloadDetails(authpkt[2], ck, chk['Checks'][ck]['Byte'], chk['Checks'][ck]['Bit'])
                     authpayload = self.PayloadDetails_Auth(authpkt[2], ck)
@@ -1268,18 +1269,18 @@ class CommonCTSChecks():
                             if chk['Checks'][ck]['comp'] == "str":
                                 if 'expected' in chk['Checks'][ck]:
                                     if chk['Checks'][ck]['expected'] in pyload[chk['Checks'][ck]['flag']]:
-                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, Expected: {chk['Checks'][ck]['expected']}", "Pass"])
+                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, Expected: {chk['Checks'][ck]['expected']}", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, Expected: {chk['Checks'][ck]['expected']}", "Fail"])
+                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, Expected: {chk['Checks'][ck]['expected']}", Enums.TestResult.FAIL])
                                 if 'startswith' in chk['Checks'][ck]:
                                     if pyload[chk['Checks'][ck]['flag']][:5] == chk['Checks'][ck]['startswith']:
-                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} starts with {chk['Checks'][ck]['startswith']}", "Pass"])
+                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} starts with {chk['Checks'][ck]['startswith']}", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} starts with {pyload[chk['Checks'][ck]['flag']][:5]}, Expected: {chk['Checks'][ck]['startswith']}", "Fail"])
+                                        res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} starts with {pyload[chk['Checks'][ck]['flag']][:5]}, Expected: {chk['Checks'][ck]['startswith']}", Enums.TestResult.FAIL])
                                 if 'compare' in chk['Checks'][ck]:
                                     if 'comp1' == chk['Checks'][ck]['compare'] or 'comp2' == chk['Checks'][ck]['compare']:
                                         BitsCompare[chk['Checks'][ck]['compare']] = [chk['CertType'], chk['Checks'][ck].get('CheckName', ck),pyload[chk['Checks'][ck]['flag']], chk['Checks'][ck].get('comparetype')]
-                                        res.append([f"In {chk['CertType']}, the Recevied value for {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}", "Pass"])
+                                        res.append([f"In {chk['CertType']}, the Recevied value for {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}", Enums.TestResult.PASS])
                                 if 'customexp' in chk['Checks'][ck]:
                                     # PTMC = self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['ManufacturerCode'].split("x")[1]
                                     PTMC = self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['MemberCode'].split("x")[1]
@@ -1290,14 +1291,14 @@ class CommonCTSChecks():
                                     else:
                                         data = int(pyload[chk['Checks'][ck]['flag']])
                                     if comparedata[chk['Checks'][ck]['customexp']] == data:
-                                        res.append([f"PTx {chk['Checks'][ck]['customexp']}: {data} is matching with SDF {chk['Checks'][ck]['customexp']}: {comparedata[chk['Checks'][ck]['customexp']]}", "Pass"])
+                                        res.append([f"PTx {chk['Checks'][ck]['customexp']}: {data} is matching with SDF {chk['Checks'][ck]['customexp']}: {comparedata[chk['Checks'][ck]['customexp']]}", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"PTx {chk['Checks'][ck]['customexp']}: {data} is not matching with SDF {chk['Checks'][ck]['customexp']}: {comparedata[chk['Checks'][ck]['customexp']]}", "Fail"])
+                                        res.append([f"PTx {chk['Checks'][ck]['customexp']}: {data} is not matching with SDF {chk['Checks'][ck]['customexp']}: {comparedata[chk['Checks'][ck]['customexp']]}", Enums.TestResult.FAIL])
                                 if 'expectedfromNth' in chk['Checks'][ck]:
                                     if chk['Checks'][ck]['expectedfromNth'] == pyload[chk['Checks'][ck]['flag']][chk['Checks'][ck]['comparefromNth']:]:
-                                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']][chk['Checks'][ck]['comparefromNth']:]}, matches expected", "Pass"])
+                                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']][chk['Checks'][ck]['comparefromNth']:]}, matches expected", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']][chk['Checks'][ck]['comparefromNth']:]}, Expected: {chk['Checks'][ck]['expectedfromNth']}", "Fail"])
+                                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']][chk['Checks'][ck]['comparefromNth']:]}, Expected: {chk['Checks'][ck]['expectedfromNth']}", Enums.TestResult.FAIL])
                             elif chk['Checks'][ck]['comp'] == "btw":
                                 if chk['Checks'][ck]['flag'] == "sRawData":
                                     originaldata = int(pyload[chk['Checks'][ck]['flag']].replace("-", ""), 16)
@@ -1306,28 +1307,28 @@ class CommonCTSChecks():
                                     originaldata = int(pyload[chk['Checks'][ck]['flag']])
                                     comparedata = chk['Checks'][ck]['expected']
                                 if originaldata >= comparedata[0] and originaldata <= comparedata[1]:
-                                    res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, within range {comparedata}", "Pass"])
+                                    res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, within range {comparedata}", Enums.TestResult.PASS])
                                 else:
-                                    res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, out of range {comparedata}", "Fail"])
+                                    res.append([f"In {chk['CertType']}, the Recevied {chk['Checks'][ck].get('CheckName', ck)} is {pyload[chk['Checks'][ck]['flag']]}, out of range {comparedata}", Enums.TestResult.FAIL])
                                 if 'compare' in chk['Checks'][ck]:
                                     if 'comp1' == chk['Checks'][ck]['compare'] or 'comp2' == chk['Checks'][ck]['compare']:
                                         BitsCompare[chk['Checks'][ck]['compare']] = [chk['CertType'], chk['Checks'][ck].get('CheckName', ck),pyload[chk['Checks'][ck]['flag']], chk['Checks'][ck].get('comparetype')]
                     else:
-                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} not found", 'Fail'])
+                        res.append([f"In {chk['CertType']}, {chk['Checks'][ck].get('CheckName', ck)} not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"{chk['Packet'][0]}_{chk['Packet'][1] if chk['Packet'][1] is not None else ''} {chk['Packet'][2]} not found", 'Fail'])
+                res.append([f"{chk['Packet'][0]}_{chk['Packet'][1] if chk['Packet'][1] is not None else ''} {chk['Packet'][2]} not found", Enums.TestResult.FAIL])
         print("BitsCompare:",BitsCompare)
         if len(BitsCompare) > 0:
             if BitsCompare['comp1'][3] == "EQL":
                 if BitsCompare['comp1'][2] == BitsCompare['comp2'][2]:
-                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should be equal", "Pass"])
+                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should be equal", Enums.TestResult.PASS])
                 else:
-                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is not equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should be equal", "Fail"])
+                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is not equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should be equal", Enums.TestResult.FAIL])
             elif BitsCompare['comp1'][3] == "NEQL":
                 if BitsCompare['comp1'][2] != BitsCompare['comp2'][2]:
-                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is not equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should not be equal", "Pass"])
+                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is not equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should not be equal", Enums.TestResult.PASS])
                 else:
-                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should not be equal", "Fail"])
+                    res.append([f"{BitsCompare['comp1'][0]}'s, {BitsCompare['comp1'][1]}: {BitsCompare['comp1'][2]} is equal to {BitsCompare['comp2'][0]}'s, {BitsCompare['comp2'][1]}: {BitsCompare['comp2'][2]}, Expected: Both should not be equal", Enums.TestResult.FAIL])
 
 
         return res
@@ -1369,7 +1370,7 @@ class CommonCTSChecks():
                 ChkRes2 = CommonMethods.check_measure(chk['expected_val'][1], finalval[1], "EQL")
                 res.append(
                     [f"Measured {chk['MeasurementName']} is {format(ChkRes1[3],'f')} {ChkRes2[3]}, Expected: {ChkRes1[2]} {chk['expected_val'][1][0]} ", ChkRes1[1]])
-                if ChkRes2[1] != "Pass":
+                if ChkRes2[1] != Enums.TestResult.PASS:
                     res.append([f"Mismatch in Units: {ChkRes2[3]}, Expected: {ChkRes2[2]}", ChkRes2[1]])
         return res
     def Test_Results(self, Flow_limit, Check):
@@ -1464,7 +1465,7 @@ class CommonCTSChecks():
             if len(ua) > 2:
                 pd = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[ua[2], tempUlmt], Type="TesterMsg")
                 if len(pd) > 2:
-                    res.append([f"First ping found at {round(self.file_list[pd[2]]['startTime'], 3)}sec", "Pass"])
+                    res.append([f"First ping found at {round(self.file_list[pd[2]]['startTime'], 3)}sec", Enums.TestResult.PASS])
                     sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[pd[2], tempUlmt], Type="TesterMsg")
                     if len(sd) > 2:
                         fop = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[pd[2], sd[2]], Type="TesterMsg")
@@ -1474,18 +1475,18 @@ class CommonCTSChecks():
                         id = pd[2]
                         while id < sd[2]:
                             if self.file_list[id]['isTesterPkt'] == True and self.file_list[id]['isFWTestermessage'] == False:
-                                res.append([f"TPR responded with {self.file_list[id]['pktType']} at {round(self.file_list[id]['startTime'], 3)}sec", "Fail"])
+                                res.append([f"TPR responded with {self.file_list[id]['pktType']} at {round(self.file_list[id]['startTime'], 3)}sec", Enums.TestResult.FAIL])
                                 break
                             id += 1
                         else:
-                            res.append([f"TPR not responded to first digital ping 128 kHz from {round(pd[0], 3)} sec to {round(sd[0], 3)} sec", "Pass"])
+                            res.append([f"TPR not responded to first digital ping 128 kHz from {round(pd[0], 3)} sec to {round(sd[0], 3)} sec", Enums.TestResult.PASS])
 
                         end2 = len(self.file_list)
                         # second ping
                         if "second_ping" in Check:
                             pd2 = self.PktMethod.GetPacketDetails(packet="Ping Detected", limit=[sd[2], Flow_limit[1]], Type="TesterMsg")
                             if len(pd2) > 2:
-                                res.append([f"Second ping found at {round(self.file_list[pd2[2]]['startTime'], 3)}sec", "Pass"])
+                                res.append([f"Second ping found at {round(self.file_list[pd2[2]]['startTime'], 3)}sec", Enums.TestResult.PASS])
                                 sd2 = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[pd2[2], end2], Type="TesterMsg")
                                 if len(sd2) > 2:
                                     fop2 = self.PktMethod.GetPacketDetails(packet="", value="FOP:", limit=[pd2[2], sd2[2]], Type="TesterMsg")
@@ -1495,7 +1496,7 @@ class CommonCTSChecks():
                                     id2 = pd2[2]
                                     while id2 < sd2[2]:
                                         if self.file_list[id2]['isTesterPkt'] == True and self.file_list[id2]['isFWTestermessage'] == False:
-                                            res.append([f"TPR responded with {self.file_list[id2]['pktType']} at {round(self.file_list[id2]['startTime'], 3)}sec", "Pass"])
+                                            res.append([f"TPR responded with {self.file_list[id2]['pktType']} at {round(self.file_list[id2]['startTime'], 3)}sec", Enums.TestResult.PASS])
 
                                             if "ChecksList" in Check:
                                                 data = self.PacketCheck_New(Flow_limit, Check)
@@ -1505,20 +1506,20 @@ class CommonCTSChecks():
                                             break
                                         id2 += 1
                                     else:
-                                        res.append([f"TPR not responded to second digital ping 128 kHz from {round(pd2[0], 3)} sec to {round(sd2[0], 3)} sec", "Fail"])
+                                        res.append([f"TPR not responded to second digital ping 128 kHz from {round(pd2[0], 3)} sec to {round(sd2[0], 3)} sec", Enums.TestResult.FAIL])
                                 else:
-                                    res.append([f"Shutdown not found in the second ping", "Fail"])
+                                    res.append([f"Shutdown not found in the second ping", Enums.TestResult.FAIL])
                             else:
-                                res.append([f"Second ping not found", "Fail"])
+                                res.append([f"Second ping not found", Enums.TestResult.FAIL])
 
 
 
                     else:
-                        res.append([f"Shutdown not found in the first ping", "Fail"])
+                        res.append([f"Shutdown not found in the first ping", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"First ping not found", "Fail"])
+                    res.append([f"First ping not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"User action not found", "Fail"])
+                res.append([f"User action not found", Enums.TestResult.FAIL])
 
 
         return res
@@ -1560,15 +1561,15 @@ class CommonCTSChecks():
                     self.GetInitailVoltage(2, start=TempPkt1[2])
                     if prect.get("LoadPercent"):
                         if prect["LoadPercent"] != "NA":
-                            res.append([f"{prect['LoadPercent']}% of Negotiable load: {load} mW is applied in {self.file_list[TempPkt1[2]].get('pktType')} packet at index @{TempPkt1[2]}", "Pass"])
+                            res.append([f"{prect['LoadPercent']}% of Negotiable load: {load} mW is applied in {self.file_list[TempPkt1[2]].get('pktType')} packet at index @{TempPkt1[2]}", Enums.TestResult.PASS])
                         else:
-                            res.append([f"Minimum load: {load} mW is applied in {self.file_list[TempPkt1[2]].get('pktType')} packet at index @{TempPkt1[2]}", "Pass"])
+                            res.append([f"Minimum load: {load} mW is applied in {self.file_list[TempPkt1[2]].get('pktType')} packet at index @{TempPkt1[2]}", Enums.TestResult.PASS])
                     else:
                         res.append([f"{self.file_list[TempPkt1[2]].get('pktType')} packet is found at index @{TempPkt1[2]}", "pass"])
                     if self.XCEV_Ideal is not None:
-                        res.append([f"Power transfer stabilized at {self.PktMethod.Timeconvert(self.file_list[self.XCEV_Ideal]['startTime'])}", "Pass"])
+                        res.append([f"Power transfer stabilized at {self.PktMethod.Timeconvert(self.file_list[self.XCEV_Ideal]['startTime'])}", Enums.TestResult.PASS])
                     else:
-                        res.append([f"Power transfer not stabilized", "Fail"])
+                        res.append([f"Power transfer not stabilized", Enums.TestResult.FAIL])
 
 
                     if not prect.get("LoadPercent"):
@@ -1585,34 +1586,34 @@ class CommonCTSChecks():
                                     if prect['irect']['comp'] != 'NA':
                                         ChkRes1 = CommonMethods.check_measure(prect['irect']['exp'], irect[0], prect['irect']['comp'])
                                     else:
-                                        ChkRes1 = ['NA', 'Pass', 'NA', irect[0]]
+                                        ChkRes1 = ['NA', Enums.TestResult.PASS, 'NA', irect[0]]
                                     res.append([f"Measured Irect is {ChkRes1[3]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}{f", Expectd: {ChkRes1[2]} A" if ChkRes1[2] != "NA" else ""}", ChkRes1[1]])
-                                else: res.append([f"Measured Irect is {irect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                else: res.append([f"Measured Irect is {irect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                             else:
-                                res.append([f"Measured Irect is {irect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                res.append([f"Measured Irect is {irect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                             
                             if prect.get('vrect'):
                                 if 'comp' in prect['vrect']:
                                     if prect['vrect']['comp'] != 'NA':
                                         ChkRes2 = CommonMethods.check_measure(prect['vrect']['exp'], vrect[0], prect['vrect']['comp'])
                                     else:
-                                        ChkRes2 = ['NA', 'Pass', 'NA', vrect[0]]
+                                        ChkRes2 = ['NA', Enums.TestResult.PASS, 'NA', vrect[0]]
                                     res.append([f"Measured Vrect is {ChkRes2[3]} V at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}{f", Expectd: {ChkRes2[2]} V" if ChkRes2[2] != "NA" else ""}", ChkRes2[1]])
-                                else: res.append([f"Measured Vrect is {vrect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                else: res.append([f"Measured Vrect is {vrect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                             else:
-                                res.append([f"Measured Vrect is {vrect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                res.append([f"Measured Vrect is {vrect[0]} A at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                             
                             if prect.get('Prect'):
                                 if 'comp' in prect['Prect']:
                                     if prect['Prect']['comp'] != 'NA':
                                         ChkRes3 = CommonMethods.check_measure(prect['Prect']['exp'], power, prect['Prect']['comp'])
                                     else:
-                                        ChkRes3 = ['NA', 'Pass', 'NA', power]
+                                        ChkRes3 = ['NA', Enums.TestResult.PASS, 'NA', power]
                                     res.append([f"Measured Prect is {power} W at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}{f", Expectd: {ChkRes3[2]} W" if ChkRes3[2] != "NA" else ""}", ChkRes3[1]])
                                 else:
-                                    res.append([f"Measured Prect is {power} W at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                    res.append([f"Measured Prect is {power} W at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                             else:
-                                res.append([f"Measured Prect is {power} W at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", "Pass"])
+                                res.append([f"Measured Prect is {power} W at {self.PktMethod.Timeconvert(self.file_list[self.stability]['startTime'])}", Enums.TestResult.PASS])
                     else:
                         irect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData3)[0]
                         vrect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData)[0]
@@ -1628,9 +1629,9 @@ class CommonCTSChecks():
 
                 else:
                     if prect.get("LoadPercent") and prect["LoadPercent"] != "NA":
-                        res.append([f"{prect['LoadPercent']}% of Negotiable load is not applied", "Fail"])
+                        res.append([f"{prect['LoadPercent']}% of Negotiable load is not applied", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"Set_Load {load}mW packet not found", "Inconclusive"])
+                        res.append([f"Set_Load {load}mW packet not found", Enums.TestResult.INCONCLUSIVE])
 
 
         return res
@@ -1645,9 +1646,9 @@ class CommonCTSChecks():
             # Update 2
             tdiff = round((t_end - t0),3)
             if tdiff >= Monitor_check['time']:
-                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", "Pass"])
+                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", Enums.TestResult.PASS])
             else:
-                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", "Fail"])
+                res.append([f"TPR waited for {tdiff} sec before {Monitor_check['until']}, Expected: >= {Monitor_check['time']} sec", Enums.TestResult.FAIL])
 
             
             # #Update1
@@ -1660,9 +1661,9 @@ class CommonCTSChecks():
 
             #         # Prect validation
             #         ChkRes = CommonMethods.check_measure(Monitor_check['comp'][0], power, Monitor_check['comp'][1])
-            #         if "Pass" in ChkRes[1]:
+            #         if Enums.TestResult.PASS in ChkRes[1]:
             #             pass
-            #         elif "Fail" in ChkRes[1]:
+            #         elif Enums.TestResult.FAIL in ChkRes[1]:
             #             return  [[f"Prect {power}W is out of range at index@{XCE[2]}, Expected: {ChkRes[2]}W for 5 sec", ChkRes[1]]]
             #             # break
             #             # pass
@@ -1674,9 +1675,9 @@ class CommonCTSChecks():
             # else:
             #     tdiff = round((t_end - t0),3)
             #     if tdiff >= Monitor_check['time']:
-            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", "Pass"])
+            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", Enums.TestResult.PASS])
             #     else:
-            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", "Fail"])
+            #         res.append([f"Prect > {Monitor_check['comp'][0][0]}W maintained for {tdiff}sec, Expected: >= 5sec", Enums.TestResult.FAIL])
         return res
 
 
@@ -1697,9 +1698,9 @@ class CommonCTSChecks():
                 res.append(
                     [f"Measured Negotiate t_cloak: {ChkRes[3]} Sec at index@{SRQ1[2]} and index@{SRQ2[2]}, Expected: {ChkRes[2]} Sec", ChkRes[1]])
             else:
-                res.append([f"SRQ Cloak_Ping_Delay_Value_High packet not observed", "Fail"])
+                res.append([f"SRQ Cloak_Ping_Delay_Value_High packet not observed", Enums.TestResult.FAIL])
         else:
-            res.append([f"SRQ Cloak_Ping_Delay_Value_Low packet not observed", "Fail"])
+            res.append([f"SRQ Cloak_Ping_Delay_Value_Low packet not observed", Enums.TestResult.FAIL])
         return res
 
     def Set_Load(self, Flow_limit, Check):
@@ -1717,7 +1718,7 @@ class CommonCTSChecks():
                 if len(TempPkt1) > 2:
                     setload = self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Set_load']}mA", limit=[TempPkt1[2], id], Type="TesterMsg")
                     if len(setload) > 2:
-                        res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", "Pass"])
+                        res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", Enums.TestResult.PASS])
                         sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[TempPkt1[2] + 1, end], Type="TesterMsg")
                         ts = self.PktMethod.GetPacketDetails(packet="Test_Status", value="Test_Stop", limit=[TempPkt1[2] + 1, end], Type="TesterMsg")
                         if len(sd) > 2 or len(ts) > 2:
@@ -1730,20 +1731,20 @@ class CommonCTSChecks():
                                 # if (Check['Set_load'] + 1) >= AllChannelData3['RV']['displayDataChunk'][x] * 1000 >= (Check['Set_load'] - 0.2):
                                 value = AllChannelData3['RV']['displayDataChunk'][x] * 1000 
                                 if (Check['Set_load'] - 0.2) <= value <= (Check['Set_load'] + 2):
-                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found", "Pass"])
+                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found", Enums.TestResult.PASS])
                                     break
                                 if value > (Check['Set_load'] + 2):
-                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", "Fail"])
+                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", Enums.TestResult.FAIL])
                                     break
                                 x += 1
                             else:
                                 print(f"Not reached to {Check['Set_load']}mA in {cnt}th ping from {TempPkt1[2]} to {sd[2] if len(sd) > 2 else ts[2]}")
-                                res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", "Fail"])
+                                res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", Enums.TestResult.FAIL])
                             id = sd[2] if len(sd) > 2 else ts[2]
             else:
                 setload = self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Set_load']}mA", limit=[id, end], Type="TesterMsg")
                 if len(setload) > 2:
-                    res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", "Pass"])
+                    res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", Enums.TestResult.PASS])
                     sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[setload[2] + 1, end], Type="TesterMsg")
                     ts = self.PktMethod.GetPacketDetails(packet="Test_Status", value="Test_Stop", limit=[setload[2] + 1, end], Type="TesterMsg")
                     if len(sd) > 2 or len(ts) > 2:
@@ -1753,14 +1754,14 @@ class CommonCTSChecks():
                         x = sindex2
                         while x <= eindex2:
                             if (Check['Set_load'] + 0.2) >= AllChannelData3['RV']['displayDataChunk'][x] * 1000 >= (Check['Set_load'] - 0.2):
-                                res.append([f"Irect: {round(AllChannelData3['RV']['displayDataChunk'][x] * 1000, 2)} mA is found, Expected: {Check['Set_load']} mA", "Pass"])
+                                res.append([f"Irect: {round(AllChannelData3['RV']['displayDataChunk'][x] * 1000, 2)} mA is found, Expected: {Check['Set_load']} mA", Enums.TestResult.PASS])
                                 break
                             x += 1
                         else:
-                            res.append([f"In {cnt}th cloak ping, Irect is not reached to {Check['Set_load']} mA", "Fail"])
+                            res.append([f"In {cnt}th cloak ping, Irect is not reached to {Check['Set_load']} mA", Enums.TestResult.FAIL])
                         id = sd[2] if len(sd) > 2 else ts[2]
                 else:
-                    res.append([f"Set_Load: {Check['Set_load']} mA not found", "Fail"])
+                    res.append([f"Set_Load: {Check['Set_load']} mA not found", Enums.TestResult.FAIL])
             id += 1
         return res
 
@@ -1786,7 +1787,7 @@ class CommonCTSChecks():
                         if len(fop_pkt) > 2:
                             fop = float(self.file_list[fop_pkt[2]]['value'].split(":")[1].split(" ")[0])
                             if 127.5 < fop < 128.5:
-                                # res.append([f"FOP: {fop} kHz found at {round(fop_pkt[0],3)} sec, Expected: 127.5 kHz < fop <128.5 kHz", "Pass"])
+                                # res.append([f"FOP: {fop} kHz found at {round(fop_pkt[0],3)} sec, Expected: 127.5 kHz < fop <128.5 kHz", Enums.TestResult.PASS])
                                 ss = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[fop_pkt[2], end], Type="Packet")
                                 print("ss",ss)
                                 if len(ss) > 2:
@@ -1805,19 +1806,19 @@ class CommonCTSChecks():
                                                 value = AllChannelData3['RV']['displayDataChunk'][x] * 1000 
                                                 # print("value:",value)
                                                 if (Check['Set_load'] - 1.3) <= value <= (Check['Set_load'] + 2):
-                                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", "Pass"])
+                                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", Enums.TestResult.PASS])
                                                     break
                                                 if value > (Check['Set_load'] + 2):
-                                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", "Fail"])
+                                                    res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", Enums.TestResult.FAIL])
                                                     break
                                                 x += 1
                                             else:
                                                 print(f"Not reached to {Check['Set_load']}mA in {cnt}th ping from {ss[2]} to {sd[2] if len(sd) > 2 else ts[2]}")
-                                                res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", "Fail"])
+                                                res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", Enums.TestResult.FAIL])
                                             cnt += 1
                                             id = xid[2]
                                         
-                            # else: res.append([f"FOP: {fop} kHz found at {round(fop_pkt[0],3)} sec, Expected: 127.5 kHz < fop <128.5 kHz", "Fail"])
+                            # else: res.append([f"FOP: {fop} kHz found at {round(fop_pkt[0],3)} sec, Expected: 127.5 kHz < fop <128.5 kHz", Enums.TestResult.FAIL])
                 id += 1               
         return res
 
@@ -1839,7 +1840,7 @@ class CommonCTSChecks():
             if len(TempPkt1) > 2:
                 setload = self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Set_load']}mA", limit=[TempPkt1[2], id], Type="TesterMsg")
                 if len(setload) > 2:
-                    res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", "Pass"])
+                    res.append([f"Set_Load: {Check['Set_load']} mA found at index@{setload[2]}, Expected: {Check['Set_load']} mA", Enums.TestResult.PASS])
                     sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[TempPkt1[2] + 1, end+1], Type="TesterMsg")
                     ts = self.PktMethod.GetPacketDetails(packet="Test_Status", value="Test_Stop", limit=[TempPkt1[2] + 1, end+1], Type="TesterMsg")
                     print("sd:",sd)
@@ -1854,15 +1855,15 @@ class CommonCTSChecks():
                             value = AllChannelData3['RV']['displayDataChunk'][x] * 1000 
                             # print("value:",value)
                             if (Check['Set_load'] - 1.3) <= value <= (Check['Set_load'] + 2):
-                                res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found", "Pass"])
+                                res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found", Enums.TestResult.PASS])
                                 break
                             if value > (Check['Set_load'] + 2):
-                                res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", "Fail"])
+                                res.append([f"In ping_{cnt}, Irect: {round(value, 2)} mA found, Expected: {Check['Set_load']} mA", Enums.TestResult.FAIL])
                                 break
                             x += 1
                         else:
                             print(f"Not reached to {Check['Set_load']}mA in {cnt}th ping from {TempPkt1[2]} to {sd[2] if len(sd) > 2 else ts[2]}")
-                            res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", "Fail"])
+                            res.append([f"In {cnt}th ping, Irect is not reached to {Check['Set_load']} mA", Enums.TestResult.FAIL])
                         id = sd[2] if len(sd) > 2 else ts[2]
 
             id += 1
@@ -1886,7 +1887,7 @@ class CommonCTSChecks():
             if "DPL" in Check["expected"][0]["chks"]:
                 dpl = round(self.PktMethod.CalculateVoltTwindow(ss[2], self.AllChannelData, winsize=[9, 11])[0], 3)
                 dpl_lmt = [round((dpl - (dpl / 20)), 3), round((dpl + (dpl / 20)), 3)]
-                res.append([f"Measured DPL voltage is: {dpl} V", "Pass"])
+                res.append([f"Measured DPL voltage is: {dpl} V", Enums.TestResult.PASS])
             clk_ping = self.PktMethod.GetPacketDetails(packet="Cloak", limit=[ss[2], Flow_limit[1]], Type="Packet")
             if len(clk_ping) > 2:
                 initial_cloak = clk_ping[2]
@@ -1942,7 +1943,7 @@ class CommonCTSChecks():
                                 # cnt += 1
                             elif "ATN" in clk_resp:
                                 res.append([f"Cloak Ping {cnt} found with reason:{reason} at {round(clk_ping[0], 3)} sec and received {clk_resp}", rsn_chk[1]])
-                                res.append([f"PTx initiated cloak exit by sending ATN response to cloak ping {cnt}", "Pass"])
+                                res.append([f"PTx initiated cloak exit by sending ATN response to cloak ping {cnt}", Enums.TestResult.PASS])
                             id = clk_ping[2]
                             cnt += 1
 
@@ -1960,13 +1961,13 @@ class CommonCTSChecks():
                                 respid2 = self.PktMethod.GetPacketResponse2(clk_start, [clk_start+1, exitid])
                                 print("respid2",respid2)
                                 if respid2 is not None:
-                                    res.append([f"{self.file_list[clk_start]['pktType']} {self.file_list[clk_start]['value']} packet and {self.file_list[respid2]['pktType']} response found", "Pass"])
+                                    res.append([f"{self.file_list[clk_start]['pktType']} {self.file_list[clk_start]['value']} packet and {self.file_list[respid2]['pktType']} response found", Enums.TestResult.PASS])
                         else:
                             if Check["expected"][0].get("illegal_chk"):
                                 ill_chk = CommonMethods.check_measure(Check["expected"][0]["illegal_chk"], self.file_list[clk_start]['pktType'], "EQL")
                                 res.append([f"Illegal packet {ill_chk[3]} found at {round(self.file_list[clk_start]['startTime'], 3)} sec", ill_chk[1]])
                             else:
-                                res.append([f"Illegal packet found at {round(self.file_list[clk_start]['startTime'], 3)} sec", "Fail"])
+                                res.append([f"Illegal packet found at {round(self.file_list[clk_start]['startTime'], 3)} sec", Enums.TestResult.FAIL])
                             sd = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[clk_start, end], Type="TesterMsg")
                             if len(sd) > 2:
                                 Tterm = round((sd[0] - self.file_list[clk_start].get('stopTime')) * 1000, 3)
@@ -1983,20 +1984,20 @@ class CommonCTSChecks():
                             # res.append([f"Measured last ASK to shutdown interval is {results[3]}ms, expected value:{results[2]}ms",results[1]])     
                             # break
                             if (clk_ping[0] - self.file_list[id]['startTime']) < 1:
-                                res.append([f"Once in the Cloak state, within 1 second TPR sent {self.file_list[id]['pktType']} ASK packet at {round(self.file_list[id]['startTime'], 3)} sec","Fail"])
+                                res.append([f"Once in the Cloak state, within 1 second TPR sent {self.file_list[id]['pktType']} ASK packet at {round(self.file_list[id]['startTime'], 3)} sec",Enums.TestResult.FAIL])
                                 break
                             # else:
-                            #     res.append([f"Once in the Cloak state, TPR sent {self.file_list[id]['pktType']} ASK packet at {round(self.file_list[id]['startTime'], 3)} sec","Pass"])
+                            #     res.append([f"Once in the Cloak state, TPR sent {self.file_list[id]['pktType']} ASK packet at {round(self.file_list[id]['startTime'], 3)} sec",Enums.TestResult.PASS])
                             #     break
                         id += 1
                     else: 
-                        res.append([f"Once in the Cloak state, TPR did not sent ASK packet for 1 sec","Pass"])
+                        res.append([f"Once in the Cloak state, TPR did not sent ASK packet for 1 sec",Enums.TestResult.PASS])
 
                 if "ENTER" not in self.Header['TestcaseID']:
                     if len(clk_exit) > 2:
-                        res.append([f"Cloak exit found at {round(clk_exit[0], 3)} sec", "Pass"])
+                        res.append([f"Cloak exit found at {round(clk_exit[0], 3)} sec", Enums.TestResult.PASS])
                     else:
-                        res.append([f"Cloak exit was not found", "Fail"])
+                        res.append([f"Cloak exit was not found", Enums.TestResult.FAIL])
                 if "pings" in Check["expected"][0]:
                     pings_chk_resp = CommonMethods.check_measure([Check["expected"][0]['pings'][0]], pings, Check["expected"][0]['pings'][1])
                     res.append([f"System stayed for {pings} Cloak Pings, tcloak, cycle, Expected: {pings_chk_resp[2]}", pings_chk_resp[1]])
@@ -2008,39 +2009,39 @@ class CommonCTSChecks():
                         res.append([f"{self.file_list[fop[2]]['value']} is observed at {round(fop[0], 3)} sec, Expected: {ChkRes[2]} kHz", ChkRes[1]])
                         ss2 = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[exitid, end], Type="Packet")
                         if len(ss2) > 2:
-                            res.append([f"Ping phase is observed at {round(ss2[0], 3)} sec", "Pass"])
+                            res.append([f"Ping phase is observed at {round(ss2[0], 3)} sec", Enums.TestResult.PASS])
                         else:
-                            res.append([f"Ping phase is not observed", "Fail"])
+                            res.append([f"Ping phase is not observed", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"FOP is not observed", "Fail"])
+                        res.append([f"FOP is not observed", Enums.TestResult.FAIL])
                 if "PT" in Check["expected"][0]["chks"]:
                     CE = self.PktMethod.GetPacketDetails(packet="Extended Control Error", limit=[exitid, end], Type="Packet")
                     if len(CE) > 2:
-                        res.append([f"Entered to PT Phase at {round(self.file_list[CE[2]]['startTime'], 3)} sec after cloak exit", "Pass"])
+                        res.append([f"Entered to PT Phase at {round(self.file_list[CE[2]]['startTime'], 3)} sec after cloak exit", Enums.TestResult.PASS])
 
                         if "t_atn" in Check["expected"][0]["chks"]:
                             eptid = self.PktMethod.GetPacketDetails(packet="Extended Power Transmitter Identification", limit=[exitid, initial_cloak], Type="Response")
                             if len(eptid)>2:
                                 dsr = self.PktMethod.GetPacketDetails(packet="DSR",value="POLL", limit=[exitid, end], Type="Packet")
                                 if len(dsr) > 2:
-                                    res.append([f"DSR/POLL packet found at {round(dsr[0], 3)} sec in PT Phase", "Pass"])
+                                    res.append([f"DSR/POLL packet found at {round(dsr[0], 3)} sec in PT Phase", Enums.TestResult.PASS])
                                     t_atn = round((dsr[0] - eptid[1]) * 1000, 3)
-                                    res.append([f"Measured t_atn is {t_atn} ms from Extended Power Transmitter Identification to DSR/POLL packet", "Pass"])
+                                    res.append([f"Measured t_atn is {t_atn} ms from Extended Power Transmitter Identification to DSR/POLL packet", Enums.TestResult.PASS])
                                 else:
-                                    res.append([f"DSR/POLL packet not found in PT Phase", "Fail"])
+                                    res.append([f"DSR/POLL packet not found in PT Phase", Enums.TestResult.FAIL])
                             else:
-                                res.append([f"Extended Power Transmitter Identification packet not found", "Fail"])
+                                res.append([f"Extended Power Transmitter Identification packet not found", Enums.TestResult.FAIL])
 
-                        res.append([f"TPR sent Extended Control Error at {round(CE[0], 3)} sec", "Pass"])
+                        res.append([f"TPR sent Extended Control Error at {round(CE[0], 3)} sec", Enums.TestResult.PASS])
                         SD = self.PktMethod.GetPacketDetails(packet="Shutdown", limit=[CE[2], end], Type="TesterMsg")
                         if len(SD) < 2:
-                            res.append([f"PTx kept Power signal ON", "Pass"])
+                            res.append([f"PTx kept Power signal ON", Enums.TestResult.PASS])
                         else:
-                            res.append([f"PTx removed Power signal", "Fail"])
+                            res.append([f"PTx removed Power signal", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"PT Phase not found after cloak exit", "Fail"])
+                        res.append([f"PT Phase not found after cloak exit", Enums.TestResult.FAIL])
         else:
-            res.append([f"Signal strength packet not found", "Fail"])
+            res.append([f"Signal strength packet not found", Enums.TestResult.FAIL])
 
 
         return res
@@ -2056,14 +2057,14 @@ class CommonCTSChecks():
                     if Check['expected'][0]['MPP_Pattern']:
                         if "MPP" not in self.file_list[pktrespid]['pktType']:
                             MPP_status = False
-                            res.append([f"{self.file_list[pktrespid]['pktType']} pattern observed at {round(self.file_list[pktrespid]['startTime'], 3)} sec CE Packet, Expected: MPP pattern", "Fail"])
+                            res.append([f"{self.file_list[pktrespid]['pktType']} pattern observed at {round(self.file_list[pktrespid]['startTime'], 3)} sec CE Packet, Expected: MPP pattern", Enums.TestResult.FAIL])
                             break
                         else: 
                             MPP_status = True
                     elif not Check['expected'][0]['MPP_Pattern']:
                         if "MPP" in self.file_list[pktrespid]['pktType']:
                             MPP_status = True
-                            res.append([f"MPP FSK Pattern observed at {round(self.file_list[pktrespid]['startTime'], 3)} sec after CE Packet, Expected: No MPP pattern", "Fail"])
+                            res.append([f"MPP FSK Pattern observed at {round(self.file_list[pktrespid]['startTime'], 3)} sec after CE Packet, Expected: No MPP pattern", Enums.TestResult.FAIL])
                             break
                         else:
                             MPP_status = False
@@ -2075,14 +2076,14 @@ class CommonCTSChecks():
         if Check['expected'][0]['MPP_Pattern']:
             if MPP_status is not None:
                 if MPP_status:
-                    res.append([f"PTx sent MPP pattern after CE Packets", "Pass"])
+                    res.append([f"PTx sent MPP pattern after CE Packets", Enums.TestResult.PASS])
                 # else:
-                #     res.append([f"PTx not sent MPP pattern after CE Packets", "Fail"])
+                #     res.append([f"PTx not sent MPP pattern after CE Packets", Enums.TestResult.FAIL])
 
         elif not Check['expected'][0]['MPP_Pattern']:
             if MPP_status is not None:
                 if not MPP_status:
-                    res.append([f"PTx not sent MPP pattern after CE Packets", "Pass"])
+                    res.append([f"PTx not sent MPP pattern after CE Packets", Enums.TestResult.PASS])
 
 
 
@@ -2095,15 +2096,15 @@ class CommonCTSChecks():
             dlypkt = self.PktMethod.GetPacketDetails(packet="SRQ ", value="Cloak Ping Delay Low", limit=Flow_limit, Type="Packet")
             if len(dlypkt) > 2:
                 cdelay = (GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(dlypkt[2], 'Cloak_Ping_Delay_Value_Low')[0]['sDescription'])[0]) * 1000
-                res.append([f"SRQ/Cloak packet with {cdelay} ms delay configuration was found at {round(dlypkt[0], 3)} sec", "Pass"])
+                res.append([f"SRQ/Cloak packet with {cdelay} ms delay configuration was found at {round(dlypkt[0], 3)} sec", Enums.TestResult.PASS])
             else:
-                res.append([f"SRQ/Cloak packet was not found", "Fail"])
+                res.append([f"SRQ/Cloak packet was not found", Enums.TestResult.FAIL])
             dtctpkt = self.PktMethod.GetPacketDetails(packet="SRQ ", value="Cloak Detect Ping Interval", limit=Flow_limit, Type="Packet")
             if len(dtctpkt) > 2:
                 cdetect = (GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(dtctpkt[2], 'Cloak_Detect_Ping_Value')[0]['sDescription'])[0]) * 1000
-                res.append([f"SRQ/detect packet with {cdetect} ms delay value was found at {round(dtctpkt[0], 3)} sec", "Pass"])
+                res.append([f"SRQ/detect packet with {cdetect} ms delay value was found at {round(dtctpkt[0], 3)} sec", Enums.TestResult.PASS])
             else:
-                res.append([f"SRQ/detect packet was not found", "Fail"])
+                res.append([f"SRQ/detect packet was not found", Enums.TestResult.FAIL])
             clk_ping = self.PktMethod.GetPacketDetails(packet="Cloak", limit=[ss[2], Flow_limit[1]], Type="Packet")
             if len(clk_ping) > 2:
                 reason = self.GetPayloadDetails(clk_ping[2], 'Reason')[0]["sDescription"].split(":")[-1]
@@ -2164,19 +2165,19 @@ class CommonCTSChecks():
                 UA1 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coil_remove[2],end], Type="TesterMsg")
                 if len(UA1)>2:
                     t1 = round(UA1[0]-clk[0],3)
-                    res.append([f"Detach happened in {t1} sec from the start of cloak, Expected: 5 to 10 sec", "Pass" if 5<=t1<=10 else "Fail"])
+                    res.append([f"Detach happened in {t1} sec from the start of cloak, Expected: 5 to 10 sec", Enums.TestResult.PASS if 5<=t1<=10 else Enums.TestResult.FAIL])
 
                     coil_place = self.PktMethod.GetPacketDetails(packet="Coil_Place_On_Base_Station", limit=[UA1[2],end], Type="TesterMsg")
                     if len(coil_place)>2:
                         UA2 = self.PktMethod.GetPacketDetails(packet="User Action status", limit=[coil_place[2],end], Type="TesterMsg")
                         if len(UA2)>2:
                             t2 = round(UA2[0]-UA1[0],3)
-                            res.append([f"Reattach happened in {t2} sec from detach, Expected: 5 to 10 sec", "Pass" if 5<=t2<=10 else "Fail"])
-                        else: res.append([f"User action not found to reattach", 'Fail'])
-                    else: res.append([f"Coil_Place_On_Base_Station not found to reattach", 'Fail'])
-                else: res.append([f"User action not found to detach", 'Fail'])
-            else: res.append([f"Coil_Remove_From_Base_Station not found to detach", 'Fail'])
-        else: res.append([f"System didn't went to cloak", 'Fail'])
+                            res.append([f"Reattach happened in {t2} sec from detach, Expected: 5 to 10 sec", Enums.TestResult.PASS if 5<=t2<=10 else Enums.TestResult.FAIL])
+                        else: res.append([f"User action not found to reattach", Enums.TestResult.FAIL])
+                    else: res.append([f"Coil_Place_On_Base_Station not found to reattach", Enums.TestResult.FAIL])
+                else: res.append([f"User action not found to detach", Enums.TestResult.FAIL])
+            else: res.append([f"Coil_Remove_From_Base_Station not found to detach", Enums.TestResult.FAIL])
+        else: res.append([f"System didn't went to cloak", Enums.TestResult.FAIL])
 
             
         
@@ -2191,13 +2192,13 @@ class CommonCTSChecks():
             finalload = None
             while id < Flow_limit[1]:
                 if "Set_Load" in self.file_list[id].get('pktType'):
-                    res.append([f"{self.file_list[id].get('pktType')} packet found at index @{id}", "Pass"])
+                    res.append([f"{self.file_list[id].get('pktType')} packet found at index @{id}", Enums.TestResult.PASS])
                     id2 = id + 1
                     while id2 < Flow_limit[1]:
                         if any(rs in self.file_list[id2].get('pktType') for rs in ['Extended Control Error', 'Power Loss Accounting']):
                             if "NAK" in self.file_list[id2 + 1].get('pktType'):
                                 res.append(
-                                    [f"NAK response observed for {self.file_list[id2].get('pktType')} at index@{id2}", "Pass"])
+                                    [f"NAK response observed for {self.file_list[id2].get('pktType')} at index@{id2}", Enums.TestResult.PASS])
                                 nak_flag = True
                         if "Set_Load 80mA" in self.file_list[id2].get('pktType'):
                             id = id2 - 1
@@ -2208,11 +2209,11 @@ class CommonCTSChecks():
                             break
                         if "MPP_XCEV_Ideal" in self.file_list[id2].get('pktType'):
                             self.GetInitailVoltage(2, start=id2)
-                            res.append([f"Measured Vrect is {self.initialVolt} V, Irect is {self.initialCurrent} A", "Pass"])
+                            res.append([f"Measured Vrect is {self.initialVolt} V, Irect is {self.initialCurrent} A", Enums.TestResult.PASS])
                         id2 += 1
                 id += 1
             if not nak_flag:
-                res.append([f"NAK is not observed for any of the above applied loads", "Pass"])
+                res.append([f"NAK is not observed for any of the above applied loads", Enums.TestResult.PASS])
 
 
         return res
@@ -2246,25 +2247,25 @@ class CommonCTSChecks():
         limit = [excnt[2], len(self.file_list) - 1] if len(excnt) > 2 else Flow_limit
         TempPkt1 = self.PktMethod.GetPacketDetails(packet="Configuration", limit=limit, Type="Packet")
         if len(TempPkt1) > 2:
-            res.append([f"Configuration packet found at {round(TempPkt1[0], 3)} sec", "Pass"])
+            res.append([f"Configuration packet found at {round(TempPkt1[0], 3)} sec", Enums.TestResult.PASS])
             respid = self.PktMethod.GetPacketResponse2(TempPkt1[2], [TempPkt1[2] + 1, limit[1]])
             if respid is not None:
                 if self.file_list[respid]['pktType'] in ["MPP", "MPP:ACK", "MPP ACK"]:
-                    res.append([f"ACK response received for Configuration packet at {round(self.file_list[respid]['startTime'], 3)} sec, Expected: {['MPP', 'ACK', 'NAK']}", "Pass"])
+                    res.append([f"ACK response received for Configuration packet at {round(self.file_list[respid]['startTime'], 3)} sec, Expected: {['MPP', 'ACK', 'NAK']}", Enums.TestResult.PASS])
                 elif self.file_list[respid]['pktType'] == "NAK":
-                    res.append([f"NAK response received for Configuration packet at {round(self.file_list[respid]['startTime'], 3)} sec, Expected: {['MPP', 'ACK', 'NAK']}", "Pass"])
+                    res.append([f"NAK response received for Configuration packet at {round(self.file_list[respid]['startTime'], 3)} sec, Expected: {['MPP', 'ACK', 'NAK']}", Enums.TestResult.PASS])
                     if Check['expected'].get("Errbit"):
                         Reqerror = self.PktMethod.GetPacketDetails(packet="Get Request", value="PTx error status", limit=[TempPkt1[2] + 1, limit[1]], Type="Packet")
                         if len(Reqerror) > 2:
-                            res.append([f"Get Request(PTx error status) found at {round(Reqerror[0], 3)}sec", "Pass"])
+                            res.append([f"Get Request(PTx error status) found at {round(Reqerror[0], 3)}sec", Enums.TestResult.PASS])
                             ptxerror = self.PktMethod.GetPacketDetails(packet="PTx Error status", limit=limit, Type="Response")
                             if len(ptxerror) > 2:
                                 error = self.PktMethod.GetPayloadDetails(ptxerror[2], "Error")[0]['sRawData']
-                                res.append([f"PTx Error status received found at {round(ptxerror[0], 3)}sec, with Error : {error}, Expected: Error ≠ 0", "Pass" if error != "0x00" else "Fail"])
+                                res.append([f"PTx Error status received found at {round(ptxerror[0], 3)}sec, with Error : {error}, Expected: Error ≠ 0", Enums.TestResult.PASS if error != "0x00" else Enums.TestResult.FAIL])
                             else:
-                                res.append([f"PTx Error status not received", "Fail"])
+                                res.append([f"PTx Error status not received", Enums.TestResult.FAIL])
                         else:
-                            res.append([f"Get Request(PTx error status) not found", "Fail"])
+                            res.append([f"Get Request(PTx error status) not found", Enums.TestResult.FAIL])
 
                     data = self.PacketCheck_New(limit, Check)
                     for ele in data:
@@ -2274,9 +2275,9 @@ class CommonCTSChecks():
                         for ele in data2:
                             res.append(ele)
             else:
-                res.append([f"NO response received for Configuration packet", "Fail"])
+                res.append([f"NO response received for Configuration packet", Enums.TestResult.FAIL])
         else:
-            res.append([f"Configuration packet not found", "Fail"])
+            res.append([f"Configuration packet not found", Enums.TestResult.FAIL])
         return res
     
     def Encoded(self, Flow_limit, Check):
@@ -2310,7 +2311,7 @@ class CommonCTSChecks():
             if conditions[cond]:
                 start = conditions[cond][0]
                 stop = conditions[cond][1]
-                res.append([f"{cond} validating from {self.PktMethod.Timeconvert(self.file_list[start]['startTime'])} to {self.PktMethod.Timeconvert(self.file_list[stop]['startTime'])}", "Pass"])
+                res.append([f"{cond} validating from {self.PktMethod.Timeconvert(self.file_list[start]['startTime'])} to {self.PktMethod.Timeconvert(self.file_list[stop]['startTime'])}", Enums.TestResult.PASS])
                 PLAP78 = self.PktMethod.GetPacketDetails(packet=self.PLAP_pkt, limit=conditions[cond], Type="Packet")
                 if len(PLAP78) > 2:
                     Alpha_FM = int(self.PktMethod.GetPayloadDetails(PLAP78[2], "Alpha_FM")[0]['sDescription'].split(":")[1].split(" ")[1].strip())
@@ -2321,52 +2322,52 @@ class CommonCTSChecks():
                     g_coil_TX_raw = float(self.PktMethod.GetPayloadDetails(PLAP78[2], Check['PTx_coil_key'])[0]['sDescription'].split(":")[1].split(" ")[2].strip("()"))
                     if cnt == 1:
                         self.default_values = [Alpha_FM, Alpha_FM_raw, Alpha_FM_DC, Alpha_FM_DC_raw, g_coil_TX, g_coil_TX_raw]
-                        res.append([f"Alpha_FM: {Alpha_FM}, Alpha_FM_raw: {Alpha_FM_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", "Pass"])
-                        res.append([f"Alpha_FM_DC: {Alpha_FM_DC}, Alpha_FM_DC_raw: {Alpha_FM_DC_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", "Pass"])
-                        res.append([f"{Check['PTx_coil_key']}: {g_coil_TX}, {Check['PTx_coil_key']}_raw: {g_coil_TX_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", "Pass"])
+                        res.append([f"Alpha_FM: {Alpha_FM}, Alpha_FM_raw: {Alpha_FM_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", Enums.TestResult.PASS])
+                        res.append([f"Alpha_FM_DC: {Alpha_FM_DC}, Alpha_FM_DC_raw: {Alpha_FM_DC_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", Enums.TestResult.PASS])
+                        res.append([f"{Check['PTx_coil_key']}: {g_coil_TX}, {Check['PTx_coil_key']}_raw: {g_coil_TX_raw} in  PLAP (0x78) packet at {self.PktMethod.Timeconvert(PLAP78[0])}", Enums.TestResult.PASS])
                     else:
                         exp_alpha = int(self.default_values[0] if cnt == 2 else 0.8 * self.default_values[0])
                         exp_alpha_raw = self.default_values[1] if cnt == 2 else 0.8 * self.default_values[1]
-                        # res_str = "Pass" if (Alpha_FM == exp_alpha and Alpha_FM_raw == exp_alpha_raw) else "Fail"
+                        # res_str = Enums.TestResult.PASS if (Alpha_FM == exp_alpha and Alpha_FM_raw == exp_alpha_raw) else Enums.TestResult.FAIL
                         # res.append([f"Alpha_FM: {Alpha_FM}, Alpha_FM_raw: {Alpha_FM_raw} in PLAP (0x78), Expected: Alpha_FM: {exp_alpha} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}, Alpha_FM_raw: {exp_alpha_raw} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}. Default values: Alpha_FM: {self.default_values[0]}, Alpha_FM_raw: {self.default_values[1]}", res_str])
-                        res_str = "Pass" if Alpha_FM == exp_alpha else "Fail"
+                        res_str = Enums.TestResult.PASS if Alpha_FM == exp_alpha else Enums.TestResult.FAIL
                         res.append([f"Alpha_FM: {Alpha_FM}, Alpha_FM_raw: {Alpha_FM_raw} in PLAP (0x78), Expected: Alpha_FM: {exp_alpha} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}. Default values: Alpha_FM: {self.default_values[0]}, Alpha_FM_raw: {self.default_values[1]}", res_str])
                         
                         exp_dc = int(self.default_values[2] if cnt == 2 else 0.8 * self.default_values[2])
                         exp_dc_raw = self.default_values[3] if cnt == 2 else 0.8 * self.default_values[3]
-                        # res_str2 = "Pass" if (Alpha_FM_DC == exp_dc and Alpha_FM_DC_raw == exp_dc_raw) else "Fail"
+                        # res_str2 = Enums.TestResult.PASS if (Alpha_FM_DC == exp_dc and Alpha_FM_DC_raw == exp_dc_raw) else Enums.TestResult.FAIL
                         # res.append([f"Alpha_FM_DC: {Alpha_FM_DC}, Alpha_FM_DC_raw: {Alpha_FM_DC_raw} in PLAP (0x78), Expected: Alpha_FM_DC: {exp_dc} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}, Alpha_FM_DC_raw: {exp_dc_raw} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}. Default values: Alpha_FM_DC: {self.default_values[2]}, Alpha_FM_DC_raw: {self.default_values[3]}", res_str2])
-                        res_str2 = "Pass" if Alpha_FM_DC == exp_dc else "Fail"
+                        res_str2 = Enums.TestResult.PASS if Alpha_FM_DC == exp_dc else Enums.TestResult.FAIL
                         res.append([f"Alpha_FM_DC: {Alpha_FM_DC}, Alpha_FM_DC_raw: {Alpha_FM_DC_raw} in PLAP (0x78), Expected: Alpha_FM_DC: {exp_dc} {f'(default value)' if cnt == 2 else '(0.8 * default value)'}. Default values: Alpha_FM_DC: {self.default_values[2]}, Alpha_FM_DC_raw: {self.default_values[3]}", res_str2])
 
                         exp_tx = int(0.8 * self.default_values[4] if cnt == 2 else self.default_values[4])
                         exp_tx_raw = 0.8 * self.default_values[5] if cnt == 2 else self.default_values[5]
-                        # res_str3 = "Pass" if (g_coil_TX == exp_tx and g_coil_TX_raw == exp_tx_raw) else "Fail"
+                        # res_str3 = Enums.TestResult.PASS if (g_coil_TX == exp_tx and g_coil_TX_raw == exp_tx_raw) else Enums.TestResult.FAIL
                         # res.append([f"{Check['PTx_coil_key']}: {g_coil_TX}, {Check['PTx_coil_key']}_raw: {g_coil_TX_raw} in PLAP (0x78), Expected: {Check['PTx_coil_key']}: {exp_tx} {f'(0.8 * default value)' if cnt == 2 else '(default value)'}, {Check['PTx_coil_key']}_raw: {exp_tx_raw} {f'(0.8 * default value)' if cnt == 2 else '(default value)'}. Default values: {Check['PTx_coil_key']}: {self.default_values[4]}, {Check['PTx_coil_key']}_raw: {self.default_values[5]}", res_str3])
-                        res_str3 = "Pass" if g_coil_TX == exp_tx else "Fail"
+                        res_str3 = Enums.TestResult.PASS if g_coil_TX == exp_tx else Enums.TestResult.FAIL
                         res.append([f"{Check['PTx_coil_key']}: {g_coil_TX}, {Check['PTx_coil_key']}_raw: {g_coil_TX_raw} in PLAP (0x78), Expected: {Check['PTx_coil_key']}: {exp_tx} {f'(0.8 * default value)' if cnt == 2 else '(default value)'}. Default values: {Check['PTx_coil_key']}: {self.default_values[4]}, {Check['PTx_coil_key']}_raw: {self.default_values[5]}", res_str3])
                 else:
-                    res.append([f"PLAP (0x78) packet not found", "Fail"])
+                    res.append([f"PLAP (0x78) packet not found", Enums.TestResult.FAIL])
                 PLAP5F = self.PktMethod.GetPacketDetails(packet=self.PLAP_pkt, limit=conditions[cond], Type="Response")
                 if len(PLAP5F) > 2:
                     g_coil_RX = float(self.PktMethod.GetPayloadDetails(PLAP5F[2], Check['PRx_coil_key'])[0]['sDescription'].split(":")[1].split(" ")[1].strip())
                     g_coil_RX_raw = float(self.PktMethod.GetPayloadDetails(PLAP5F[2], Check['PRx_coil_key'])[0]['sDescription'].split(":")[1].split(" ")[2].strip("()"))
                     if g_coil_RX == 10000 and g_coil_RX_raw == 1:
-                        res.append([f"{Check['PRx_coil_key']}: {g_coil_RX}, {Check['PRx_coil_key']}_raw: {g_coil_RX_raw} in PLAP (0x5F), Expected: 10000, 1", "Pass"])
+                        res.append([f"{Check['PRx_coil_key']}: {g_coil_RX}, {Check['PRx_coil_key']}_raw: {g_coil_RX_raw} in PLAP (0x5F), Expected: 10000, 1", Enums.TestResult.PASS])
                     else:
-                        res.append([f"{Check['PRx_coil_key']}: {g_coil_RX}, {Check['PRx_coil_key']}_raw: {g_coil_RX_raw} in PLAP (0x5F), Expected: 10000, 1", "Fail"])
+                        res.append([f"{Check['PRx_coil_key']}: {g_coil_RX}, {Check['PRx_coil_key']}_raw: {g_coil_RX_raw} in PLAP (0x5F), Expected: 10000, 1", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"PLAP (0x5F) packet not found", "Fail"])
+                    res.append([f"PLAP (0x5F) packet not found", Enums.TestResult.FAIL])
                 TempPkt1 = self.PktMethod.GetPacketDetails(packet=f"Set_Load 15000mW", limit=conditions[cond], Type="TesterMsg")
                 print("TempPkt1:",TempPkt1)
                 if len(TempPkt1) > 2:
                     self.GetInitailVoltage(2, start=TempPkt1[2],end=conditions[cond][1])
-                    res.append([f"{self.file_list[TempPkt1[2]]['pktType']} found at {self.PktMethod.Timeconvert(TempPkt1[0])}", "Pass"])
+                    res.append([f"{self.file_list[TempPkt1[2]]['pktType']} found at {self.PktMethod.Timeconvert(TempPkt1[0])}", Enums.TestResult.PASS])
                     if self.XCEV_Ideal is not None:
-                        res.append([f"Power transfer stabilized at {self.PktMethod.Timeconvert(self.file_list[self.XCEV_Ideal]['startTime'])}", "Pass"])
+                        res.append([f"Power transfer stabilized at {self.PktMethod.Timeconvert(self.file_list[self.XCEV_Ideal]['startTime'])}", Enums.TestResult.PASS])
                         irect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData3)
                         # ChkRes1 = CommonMethods.check_measure([1.080, 1.090], irect[0], 0)
-                        res.append([f"Measured Irect is {irect[0]} A", "Pass"])
+                        res.append([f"Measured Irect is {irect[0]} A", Enums.TestResult.PASS])
                         vrect = self.PktMethod.CalculateVoltTwindow(self.stability, self.AllChannelData)
                         ChkRes2 = CommonMethods.check_measure([13.86, 14.14], vrect[0], 0)
                         res.append([f"Measured Vrect is {ChkRes2[3]} V, Limit: {ChkRes2[2]} V", ChkRes2[1]])
@@ -2374,9 +2375,9 @@ class CommonCTSChecks():
                         ChkRes3 = CommonMethods.check_measure([15], power, "GTEQL")
                         res.append([f"Measured Prect is {power} W, Limit: {ChkRes3[2]} W", ChkRes3[1]])
                     else:
-                        res.append([f"Power transfer not stabilized", "Fail"])
+                        res.append([f"Power transfer not stabilized", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"Set_Load 1500mW assertion not found", "Fail"])
+                    res.append([f"Set_Load 1500mW assertion not found", Enums.TestResult.FAIL])
                 nak_chk = False
                 AllChannelData = self.PlotMethod.GetAllChannelData2('2', self.JapiData)
                 AllChannelData3 = self.PlotMethod.GetAllChannelData2('3', self.JapiData)
@@ -2401,21 +2402,21 @@ class CommonCTSChecks():
                                     pass
                                 else:
                                     res.append(
-                                        [f"Mismatch in offset applied: {RP_offset} mW, Expected offset: {abs(ReceivedPower_offset)} mW", "Fail"])
+                                        [f"Mismatch in offset applied: {RP_offset} mW, Expected offset: {abs(ReceivedPower_offset)} mW", Enums.TestResult.FAIL])
                                 if PLA_ReceivedPower == (Received_Power + ReceivedPower_offset):
                                     res.append(
-                                        [f"Received power in PLA packet: {PLA_ReceivedPower} mW is matching to calculated power: {(Received_Power + ReceivedPower_offset)} mW after applying {ReceivedPower_offset} mW offset", "Pass"])
+                                        [f"Received power in PLA packet: {PLA_ReceivedPower} mW is matching to calculated power: {(Received_Power + ReceivedPower_offset)} mW after applying {ReceivedPower_offset} mW offset", Enums.TestResult.PASS])
                                 else:
                                     res.append(
-                                        [f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {(Received_Power + ReceivedPower_offset)} mW after applying {ReceivedPower_offset} mW offset", "Fail"])
+                                        [f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {(Received_Power + ReceivedPower_offset)} mW after applying {ReceivedPower_offset} mW offset", Enums.TestResult.FAIL])
                                 x = TempPkt2[2] + 1
                                 if 'TesterMsg' in self.GetPacketType(x):
                                     x += 1
-                                res.append([f"{self.file_list[x]['pktType']} response received for PLA packet", "Pass"])
+                                res.append([f"{self.file_list[x]['pktType']} response received for PLA packet", Enums.TestResult.PASS])
                                 if 'NAK' in self.file_list[x]['pktType']:
                                     nak_chk = True
                                     NAK_offset[cond] = ReceivedPower_offset
-                                    res.append([f"NAK response received after applying {ReceivedPower_offset} mW offset for PLA packet", "Pass"])
+                                    res.append([f"NAK response received after applying {ReceivedPower_offset} mW offset for PLA packet", Enums.TestResult.PASS])
                                     vrect1 = self.CalculateVoltTwindow(TempPkt2[2], AllChannelData, at="end", measure="after", winsize=[15, 19])[0]
                                     irect1 = self.CalculateVoltTwindow(TempPkt2[2], AllChannelData3, at="end", measure="after", winsize=[15, 19])[0]
                                     Prect1 = vrect1 * irect1
@@ -2423,45 +2424,45 @@ class CommonCTSChecks():
                                     irect2 = self.CalculateVoltTwindow(TempPkt2[2], AllChannelData3, at="end", measure="after", winsize=[40, 44])[0]
                                     Prect2 = vrect2 * irect2
                                     if (Prect2 - Prect1) * 1000 <= 50:
-                                        res.append([f"PTx throttled while sending NAK to PLA packet at {self.PktMethod.Timeconvert(TempPkt2[0])}", "Pass"])
+                                        res.append([f"PTx throttled while sending NAK to PLA packet at {self.PktMethod.Timeconvert(TempPkt2[0])}", Enums.TestResult.PASS])
                                     else:
-                                        res.append([f"PTx not throttled while sending NAK to PLA packet at {self.PktMethod.Timeconvert(TempPkt2[0])}", "Fail"])
+                                        res.append([f"PTx not throttled while sending NAK to PLA packet at {self.PktMethod.Timeconvert(TempPkt2[0])}", Enums.TestResult.FAIL])
                             id = TempPkt2[2] + 1
                             ReceivedPower_offset -= 10.0
                         else:
                             break
                     sd = self.PktMethod.GetPacketDetails(packet='Test_Status', value="Test_Stop", limit=[Flow_limit[1], Flow_limit[0]], Type="TesterMsg")
                     if len(sd) > 2:
-                        res.append([f"PTx removed power at {self.PktMethod.Timeconvert(sd[0])}", "Pass"])
+                        res.append([f"PTx removed power at {self.PktMethod.Timeconvert(sd[0])}", Enums.TestResult.PASS])
                     else:
-                        res.append([f"PTx does not removed power", "Fail"])
+                        res.append([f"PTx does not removed power", Enums.TestResult.FAIL])
                     if packetCount == 0:
                         res.append(
-                            [f"No PLA packets found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}Sec", "Fail"])
+                            [f"No PLA packets found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}Sec", Enums.TestResult.FAIL])
                     elif not nak_chk:
                         res.append(
-                            [f"Received {packetCount} PLA Packets with all ACK responses, without Throttling", "Fail"])
+                            [f"Received {packetCount} PLA Packets with all ACK responses, without Throttling", Enums.TestResult.FAIL])
                     else:
                         res.append(
-                            [f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", "Pass"])
+                            [f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", Enums.TestResult.PASS])
                 else:
                     res.append(
-                        [f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}Sec", "Fail"])
+                        [f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}Sec", Enums.TestResult.FAIL])
                 cnt += 1
             else:
-                res.append([f"{cond} sequence not found.", "Fail"])
+                res.append([f"{cond} sequence not found.", Enums.TestResult.FAIL])
         if abs(NAK_offset['condition_B']) < abs(NAK_offset['condition_A']):
             res.append(
-                [f"PPR_offset_B: {abs(NAK_offset['condition_B'])} < PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_B < PPR_offset_A", "Pass"])
+                [f"PPR_offset_B: {abs(NAK_offset['condition_B'])} < PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_B < PPR_offset_A", Enums.TestResult.PASS])
         else:
             res.append(
-                [f"PPR_offset_B: {abs(NAK_offset['condition_B'])}, PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_B < PPR_offset_A", "Fail"])
+                [f"PPR_offset_B: {abs(NAK_offset['condition_B'])}, PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_B < PPR_offset_A", Enums.TestResult.FAIL])
         if abs(NAK_offset['condition_C']) < abs(NAK_offset['condition_A']):
             res.append(
-                [f"PPR_offset_C: {abs(NAK_offset['condition_C'])} < PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_C < PPR_offset_A", "Pass"])
+                [f"PPR_offset_C: {abs(NAK_offset['condition_C'])} < PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_C < PPR_offset_A", Enums.TestResult.PASS])
         else:
             res.append(
-                [f"PPR_offset_C: {abs(NAK_offset['condition_C'])}, PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_C < PPR_offset_A", "Fail"])
+                [f"PPR_offset_C: {abs(NAK_offset['condition_C'])}, PPR_offset_A: {abs(NAK_offset['condition_A'])}, Expected: PPR_offset_C < PPR_offset_A", Enums.TestResult.FAIL])
 
 
         return res
@@ -2477,11 +2478,11 @@ class CommonCTSChecks():
                     res.append(
                         [f"Measured Txce_stable is {chk_res[3]} sec, Expected: {chk_res[2]}", chk_res[1]])
                 else:
-                    res.append([f"Extended Control Error packet not found.", "Fail"])
+                    res.append([f"Extended Control Error packet not found.", Enums.TestResult.FAIL])
             else:
-                res.append([f"MPP_XCEV_Ideal packet not found.", "Fail"])
+                res.append([f"MPP_XCEV_Ideal packet not found.", Enums.TestResult.FAIL])
         else:
-            res.append([f"Set_Load {Check['set_load']}mA packet not found.", "Inconclusive"])
+            res.append([f"Set_Load {Check['set_load']}mA packet not found.", Enums.TestResult.INCONCLUSIVE])
 
 
         return res
@@ -2500,15 +2501,15 @@ class CommonCTSChecks():
                 if len(IncZ2) > 2:
                     ssvrect['z_2mm'] = IncZ2[2]
                 else:
-                    res.append([f"Increase_z_By_1mm assertion_2 not found", "Fail"])
+                    res.append([f"Increase_z_By_1mm assertion_2 not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"Increase_z_By_1mm assertion_1 not found", "Fail"])
+                res.append([f"Increase_z_By_1mm assertion_1 not found", Enums.TestResult.FAIL])
         else:
-            res.append([f"Execution_count_no not found", "Fail"])
+            res.append([f"Execution_count_no not found", Enums.TestResult.FAIL])
         vrectmax = {"z_0mm": 0, "z_1mm": 0, "z_2mm": 0}
         for key, value in ssvrect.items():
             if value:
-                res.append([f"{self.file_list[value]['pktType']} found at {round(self.file_list[value]['startTime'], 3)} sec", "Pass"])
+                res.append([f"{self.file_list[value]['pktType']} found at {round(self.file_list[value]['startTime'], 3)} sec", Enums.TestResult.PASS])
                 cnt = 1
                 start = value
                 vmax = 0
@@ -2516,17 +2517,17 @@ class CommonCTSChecks():
                     ss = self.PktMethod.GetPacketDetails(packet="Signal strength", limit=[start, end])
                     if len(ss) > 2:
                         vrect = float(round(self.PktMethod.CalculateVoltTwindow(ss[2], self.AllChannelData, winsize=[9, 11])[0], 3))
-                        res.append([f"At {key}, Vrect at Signal strength_{cnt} is {vrect} V, found at {round(ss[0], 3)} sec", "Pass"])
+                        res.append([f"At {key}, Vrect at Signal strength_{cnt} is {vrect} V, found at {round(ss[0], 3)} sec", Enums.TestResult.PASS])
                         if vrect > vmax:
                             vmax = vrect
                         start = ss[2] + 1
                     else:
-                        res.append([f"Signal strength not found", "Fail"])
+                        res.append([f"Signal strength not found", Enums.TestResult.FAIL])
                     cnt += 1
                 vrectmax[key] = vmax
-                res.append([f"Vrect_{list(ssvrect.keys()).index(key)}_max at {key} is {vmax} V", "Pass"])
+                res.append([f"Vrect_{list(ssvrect.keys()).index(key)}_max at {key} is {vmax} V", Enums.TestResult.PASS])
         maxkey = max(vrectmax, key=vrectmax.get)
-        res.append([f"Final Maximum voltage is {max(vrectmax.values())} V at {maxkey}", "Pass"])
+        res.append([f"Final Maximum voltage is {max(vrectmax.values())} V at {maxkey}", Enums.TestResult.PASS])
         res = res
 
 
@@ -2535,7 +2536,7 @@ class CommonCTSChecks():
         res = []
         setload = self.PktMethod.GetPacketDetails(packet=f'Set_Load 80mA', limit=Flow_limit, Type="TesterMsg")
         if len(setload) > 2:
-            res.append([f"Load current switched to 80 mA at {round(setload[0],3)} sec", "Pass"])
+            res.append([f"Load current switched to 80 mA at {round(setload[0],3)} sec", Enums.TestResult.PASS])
             sindex = int((((self.file_list[setload[2]].get('startTime') - 1) * 1000)) / self.AllChannelData['Interval'])
             eindex = int((((self.file_list[setload[2]].get('startTime') + 1) * 1000)) / self.AllChannelData['Interval'])
             id = sindex
@@ -2544,11 +2545,11 @@ class CommonCTSChecks():
             vrect_max_index = sindex + vrects.index(vrect_max) + 1
             t1 = self.AllChannelData['Interval'] * vrect_max_index
             if vrect_max <= 20.4:
-                res.append([f"Vrect_max: {round(vrect_max, 3)} V found at {self.PktMethod.ms_to_time(t1)}, Expected: <= 20.4 V", "Pass"])
+                res.append([f"Vrect_max: {round(vrect_max, 3)} V found at {self.PktMethod.ms_to_time(t1)}, Expected: <= 20.4 V", Enums.TestResult.PASS])
             else:
-                res.append([f"Vrect_max: {round(vrect_max, 3)} V found at {self.PktMethod.ms_to_time(t1)}, Expected: <= 20.4 V", "Fail"])
+                res.append([f"Vrect_max: {round(vrect_max, 3)} V found at {self.PktMethod.ms_to_time(t1)}, Expected: <= 20.4 V", Enums.TestResult.FAIL])
         else:
-            res.append([f"Set_Load 80mA packet not found.", "Fail"])
+            res.append([f"Set_Load 80mA packet not found.", Enums.TestResult.FAIL])
         return res
     
     # def InitialVoltage_Vrectfinal0(self, Flow_limit, Check):
@@ -2556,9 +2557,9 @@ class CommonCTSChecks():
     #     if self.initialVoltage is not None:
     #         AllMeasures[CTSCheck] = self.initialVoltage
     #         res.append(
-    #             [f"The Measured voltage is {self.initialVoltage}V at {round(self.file_list[self.stability]['startTime'], 2)}sec", "Pass"])
+    #             [f"The Measured voltage is {self.initialVoltage}V at {round(self.file_list[self.stability]['startTime'], 2)}sec", Enums.TestResult.PASS])
     #     else:
-    #         res.append(["Stabilization not found", "Fail"])
+    #         res.append(["Stabilization not found", Enums.TestResult.FAIL])
 
 
     #     return res
@@ -2598,10 +2599,10 @@ class CommonCTSChecks():
         while id < Flow_limit[1]:
             Setload = self.PktMethod.GetPacketDetails(packet=f'Set_Load 50mA', limit=[id,Flow_limit[1]], Type="TesterMsg")
             if len(Setload) > 2:
-                res.append([f"Set_Load 50mA packet found at {round(Setload[0], 3)} Sec, Expected: Set_Load 50mA", "Pass"])
+                res.append([f"Set_Load 50mA packet found at {round(Setload[0], 3)} Sec, Expected: Set_Load 50mA", Enums.TestResult.PASS])
                 Ideal = self.PktMethod.GetPacketDetails(packet='MPP_XCEV_Ideal', limit=[Setload[2], Flow_limit[1]], Type="TesterMsg")
                 if len(Ideal) > 2:
-                    res.append([f"MPP_XCEV_Ideal packet found at {round(Ideal[0], 3)} Sec", "Pass"])
+                    res.append([f"MPP_XCEV_Ideal packet found at {round(Ideal[0], 3)} Sec", Enums.TestResult.PASS])
                     xce = self.PktMethod.GetPacketDetails(packet='Extended Control Error', limit=[Ideal[2],Setload[2]], Type="Packet")
                     if len(xce)>2:
                         Vrect = self.CalculateVoltTwindow(xce[2], self.AllChannelData)[0]
@@ -2618,13 +2619,13 @@ class CommonCTSChecks():
         if len(Vrect_values) == 3:
             if Check['chk'] == "Vrectfinal0<Vrectfinal1<Vrectfinal2":
                 if Vrect_values[0]<Vrect_values[1]<Vrect_values[2]:
-                    res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", 'Pass'])
-                else: res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", 'Fail'])
+                    res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", Enums.TestResult.PASS])
+                else: res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", Enums.TestResult.FAIL])
             elif Check['chk'] == "Vrectfinal0>Vrectfinal1>Vrectfinal2":
                 if Vrect_values[0]>Vrect_values[1]>Vrect_values[2]:
-                    res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", 'Pass'])
-                else: res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", 'Fail'])
-        else: res.append([f"Control stabilized for only {len(Vrect_values)} loads, Expected: 3 loads", "Fail"])
+                    res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", Enums.TestResult.PASS])
+                else: res.append([f"Vrectfinal0 = {Vrect_values[0]} V, Vrectfinal1 = {Vrect_values[1]} V, Vrectfinal2 = {Vrect_values[2]} V, Expected: {Check['chk']}", Enums.TestResult.FAIL])
+        else: res.append([f"Control stabilized for only {len(Vrect_values)} loads, Expected: 3 loads", Enums.TestResult.FAIL])
 
 
 
@@ -2639,22 +2640,22 @@ class CommonCTSChecks():
         for load in loads:
             Setload = self.PktMethod.GetPacketDetails(packet=f'Set_Load {load}mA', limit=Flow_limit, Type="TesterMsg")
             if len(Setload) > 2:
-                res.append([f"Set_Load {load}mA packet found at {round(Setload[0], 3)} Sec, Expected: Set_Load {load}mA", "Pass"])
+                res.append([f"Set_Load {load}mA packet found at {round(Setload[0], 3)} Sec, Expected: Set_Load {load}mA", Enums.TestResult.PASS])
                 Ideal = self.PktMethod.GetPacketDetails(packet='MPP_XCEV_Ideal', limit=[Setload[2], Flow_limit[1]], Type="TesterMsg")
                 if len(Ideal) > 2:
-                    res.append([f"MPP_XCEV_Ideal packet found at {round(Ideal[0], 3)} Sec", "Pass"])
+                    res.append([f"MPP_XCEV_Ideal packet found at {round(Ideal[0], 3)} Sec", Enums.TestResult.PASS])
                     Get_inv = self.PktMethod.GetPacketDetails(packet="Get Request", value="PTx Inverter Voltage", limit=[Ideal[2], Flow_limit[1]], Type="Packet")
                     if len(Get_inv) > 2:
                         if cnt == 2:
                             t_waited = round(Get_inv[0] - Setload[1], 3)
                             if t_waited > 5:
-                                res.append([f"Waited for {t_waited}sec after Set_Load {load}mA, Expected: > 5 sec", "Pass"])
+                                res.append([f"Waited for {t_waited}sec after Set_Load {load}mA, Expected: > 5 sec", Enums.TestResult.PASS])
                             else:
-                                res.append([f"Waited for {t_waited}sec after Set_Load {load}mA, Expected: > 5 sec", "Fail"])
-                        res.append([f"Get Request (PTx Inverter Voltage) packet found at {round(Get_inv[0], 3)} Sec", "Pass"])
+                                res.append([f"Waited for {t_waited}sec after Set_Load {load}mA, Expected: > 5 sec", Enums.TestResult.FAIL])
+                        res.append([f"Get Request (PTx Inverter Voltage) packet found at {round(Get_inv[0], 3)} Sec", Enums.TestResult.PASS])
                         inv_resp = self.PktMethod.GetPacketDetails(packet=self.Inv_vol_pkt, limit=[Get_inv[2], Flow_limit[1]], Type="Response")
                         if len(inv_resp) > 2:
-                            res.append([f"{self.Inv_vol_pkt} response found at {round(inv_resp[0], 3)} Sec", "Pass"])
+                            res.append([f"{self.Inv_vol_pkt} response found at {round(inv_resp[0], 3)} Sec", Enums.TestResult.PASS])
                             Vinv = float(self.PktMethod.GetPayloadDetails(inv_resp[2], "Vinv")[0]['sDescription'].split(":")[-1].split("V")[0].strip())
                             Vrect = self.PktMethod.CalculateVoltTwindow(inv_resp[2], self.AllChannelData, winsize=[1, 3])[0]
                             G = round(Vrect / Vinv, 3)
@@ -2666,30 +2667,30 @@ class CommonCTSChecks():
                                 while x < Flow_limit[1]:
                                     if 'Extended Control Error' in self.file_list[x].get('pktType'):
                                         if self.file_list[x].get('value') not in ['0']:
-                                            res.append([f"Extended Control Error {self.file_list[x]['value']} found at {round(self.file_list[x]['startTime'], 3)} Sec, Expected: Extended Control Error 0 only", "Fail"])
+                                            res.append([f"Extended Control Error {self.file_list[x]['value']} found at {round(self.file_list[x]['startTime'], 3)} Sec, Expected: Extended Control Error 0 only", Enums.TestResult.FAIL])
                                             break
                                     x += 1
                                 else:
-                                    res.append([f"Extended Control Error 0 is observed from {round(inv_resp[0], 3)} Sec to {round(self.file_list[Flow_limit[1]]['startTime'], 3)} Sec(end of test)", "Pass"])
+                                    res.append([f"Extended Control Error 0 is observed from {round(inv_resp[0], 3)} Sec to {round(self.file_list[Flow_limit[1]]['startTime'], 3)} Sec(end of test)", Enums.TestResult.PASS])
                             cnt += 1
                         else:
-                            res.append([f"{self.Inv_vol_pkt} not found", "Fail"])
+                            res.append([f"{self.Inv_vol_pkt} not found", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"Get Request (PTx Inverter Voltage) not found", "Fail"])
+                        res.append([f"Get Request (PTx Inverter Voltage) not found", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"MPP_XCEV_Ideal not found", "Fail"])
+                    res.append([f"MPP_XCEV_Ideal not found", Enums.TestResult.FAIL])
             else:
-                res.append([f"Set_Load 50mA not found", "Fail"])
+                res.append([f"Set_Load 50mA not found", Enums.TestResult.FAIL])
         if len(vinv_list) == 2:
             vinv_delta = round(abs(vinv_list[1] - vinv_list[0]), 3)
             if vinv_delta <= 0.2:
                 res.append(
-                    [f"The Measured Vinverter_Delta is {vinv_delta * 1000} mV, Expected: <= 200 mV", "Pass"])
+                    [f"The Measured Vinverter_Delta is {vinv_delta * 1000} mV, Expected: <= 200 mV", Enums.TestResult.PASS])
             else:
                 res.append(
-                    [f"The Measured Vinverter_Delta is {vinv_delta * 1000} mV, Expected: <= 200 mV", "Fail"])
+                    [f"The Measured Vinverter_Delta is {vinv_delta * 1000} mV, Expected: <= 200 mV", Enums.TestResult.FAIL])
         else:
-            res.append([f"Vinverter_Delta not found", "Fail"])
+            res.append([f"Vinverter_Delta not found", Enums.TestResult.FAIL])
         return res
     
     def PeakCurrent(self, Flow_limit, Check):
@@ -2700,7 +2701,7 @@ class CommonCTSChecks():
             chk = CommonMethods.check_measure([6.7], resp[0], 'LTEQL')
             res.append([f'The Measured PeakCurrent is {chk[3]} A at {self.PktMethod.Timeconvert(PC[0])}, Expected: {chk[2]} A', chk[1]])
         else:
-            res.append([f'Short_Fixture_Status not found', 'Fail'])
+            res.append([f'Short_Fixture_Status not found', Enums.TestResult.FAIL])
         return res
     
     # def BitsCheck(self, Flow_limit, Check):
@@ -2727,10 +2728,10 @@ class CommonCTSChecks():
                 while id <= Flow_limit[1]:
                     if "Shutdown" in self.file_list[id]['pktType']:
                         res.append(
-                            [f"Power signal was removed within 2mins from the load ramp. at {round(self.file_list[id]['startTime'], 3)} sec", "Fail"])
+                            [f"Power signal was removed within 2mins from the load ramp. at {round(self.file_list[id]['startTime'], 3)} sec", Enums.TestResult.FAIL])
                         break
                     if (self.file_list[id]['startTime'] - MinRP[0]) >= 120:
-                        res.append([f"Power signal was not removed for 2mins after the load ramp.", "Pass"])
+                        res.append([f"Power signal was not removed for 2mins after the load ramp.", Enums.TestResult.PASS])
                         break
                     if 'Received Power' in self.file_list[id]['pktType']:
                         result = GeneralMethods.GetFloatFromStr(self.file_list[id]['value'])
@@ -2738,8 +2739,8 @@ class CommonCTSChecks():
                     id += 1
                 prect_min = min(RPlist)
                 prect_max = max(RPlist)
-                res.append([f"The measured Prect_min is {prect_min} W, Expected: >=5 W", "Pass" if max(RPlist) >= 5 else "Fail"])
-                res.append([f"The measured Prect_max is {prect_max} W, Expected: <=7.5 W", "Pass" if max(RPlist) <= 7.5 else "Fail"])
+                res.append([f"The measured Prect_min is {prect_min} W, Expected: >=5 W", Enums.TestResult.PASS if max(RPlist) >= 5 else Enums.TestResult.FAIL])
+                res.append([f"The measured Prect_max is {prect_max} W, Expected: <=7.5 W", Enums.TestResult.PASS if max(RPlist) <= 7.5 else Enums.TestResult.FAIL])
         return res
     
     def RP_avgPower(self, Flow_limit, Check):
@@ -2748,14 +2749,14 @@ class CommonCTSChecks():
         id = self.stability
         power = 0
         cnt = 0
-        res.append([f"Monitoring 8 bit Received power values for 2 sec:", "Pass"])
+        res.append([f"Monitoring 8 bit Received power values for 2 sec:", Enums.TestResult.PASS])
         while id < Flow_limit[1]:
             if float(self.file_list[id].get('startTime')) > maxtime:
                 break
             if 'Received Power' in self.file_list[id].get('pktType'):
                 cnt += 1
                 p1 = float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', ''))
-                res.append([f"8 bit Received Power is {p1} W at {self.PktMethod.Timeconvert(self.file_list[id]['startTime'])}", "Pass"])
+                res.append([f"8 bit Received Power is {p1} W at {self.PktMethod.Timeconvert(self.file_list[id]['startTime'])}", Enums.TestResult.PASS])
                 power = power + p1
                 # print("RP8:",float(self.file_list[id]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'].split('w')[0].replace('{', '')))
             id += 1
@@ -2804,11 +2805,11 @@ class CommonCTSChecks():
         while id < limit[1]:
             if self.file_list[id]['pktType'] in ["Extended Control Error","Control Error"]:
                 # AllMeasures[CTSCheck] = round(self.file_list[id]['startTime'], 2)
-                res.append([f'PT Phase started from {round(self.file_list[id]['startTime'],3)} sec', "Pass"])
+                res.append([f'PT Phase started from {round(self.file_list[id]['startTime'],3)} sec', Enums.TestResult.PASS])
                 break
             id += 1
         if len(res) == 0:
-            res.append([f'PT Phase not found.', "Fail"])
+            res.append([f'PT Phase not found.', Enums.TestResult.FAIL])
 
         if "Load_apply" in Check:
             if "ECAPLimit" in Check:
@@ -2827,9 +2828,9 @@ class CommonCTSChecks():
                 if len(TempPkt1) > 2:
                     res.append([f"Set_Load {load} mW is observed at index @{TempPkt1[2]}", "pass"])
                 else:
-                    res.append([f"Set_Load {load} mW is not observed.", "Fail"])
+                    res.append([f"Set_Load {load} mW is not observed.", Enums.TestResult.FAIL])
             else:
-                res.append([f"{self.ECAP_pkt} not recevied", "Fail"])
+                res.append([f"{self.ECAP_pkt} not recevied", Enums.TestResult.FAIL])
 
         if "Load_upto" in Check:
             x = Flow_limit[0]
@@ -2853,19 +2854,19 @@ class CommonCTSChecks():
                         if applied_load <= load:
                             res.append([f"Set_Load {applied_load} mW is observed at index @{TempPkt1[2]}, Expected: Upto the Negotiable load power value in the ECAP packet ", "pass"])
                         else:
-                            res.append([f"Set_Load {applied_load} mW is observed at index @{TempPkt1[2]}, Expected: Upto the Negotiable load power value in the ECAP packet", "Fail"])
+                            res.append([f"Set_Load {applied_load} mW is observed at index @{TempPkt1[2]}, Expected: Upto the Negotiable load power value in the ECAP packet", Enums.TestResult.FAIL])
                     else:
-                        res.append([f"Set_Load {load} mW is not observed.", "Fail"])
+                        res.append([f"Set_Load {load} mW is not observed.", Enums.TestResult.FAIL])
 
                     # TempPkt1 = self.PktMethod.GetPacketDetails(packet=f"Set_Load {load}mW", limit=[ECAP[2], end], Type="TesterMsg")
                     # if len(TempPkt1) > 2:
                     #     x = TempPkt1[2]
                     #     res.append([f"Set_Load {load} mW is observed at index @{TempPkt1[2]}", "pass"])
                     # else:
-                    #     res.append([f"Set_Load {load} mW is not observed.", "Fail"])
+                    #     res.append([f"Set_Load {load} mW is not observed.", Enums.TestResult.FAIL])
                 else:
                     if ECAP_cnt < 1:
-                        res.append([f"{self.ECAP_pkt} not recevied", "Fail"])
+                        res.append([f"{self.ECAP_pkt} not recevied", Enums.TestResult.FAIL])
 
                     break
                 x += 1
@@ -2882,18 +2883,18 @@ class CommonCTSChecks():
         Pkt = self.GetPacketDetails(packet="CAL_ENTER", limit=Flow_limit)
         if len(Pkt) > 2:
             CAL_ENTER_STOP = Pkt[1]
-            res.append([f"Received CAL_ENTER packet at {round(Pkt[0], 2)} sec", "Pass"])
+            res.append([f"Received CAL_ENTER packet at {round(Pkt[0], 2)} sec", Enums.TestResult.PASS])
         else:
-            res.append([f"CAL_ENTER packet not recevied", "Fail"])
+            res.append([f"CAL_ENTER packet not recevied", Enums.TestResult.FAIL])
         Pkt_res = self.GetPacketDetails(packet="CAL_ENTER_RSP", limit=Flow_limit)
         if len(Pkt_res) > 2:
             calduration = int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0])
             if self.Mode == "TPT":
                 calduration = calduration * 60
             calbPoints = int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][1]['childelement'][1]['sDescription'])[0])
-            res.append([f"Received CAL_ENTER_RSP packet at {round(Pkt_res[0], 2)} sec, with Calib points of {calbPoints}", "Pass"])
+            res.append([f"Received CAL_ENTER_RSP packet at {round(Pkt_res[0], 2)} sec, with Calib points of {calbPoints}", Enums.TestResult.PASS])
         else:
-            res.append([f"CAL_ENTER_RSP packet not recevied", "Fail"])
+            res.append([f"CAL_ENTER_RSP packet not recevied", Enums.TestResult.FAIL])
         id = Pkt[2] if len(Pkt) > 0 else Flow_limit[0]
         CAL_CAPTURE_cnt = 0
         CalStart = 0
@@ -2920,46 +2921,46 @@ class CommonCTSChecks():
         CalLevels.append([CalLevels[len(CalLevels) - 1][1] + 1, prevIndex])
         if calbPoints is not None:
             if CAL_CAPTURE_cnt == calbPoints:
-                res.append([f"Recived all the {calbPoints} CAL_CAPTURE packets between {CalStart}sec to {CalEnd}sec", "Pass"])
+                res.append([f"Recived all the {calbPoints} CAL_CAPTURE packets between {CalStart}sec to {CalEnd}sec", Enums.TestResult.PASS])
             else:
-                res.append([f"Mismatch in CAL_CAPTURE packet count, No,of Calib points={calbPoints} and Recevied CAL_CAPTURE count={CAL_CAPTURE_cnt}", "Fail"])
+                res.append([f"Mismatch in CAL_CAPTURE packet count, No,of Calib points={calbPoints} and Recevied CAL_CAPTURE count={CAL_CAPTURE_cnt}", Enums.TestResult.FAIL])
         else:
-            res.append([f"CAL_ENTER_RSP packet not recevied, Recevied CAL_CAPTURE count={CAL_CAPTURE_cnt}", "Fail"])
+            res.append([f"CAL_ENTER_RSP packet not recevied, Recevied CAL_CAPTURE count={CAL_CAPTURE_cnt}", Enums.TestResult.FAIL])
         if len(pkt_cmt) > 2:
-            res.append([f"Received CAL_OP packet at {round(pkt_cmt[0], 2)} sec", "Pass"])
+            res.append([f"Received CAL_OP packet at {round(pkt_cmt[0], 2)} sec", Enums.TestResult.PASS])
         else:
-            res.append([f"CAL_OP packet not recevied", "Fail"])
+            res.append([f"CAL_OP packet not recevied", Enums.TestResult.FAIL])
         Renego = self.GetPacketDetails(packet="SRQ", value="Extended Power Level Selection", limit=Flow_limit)
         if len(Renego) > 2:
             Renegoval = GeneralMethods.GetFloatFromStr(self.file_list[Renego[2]]['value'])[0]
             if Check['Renego_LoadPower'] == Renegoval:
-                res.append([f"The applied Load power value in ECAP is {Renegoval}W @index {Renego[2]} and CTS is {Check['Renego_LoadPower']}W", "Pass"])
+                res.append([f"The applied Load power value in ECAP is {Renegoval}W @index {Renego[2]} and CTS is {Check['Renego_LoadPower']}W", Enums.TestResult.PASS])
             else:
-                res.append([f"The applied Load power value in ECAP is {Renegoval}W @index {Renego[2]} and CTS is {Check['Renego_LoadPower']}W", "Fail"])
+                res.append([f"The applied Load power value in ECAP is {Renegoval}W @index {Renego[2]} and CTS is {Check['Renego_LoadPower']}W", Enums.TestResult.FAIL])
         else:
-            res.append([f"The ECAP packet not received to apply {Check['Renego_LoadPower']}W", "Fail"])
+            res.append([f"The ECAP packet not received to apply {Check['Renego_LoadPower']}W", Enums.TestResult.FAIL])
         pkt_exit = self.GetPacketDetails(packet="CAL_EXIT", limit=Flow_limit)
         if len(pkt_exit) > 2:
-            res.append([f"Received CAL_EXIT packet at {round(pkt_exit[0], 2)} sec", "Pass"])
+            res.append([f"Received CAL_EXIT packet at {round(pkt_exit[0], 2)} sec", Enums.TestResult.PASS])
             if CAL_ENTER_STOP and calduration:
                 if (pkt_exit[0] - CAL_ENTER_STOP) > calduration:
-                    res.append([f"Calculated Calib duration is {round(pkt_exit[0] - CAL_ENTER_STOP, 2)}S, which is not in limit of {calduration}", "Fail"])
+                    res.append([f"Calculated Calib duration is {round(pkt_exit[0] - CAL_ENTER_STOP, 2)}S, which is not in limit of {calduration}", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"Calculated Calib duration is {round(pkt_exit[0] - CAL_ENTER_STOP, 2)}S, which is in limit of {calduration}", "Pass"])
+                    res.append([f"Calculated Calib duration is {round(pkt_exit[0] - CAL_ENTER_STOP, 2)}S, which is in limit of {calduration}", Enums.TestResult.PASS])
             else:
-                res.append([f"CAL_ENTER Packet or CAL duration not found", "Pass"])
+                res.append([f"CAL_ENTER Packet or CAL duration not found", Enums.TestResult.PASS])
         else:
-            res.append([f"CAL_EXIT packet not recevied", "Fail"])
+            res.append([f"CAL_EXIT packet not recevied", Enums.TestResult.FAIL])
         pkt_DPM = self.GetPacketDetails(packet="DPCAL_PARAM", limit=Flow_limit)
         if len(pkt_DPM) > 2:
             alpha = GeneralMethods.GetFloatFromStr(self.file_list[pkt_DPM[2]]['header_Payload']['childelement'][1]['childelement'][0]['sDescription'])[0]
             beta = GeneralMethods.GetFloatFromStr(self.file_list[pkt_DPM[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0]
             if any(r == 0 for r in [alpha, beta]):
-                res.append([f"The DPCAL_PARAM packet received at {round(pkt_DPM[0], 2)}sec,Alpha:{alpha},Beta:{beta}", "Fail"])
+                res.append([f"The DPCAL_PARAM packet received at {round(pkt_DPM[0], 2)}sec,Alpha:{alpha},Beta:{beta}", Enums.TestResult.FAIL])
             else:
-                res.append([f"The DPCAL_PARAM packet received at {round(pkt_DPM[0], 2)}sec,Alpha:{alpha},Beta:{beta}", "Pass"])
+                res.append([f"The DPCAL_PARAM packet received at {round(pkt_DPM[0], 2)}sec,Alpha:{alpha},Beta:{beta}", Enums.TestResult.PASS])
         else:
-            res.append([f"DPCAL_PARAM packet not recevied", "Fail"])
+            res.append([f"DPCAL_PARAM packet not recevied", Enums.TestResult.FAIL])
         if 'AddChecks' in Check:
             for addcheck in Check['AddChecks']:
                 if addcheck == 'CAL_CAP_Level_counts':
@@ -3038,7 +3039,7 @@ class CommonCTSChecks():
             x = id
             load_reduced = False
             PLA_wo_offset = False
-            res.append([f"After stabilization at {round(self.file_list[self.stability]['startTime'],2)}sec", "Pass"])
+            res.append([f"After stabilization at {round(self.file_list[self.stability]['startTime'],2)}sec", Enums.TestResult.PASS])
             while id < Flow_limit[1]:
                 PLA = self.GetPacketDetails(packet="Power Loss Accounting", limit=[id, Flow_limit[1]])
                 if len(PLA) > 2:
@@ -3046,23 +3047,23 @@ class CommonCTSChecks():
                     PLARect = self.GetPacketDetails(packet="Rectified", limit=[PLA[2], PLA[2] - 5])
                     if len(PLAOffset) > 2 and len(PLARect) > 2:
                         if not load_reduced:
-                            res.append([f"TPR reported Ppr,est = Ppr - 669 mW and Prect,est =Prect – 669 mW at {round(PLAOffset[0],3)} sec", "Pass"])
-                            res.append([f"Power Loss Accounting packet found at {round(PLA[0],3)} sec", "Pass"])
+                            res.append([f"TPR reported Ppr,est = Ppr - 669 mW and Prect,est =Prect – 669 mW at {round(PLAOffset[0],3)} sec", Enums.TestResult.PASS])
+                            res.append([f"Power Loss Accounting packet found at {round(PLA[0],3)} sec", Enums.TestResult.PASS])
 
                             Prect = round(round(GeneralMethods.GetFloatFromStr(self.file_list[PLARect[2]]['pktType'])[1] - (Check['expected'][0]['PrectOffsetValue'] / 1000), 3) * 1000)
                             PLA_Prect = round(float(self.file_list[PLA[2]].get("value").strip("{}W")) * 1000)
                             if PLA_Prect == Prect:
-                                res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are same for the PLA@index{PLA[2]}", "Pass"])
+                                res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are same for the PLA@index{PLA[2]}", Enums.TestResult.PASS])
                             else:
-                                res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are not same for the PLA@index{PLA[2]}", "Fail"])
+                                res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are not same for the PLA@index{PLA[2]}", Enums.TestResult.FAIL])
 
                             respid = self.PktMethod.GetPacketResponse2(PLA[2], [PLA[2]+1, Flow_limit[1]])
                             if respid is not None:
                                 pla_resp = self.file_list[respid].get("pktType")
                                 if Check['expected'][0]["exp_resp1"] in pla_resp:
-                                    res.append([f"Received {pla_resp} response for PLA packet, expected: {Check['expected'][0]['exp_resp1']}", "Pass"])
+                                    res.append([f"Received {pla_resp} response for PLA packet, expected: {Check['expected'][0]['exp_resp1']}", Enums.TestResult.PASS])
                                 else:
-                                    res.append([f"Received {pla_resp} response for PLA packet, expected: {Check['expected'][0]['exp_resp1']}", "Fail"])
+                                    res.append([f"Received {pla_resp} response for PLA packet, expected: {Check['expected'][0]['exp_resp1']}", Enums.TestResult.FAIL])
 
 
                                 # Throttle check
@@ -3087,19 +3088,19 @@ class CommonCTSChecks():
                                         # throttle_cnt += 1
                                         # if throttle_cnt == 1:
                                         #     t_start = PLA[0]
-                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA_2 packet at {round(PLA[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
-                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA_2 packet at {round(PLA[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
+                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA_2 packet at {round(PLA[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
+                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA_2 packet at {round(PLA[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
 
 
 
                             if Check['expected'][0].get('Prect_reduced'):
                                 pred = round(GeneralMethods.GetFloatFromStr(self.file_list[PLA[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0], 3)
                                 if pred < Check['expected'][0]['Prect_reduced']:
-                                    res.append([f"TPR dialed down the target load to {pred} W, expected: <5w", "Pass"])
+                                    res.append([f"TPR dialed down the target load to {pred} W, expected: <5w", Enums.TestResult.PASS])
                                     load_reduced = True
                                     x = PLA[2]
                         else:
-                            res.append([f"Offsets applied even after Prect is reduced below 5W", "Fail"])
+                            res.append([f"Offsets applied even after Prect is reduced below 5W", Enums.TestResult.FAIL])
                             PLA_wo_offset = False
                             break
 
@@ -3111,7 +3112,7 @@ class CommonCTSChecks():
                 else:
                     break
             if PLA_wo_offset:
-                res.append([f"TPR continued sending PLA without the 669mW offset", "Pass"])
+                res.append([f"TPR continued sending PLA without the 669mW offset", Enums.TestResult.PASS])
 
 
             if Check['expected'][0].get("removeoffset"):
@@ -3129,33 +3130,33 @@ class CommonCTSChecks():
 
                                 if pla_resp2 == "ATN":
                                     atn_status = True
-                                    res.append([f"Safe power level is reached and {pla_resp2} response received to PLA packet at {round(PLA2[0],3)}sec", "Pass"])
+                                    res.append([f"Safe power level is reached and {pla_resp2} response received to PLA packet at {round(PLA2[0],3)}sec", Enums.TestResult.PASS])
 
                                     desired_pkt=self.PktMethod.NextOcuurance("Packet",[respid2,Flow_limit[1]])
                                     if desired_pkt is not None:
                                         if "DSR" in self.file_list[desired_pkt].get("pktType") and "POLL" in self.file_list[desired_pkt].get("value"):
-                                            res.append([f"Received DSR POLL for ATN packet at {round(self.file_list[desired_pkt].get('startTime'),3)}sec", "Pass"])
+                                            res.append([f"Received DSR POLL for ATN packet at {round(self.file_list[desired_pkt].get('startTime'),3)}sec", Enums.TestResult.PASS])
 
                                             cap_upda = self.PktMethod.GetPacketDetails(packet=Check['expected'][0]["Tcapupdate"]['packet'][0], limit=[desired_pkt, Flow_limit[1]],Type=Check['expected'][0]["Tcapupdate"]['packet'][1])
                                             if len(cap_upda) > 2:
-                                                res.append([f"{Check['expected'][0]["Tcapupdate"]['packet'][0]} response found at {round(cap_upda[0],3)}sec", "Pass"])
+                                                res.append([f"{Check['expected'][0]["Tcapupdate"]['packet'][0]} response found at {round(cap_upda[0],3)}sec", Enums.TestResult.PASS])
                                                 Tcapupdate = round((cap_upda[0] - self.file_list[respid2]['stopTime'])*1000,3)
                                                 TcapChk = CommonMethods.check_measure(Check['expected'][0]["Tcapupdate"]['exp'], Tcapupdate, Check['expected'][0]["Tcapupdate"]['comp'])
                                                 res.append([f"Measured Tcapupdate: {TcapChk[3]} ms, Expected: {TcapChk[2]} ms", TcapChk[1]])
                                             else: 
-                                                res.append([f"{Check['expected'][0]["Tcapupdate"]['packet'][0]} response not found", "Fail"])
+                                                res.append([f"{Check['expected'][0]["Tcapupdate"]['packet'][0]} response not found", Enums.TestResult.FAIL])
   
                                         else:
-                                            res.append([f"DSR POLL not received for ATN packet at {round(self.file_list[desired_pkt].get('startTime'),3)}sec", "Fail"])
+                                            res.append([f"DSR POLL not received for ATN packet at {round(self.file_list[desired_pkt].get('startTime'),3)}sec", Enums.TestResult.FAIL])
 
                                     break
                                 else:
-                                    res.append([f"{pla_resp2} response received to PLA packet at {round(PLA2[0],3)}sec", "Pass"])
+                                    res.append([f"{pla_resp2} response received to PLA packet at {round(PLA2[0],3)}sec", Enums.TestResult.PASS])
                                 
                         x += 1
 
                     if not atn_status:
-                        res.append(["ATN is not received after completing the power throttling and reaching safe power level.","Fail"])
+                        res.append(["ATN is not received after completing the power throttling and reaching safe power level.",Enums.TestResult.FAIL])
 
                     
                     
@@ -3178,27 +3179,27 @@ class CommonCTSChecks():
                         Prect = round(GeneralMethods.GetFloatFromStr(self.file_list[PLARect[2]]['pktType'])[0] + (Check['PrectOffsetValue'] / 1000), 3) * 1000
                         PLA_Prect = round(GeneralMethods.GetFloatFromStr(self.file_list[PLA[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0], 3) * 1000
                         if PLA_Prect == Prect:
-                            res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are same for the PLA@index{PLA[2]}", "Pass"])
+                            res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are same for the PLA@index{PLA[2]}", Enums.TestResult.PASS])
                         else:
-                            res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are not same for the PLA@index{PLA[2]}", "Fail"])
+                            res.append([f"The calculated Prect {Prect}mW and Received prect {PLA_Prect}mW are not same for the PLA@index{PLA[2]}", Enums.TestResult.FAIL])
                         offsetval = (round(GeneralMethods.GetFloatFromStr(self.file_list[PLAOffset[2]]['value'])[1], 3) * 1000)
                         if type(Check['RPOffsetValue']) == str:
                             if Check['RPOffsetValue'] == "PrectOffset+/-50":
                                 TempLimit = [Check['PrectOffsetValue'] - 50, Check['PrectOffsetValue'] + 50] if Check['PrectOffsetValue'] < 0 else [Check['PrectOffsetValue'] + 50, Check['PrectOffsetValue'] - 50]
                                 if offsetval >= TempLimit[0] and offsetval <= TempLimit[1]:
-                                    res.append([f"The received offset value {offsetval}mW is in the limit of {TempLimit[0]}mW to {TempLimit[1]}mW", "Pass"])
+                                    res.append([f"The received offset value {offsetval}mW is in the limit of {TempLimit[0]}mW to {TempLimit[1]}mW", Enums.TestResult.PASS])
                                 else:
-                                    res.append([f"The received offset value {offsetval}mW is not in the limit of {TempLimit[0]}mW to {TempLimit[1]}mW", "Fail"])
+                                    res.append([f"The received offset value {offsetval}mW is not in the limit of {TempLimit[0]}mW to {TempLimit[1]}mW", Enums.TestResult.FAIL])
                         PLA_RP = round((GeneralMethods.GetFloatFromStr(self.file_list[PLA[2]]['header_Payload']['childelement'][1]['childelement'][0]['sDescription'])[0] * 1000), 3)
                         Rect_RP = round(GeneralMethods.GetFloatFromStr(self.file_list[PLARect[2]]['pktType'])[1], 3) * 1000
                         if PLA_RP == Rect_RP + offsetval:
-                            res.append([f"The RP value:{PLA_RP}mW is same as adding offset of {offsetval}mW to the Rectified RP value {Rect_RP}mW", "Pass"])
+                            res.append([f"The RP value:{PLA_RP}mW is same as adding offset of {offsetval}mW to the Rectified RP value {Rect_RP}mW", Enums.TestResult.PASS])
                         else:
-                            res.append([f"The RP value:{PLA_RP}mW is not same as adding offset of {offsetval}mW to the Rectified RP value {Rect_RP}mW", "Fail"])
-                        if 'Fail' in [item[1] for item in res]:
-                            Finalres.append([','.join([item[0] for item in res]), "Fail"])
+                            res.append([f"The RP value:{PLA_RP}mW is not same as adding offset of {offsetval}mW to the Rectified RP value {Rect_RP}mW", Enums.TestResult.FAIL])
+                        if Enums.TestResult.FAIL in [item[1] for item in res]:
+                            Finalres.append([','.join([item[0] for item in res]), Enums.TestResult.FAIL])
                         else:
-                            Finalres.append([','.join([item[0] for item in res]), "Pass"])
+                            Finalres.append([','.join([item[0] for item in res]), Enums.TestResult.PASS])
                     id = PLA[2] + 1
                 else:
                     break
@@ -3212,7 +3213,7 @@ class CommonCTSChecks():
         res = []
         CustomLimit = self.GetLimits(Check['LimitType'], Check['LimitDetails'], Flow_limit)
         if CustomLimit is not None:
-            res.append([f"Found {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} @{CustomLimit[0]}", "Pass"])
+            res.append([f"Found {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} @{CustomLimit[0]}", Enums.TestResult.PASS])
             id = CustomLimit[0]
             if Check.get("pkts_chk"):
                 for pkts in Check["pkts_chk"]["packet_res"]:
@@ -3236,31 +3237,31 @@ class CommonCTSChecks():
         res = []
         CustomLimit = self.GetLimits(Check['LimitType'], Check['LimitDetails'], Flow_limit)
         if CustomLimit is not None:
-            res.append([f"Found {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} @{CustomLimit[0]}", "Pass"])
+            res.append([f"Found {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} @{CustomLimit[0]}", Enums.TestResult.PASS])
             Renego = self.GetPacketDetails(packet="SRQ", value="Extended Power Level Selection", limit=CustomLimit)
             if len(Renego) > 2:
                 Renegoval = GeneralMethods.GetFloatFromStr(self.file_list[Renego[2]]['value'])[0]
                 if Check['Power'] == Renegoval:
-                    res.append([f"The applied Load power value in ECAP is {Renegoval}W @{Renego[2]} and CTS is {Check['Power']}W", "Pass"])
+                    res.append([f"The applied Load power value in ECAP is {Renegoval}W @{Renego[2]} and CTS is {Check['Power']}W", Enums.TestResult.PASS])
                     XCEIdel = self.GetPacketDetails(packet="MPP_XCEV_Ideal", limit=[Renego[2], CustomLimit[1]])
                     if len(XCEIdel) > 2:
                         CE = self.GetPacketDetails(packet="Extended Control Error", limit=[XCEIdel[2], CustomLimit[0]])
                         if len(CE) > 2:
                             reslt = self.CalculateVoltTwindow(CE[2], self.AllChannelData)
                             if reslt[0] >= Check['Power'] - (Check['Power'] * 5) / 100 and reslt[0] <= Check['Power'] + (Check['Power'] * 5) / 100:
-                                res.append([f"The Mesure voltage {reslt[0]}V @{reslt[1]} is in the limit of {Check['Power'] - (Check['Power'] * 5) / 100} to {Check['Power'] + (Check['Power'] * 5) / 100}", "Pass"])
+                                res.append([f"The Mesure voltage {reslt[0]}V @{reslt[1]} is in the limit of {Check['Power'] - (Check['Power'] * 5) / 100} to {Check['Power'] + (Check['Power'] * 5) / 100}", Enums.TestResult.PASS])
                             else:
-                                res.append([f"The Mesure voltage {reslt[0]}V @{reslt[1]} is not in the limit of {Check['Power'] - (Check['Power'] * 5) / 100} to {Check['Power'] + (Check['Power'] * 5) / 100}", "Fail"])
+                                res.append([f"The Mesure voltage {reslt[0]}V @{reslt[1]} is not in the limit of {Check['Power'] - (Check['Power'] * 5) / 100} to {Check['Power'] + (Check['Power'] * 5) / 100}", Enums.TestResult.FAIL])
                         else:
-                            res.append("Control Error pacekt not found above the MPP_XCEV_Ideal packet", "Fail")
+                            res.append("Control Error pacekt not found above the MPP_XCEV_Ideal packet", Enums.TestResult.FAIL)
                     else:
-                        res.append(["MPP_XCEV_Ideal packet not found after the Renego", "Fail"])
+                        res.append(["MPP_XCEV_Ideal packet not found after the Renego", Enums.TestResult.FAIL])
                 else:
-                    res.append([f"The applied Load power value in ECAP is {Renegoval}W @{Renego[2]} and CTS is {Check['Power']}W", "Fail"])
+                    res.append([f"The applied Load power value in ECAP is {Renegoval}W @{Renego[2]} and CTS is {Check['Power']}W", Enums.TestResult.FAIL])
             else:
-                res.append([f"The ECAP packet not received to applied {Check['Power']}W", "Fail"])
+                res.append([f"The ECAP packet not received to applied {Check['Power']}W", Enums.TestResult.FAIL])
         else:
-            res.append([f"Coudn't find the {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} from the flow {'-'.join(map(str, Flow_limit))}", "Fail"])
+            res.append([f"Coudn't find the {Check['LimitDetails']['Packet'][0]} with response {Check['LimitDetails']['Response']} from the flow {'-'.join(map(str, Flow_limit))}", Enums.TestResult.FAIL])
         # AllMeasures[CTSCheck] = res
 
 
@@ -3270,33 +3271,33 @@ class CommonCTSChecks():
     #     negoval = None
     #     TmpPkt = self.GetPacketDetails(packet=self.ECAP_pkt, limit=Flow_limit)
     #     if len(TmpPkt) > 2:
-    #         res.append([f"The {self.ECAP_pkt} pacekt found at {round(TmpPkt[0], 3)}sec ", "Pass"])
+    #         res.append([f"The {self.ECAP_pkt} pacekt found at {round(TmpPkt[0], 3)}sec ", Enums.TestResult.PASS])
     #         EcapPayload = self.GetPayloadDetails(TmpPkt[2], "Negotiable_Load_Power")
     #         if len(EcapPayload) > 0:
     #             negoval = int(GeneralMethods.GetFloatFromStr(EcapPayload[0]['sDescription'])[0])
-    #             res.append([f"The Negotiable_Load_Power is {negoval}", "Pass"])
+    #             res.append([f"The Negotiable_Load_Power is {negoval}", Enums.TestResult.PASS])
     #         else:
-    #             res.append([f"Negotiable_Load_Power payload not found the for packet", "Fail"])
+    #             res.append([f"Negotiable_Load_Power payload not found the for packet", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"The {self.ECAP_pkt} pacekt not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", "Fail"])
+    #         res.append([f"The {self.ECAP_pkt} pacekt not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", Enums.TestResult.FAIL])
     #     if negoval is not None:
     #         TmpPkt = self.GetPacketDetails(packet="Set_Load", limit=[Flow_limit[1], Flow_limit[0]])
     #         if len(TmpPkt) > 2:
     #             load = int(GeneralMethods.GetFloatFromStr(self.file_list[TmpPkt[2]]['pktType'])[0])
     #             if Check['Type'] == 'value':
     #                 if load == Check['value']:
-    #                     res.append([f"The applied load {load}mW is same as expected value of {Check['value']}", "Pass"])
+    #                     res.append([f"The applied load {load}mW is same as expected value of {Check['value']}", Enums.TestResult.PASS])
     #                 else:
-    #                     res.append([f"The applied load {load}mW is not same as expected value of {Check['value']}", "Fail"])
+    #                     res.append([f"The applied load {load}mW is not same as expected value of {Check['value']}", Enums.TestResult.FAIL])
     #             elif Check['Type'] == 'Percentage':
     #                 if load == int(((negoval * 1000) * Check['value']) / 100):
-    #                     res.append([f"The applied load {load}mW is same as expected value of {Check['value']}% of {negoval} i.e. {int((negoval * Check['value']) / 100)}", "Pass"])
+    #                     res.append([f"The applied load {load}mW is same as expected value of {Check['value']}% of {negoval} i.e. {int((negoval * Check['value']) / 100)}", Enums.TestResult.PASS])
     #                 else:
-    #                     res.append([f"The applied load {load}mW is not same as expected value of {Check['value']}% of {negoval} i.e. {int((negoval * Check['value']) / 100)}", "Fail"])
+    #                     res.append([f"The applied load {load}mW is not same as expected value of {Check['value']}% of {negoval} i.e. {int((negoval * Check['value']) / 100)}", Enums.TestResult.FAIL])
     #         else:
-    #             res.append([f"The Set_Load pacekt not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", "Fail"])
+    #             res.append([f"The Set_Load pacekt not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"Since the Negotiable_Load_Power not found load check not performed", "Fail"])
+    #         res.append([f"Since the Negotiable_Load_Power not found load check not performed", Enums.TestResult.FAIL])
     #     AllMeasures[CTSCheck] = res
 
 
@@ -3306,7 +3307,7 @@ class CommonCTSChecks():
     #     TempPkt1 = self.GetPacketDetails(packet=self.ECAP_pkt, limit=[Flow_limit[1], Flow_limit[0]])
     #     if len(TempPkt1) > 2:
     #         Value = round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt1[2], 'Negotiable_Load_Power')[0]['sRawData'])[0], 3)
-    #         res.append([f"ECAP packet found at {round(TempPkt1[0], 3)}sec with Negotiable_Load_Power:{Value}W", 'Pass'])
+    #         res.append([f"ECAP packet found at {round(TempPkt1[0], 3)}sec with Negotiable_Load_Power:{Value}W", Enums.TestResult.PASS])
     #         id = TempPkt1[2]
     #         TempPktStatus = False
     #         while id < Flow_limit[1]:
@@ -3314,7 +3315,7 @@ class CommonCTSChecks():
     #             if len(TempPkt2) > 2:
     #                 if round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt2[2], 'PRECT')[0]['sDescription'])[0], 3) >= (Value * Check['PRECTPercentage']) / 100:
     #                     TempPktStatus = True
-    #                     res.append([f"The PLA packet recevied at {round(TempPkt2[0], 3)}, with PRECT value of {round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt2[2], 'PRECT')[0]['sDescription'])[0], 3)}", "Pass"])
+    #                     res.append([f"The PLA packet recevied at {round(TempPkt2[0], 3)}, with PRECT value of {round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt2[2], 'PRECT')[0]['sDescription'])[0], 3)}", Enums.TestResult.PASS])
     #                     PTstart = self.GetPacketDetails(packet="Extended Control Error", limit=[TempPkt1[2], Flow_limit[1]])
     #                     if len(PTstart) > 2:
     #                         result = self.check_measure(Check['expected_value'], round(TempPkt2[0] - PTstart[0], 3), Check['comp'])
@@ -3324,9 +3325,9 @@ class CommonCTSChecks():
     #             else:
     #                 break
     #         if TempPktStatus == False:
-    #             res.append([f"PLA packet with expected PRECT value not found", "Fail"])
+    #             res.append([f"PLA packet with expected PRECT value not found", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"ECAP packet not found", 'Fail'])
+    #         res.append([f"ECAP packet not found", Enums.TestResult.FAIL])
     #     AllMeasures[CTSCheck] = res
 
 
@@ -3338,31 +3339,31 @@ class CommonCTSChecks():
     #     TempPkt1 = self.GetPacketDetails(packet="Charge Status", limit=Flow_limit)
     #     if len(TempPkt1) > 2:
     #         InitialVal = round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt1[2], "Charger_Status_Value")[0]['sRawData'])[0], 3)
-    #         res.append([f"Charge Status packet found at {round(TempPkt1[0], 3)}Sec, With Initial charge value {InitialVal}", "Pass"])
+    #         res.append([f"Charge Status packet found at {round(TempPkt1[0], 3)}Sec, With Initial charge value {InitialVal}", Enums.TestResult.PASS])
     #         id = TempPkt1[2] + 1
     #         while id < Flow_limit[1]:
     #             TempPkt2 = self.GetPacketDetails(packet="Charge Status", limit=[id, Flow_limit[1]])
     #             if len(TempPkt2) > 2:
     #                 Value = round(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt2[2], "Charger_Status_Value")[0]['sRawData'])[0], 3)
     #                 if Value >= InitialVal + Check['ExpectedValue']:
-    #                     res.append([f"Charge Status packet found at {round(TempPkt2[0], 3)}sec with charge value {Value} and reached the charge value of initial charge value + {Check['ExpectedValue']}", "Pass"])
+    #                     res.append([f"Charge Status packet found at {round(TempPkt2[0], 3)}sec with charge value {Value} and reached the charge value of initial charge value + {Check['ExpectedValue']}", Enums.TestResult.PASS])
     #                     tid = TempPkt2[2] + 1
     #                     while tid < Flow_limit[1]:
     #                         if self.GetPacketType(tid) == "Packet":
-    #                             res.append([f"Found packets after reaching the charge status limit", 'Fail'])
+    #                             res.append([f"Found packets after reaching the charge status limit", Enums.TestResult.FAIL])
     #                             break
     #                         tid += 1
     #                     if tid == Flow_limit[1]:
-    #                         res.append([f"Test terminated after reaching the charge limit", 'Pass'])
+    #                         res.append([f"Test terminated after reaching the charge limit", Enums.TestResult.PASS])
     #                     break
     #                 id = TempPkt2[2] + 1
     #             else:
-    #                 res.append([f"Last Received Charge Status packet value {Value}", 'Pass'])
+    #                 res.append([f"Last Received Charge Status packet value {Value}", Enums.TestResult.PASS])
     #                 break
     #         if Value is None:
-    #             res.append([f"No further chanrge status packets Received after the first packet", "Fail"])
+    #             res.append([f"No further chanrge status packets Received after the first packet", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"Charge Status packet not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", "Fail"])
+    #         res.append([f"Charge Status packet not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", Enums.TestResult.FAIL])
     #     AllMeasures[CTSCheck] = res
 
 
@@ -3372,36 +3373,36 @@ class CommonCTSChecks():
     #     TempPkt1 = self.GetPacketDetails(packet="SRQ", value="Load Power", limit=Flow_limit)
     #     if len(TempPkt1) > 2:
     #         Value = round(GeneralMethods.GetFloatFromStr((self.GetPayloadDetails(TempPkt1[2], 'Load_Power_low')[0]['sDescription']))[0], 2)
-    #         res.append([f"SRQ Load Power packet found at {round(TempPkt1[0], 3)}sec with load power value {Value}W", "Pass"])
+    #         res.append([f"SRQ Load Power packet found at {round(TempPkt1[0], 3)}sec with load power value {Value}W", Enums.TestResult.PASS])
     #         TempPkt2 = self.GetPacketDetails(packet="SRQ", value="Control Error Calculation Method", limit=[TempPkt1[2] + 1, Flow_limit[1]])
     #         if len(TempPkt2) > 2:
     #             Value1 = self.GetPayloadDetails(TempPkt2[2], 'Request')[0]['sRawData']
     #             Value2 = self.GetPayloadDetails(TempPkt2[2], 'CE_Calculation_Method')[0]['sRawData']
     #             if Value1 == "0xA1" and Value2 == "0x02":
-    #                 res.append([f"SRQ_Control Error Calculation Method packet found at {round(TempPkt2[2], 3)}sec, with payload value Request:{Value1} and CE_Calculation_Method:{Value2} ", "Pass"])
+    #                 res.append([f"SRQ_Control Error Calculation Method packet found at {round(TempPkt2[2], 3)}sec, with payload value Request:{Value1} and CE_Calculation_Method:{Value2} ", Enums.TestResult.PASS])
     #             else:
-    #                 res.append([f"SRQ_Control Error Calculation Method packet found at {round(TempPkt2[2], 3)}sec, with payload value Request:{Value1} and CE_Calculation_Method:{Value2} ", "Fail"])
+    #                 res.append([f"SRQ_Control Error Calculation Method packet found at {round(TempPkt2[2], 3)}sec, with payload value Request:{Value1} and CE_Calculation_Method:{Value2} ", Enums.TestResult.FAIL])
     #             TempPkt3 = self.GetPacketDetails(packet="SRQ", value="Control Gain", limit=[TempPkt2[2] + 1, Flow_limit[1]])
     #             if len(TempPkt3) > 2:
     #                 resp = self.GetPacketResponse(TempPkt3, [TempPkt3[2] + 1, Flow_limit[1]])
     #                 if resp is not None:
     #                     if self.file_list[resp]['pktType'] == "ACK":
-    #                         res.append([f"Received {self.file_list[resp]['pktType']} response for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", "Pass"])
+    #                         res.append([f"Received {self.file_list[resp]['pktType']} response for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", Enums.TestResult.PASS])
     #                     else:
-    #                         res.append([f"Received {self.file_list[resp]['pktType']} response for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", "Fail"])
+    #                         res.append([f"Received {self.file_list[resp]['pktType']} response for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", Enums.TestResult.FAIL])
     #                 else:
-    #                     res.append([f"Response not found for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", "Fail"])
+    #                     res.append([f"Response not found for SRQ_Control Gain packet at {round(TempPkt3[0], 3)}sec", Enums.TestResult.FAIL])
     #                 Value1 = GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt3[2], 'G_TARGET')[0]['sDescription'])[0]
     #                 if Value1 >= 0.1 and Value1 <= 0.9:
-    #                     res.append([f"The Received G_TARGET is {Value1}, which is in limit of 0.1-0.9", "Pass"])
+    #                     res.append([f"The Received G_TARGET is {Value1}, which is in limit of 0.1-0.9", Enums.TestResult.PASS])
     #                 else:
-    #                     res.append([f"The Received G_TARGET is {Value1}, which is not in limit of 0.1-0.9", "Fail"])
+    #                     res.append([f"The Received G_TARGET is {Value1}, which is not in limit of 0.1-0.9", Enums.TestResult.FAIL])
     #             else:
-    #                 res.append([f"SRQ_Control Gain packet not found between {round(self.file_list[TempPkt2[2] + 1]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", "Fail"])
+    #                 res.append([f"SRQ_Control Gain packet not found between {round(self.file_list[TempPkt2[2] + 1]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", Enums.TestResult.FAIL])
     #         else:
-    #             res.append([f"SRQ_Control Error Calculation Method packet not found between {round(self.file_list[TempPkt1[2] + 1]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", "Fail"])
+    #             res.append([f"SRQ_Control Error Calculation Method packet not found between {round(self.file_list[TempPkt1[2] + 1]['startTime'], 3)} to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"SRQ Load Power packet not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", "Fail"])
+    #         res.append([f"SRQ Load Power packet not found between {round(self.file_list[Flow_limit[0]]['startTime'], 3)}sec to {round(self.file_list[Flow_limit[1]]['stopTime'], 3)}sec", Enums.TestResult.FAIL])
     #     AllMeasures[CTSCheck] = res
 
 
@@ -3414,16 +3415,16 @@ class CommonCTSChecks():
     #         P2 = self.GetPayloadDetails(TempPkt1[2], 'Parameter_2')[0]['sDescription']
     #         sel = self.GetPayloadDetails(TempPkt1[2], 'Selector')[0]['sRawData']
     #         if sel == "0x00":
-    #             res.append([f"The KEST_COEFF packet found at {round(TempPkt1[0], 3)}sec with Parameter1:{P1},paramter2:{P2} and Selector:{sel}", "Pass"])
+    #             res.append([f"The KEST_COEFF packet found at {round(TempPkt1[0], 3)}sec with Parameter1:{P1},paramter2:{P2} and Selector:{sel}", Enums.TestResult.PASS])
     #         else:
-    #             res.append([f"The KEST_COEFF packet found at {round(TempPkt1[0], 3)}sec with Parameter1:{P1},paramter2:{P2} and Selector:{sel}", "Fail"])
+    #             res.append([f"The KEST_COEFF packet found at {round(TempPkt1[0], 3)}sec with Parameter1:{P1},paramter2:{P2} and Selector:{sel}", Enums.TestResult.FAIL])
     #         TempPkt2 = self.GetPacketDetails(packet="Kest_First_Set_Value", limit=Flow_limit)
     #         if len(TempPkt2) > 2:
     #             Vctx = round(GeneralMethods.GetFloatFromStr(self.file_list[TempPkt2[2]]['pktType'])[0], 3)
     #             Vin = round(GeneralMethods.GetFloatFromStr(self.file_list[TempPkt2[2]]['pktType'])[1], 3)
-    #             res.append([f"The Kest_First_Set_Value packet found at {round(TempPkt2[2], 3)}sec, with Vctx:{Vctx} and Vin:{Vin}", "Pass"])
+    #             res.append([f"The Kest_First_Set_Value packet found at {round(TempPkt2[2], 3)}sec, with Vctx:{Vctx} and Vin:{Vin}", Enums.TestResult.PASS])
     #         else:
-    #             res.append([f"The KEST_COEFF packet not found", "Fail"])
+    #             res.append([f"The KEST_COEFF packet not found", Enums.TestResult.FAIL])
     #         TempPkt3 = self.GetPacketDetails(packet="K_est Value", limit=Flow_limit)
     #         if len(TempPkt3) > 2:
     #             Kest = GeneralMethods.GetFloatFromStr(self.file_list[TempPkt3[2]]['pktType'])[0]
@@ -3433,15 +3434,15 @@ class CommonCTSChecks():
     #                 Kiactual = self.BKjsonData['testBkpQiconfig']['Kest_P2_MPTPT']
     #             else:
     #                 Kiactual = self.BKjsonData['testBkpQiconfig']['Kest_P3_MPTPT']
-    #             res.append([f"The K_est Value packet found at {round(TempPkt3[0], 3)},with Kest value :{Kest} Ki_actual from SDF :{Kiactual}", "Pass"])
+    #             res.append([f"The K_est Value packet found at {round(TempPkt3[0], 3)},with Kest value :{Kest} Ki_actual from SDF :{Kiactual}", Enums.TestResult.PASS])
     #             if (Kiactual - Kest) / Kiactual < 0.06:
-    #                 res.append([f"The value of (Kiactual-Kest)/Kiactual is {round((Kiactual - Kest) / Kiactual, 3)} is < 0.06", "Pass"])
+    #                 res.append([f"The value of (Kiactual-Kest)/Kiactual is {round((Kiactual - Kest) / Kiactual, 3)} is < 0.06", Enums.TestResult.PASS])
     #             else:
-    #                 res.append([f"The value of (Kiactual-Kest)/Kiactual is {round((Kiactual - Kest) / Kiactual, 3)} is not < 0.06", "Fail"])
+    #                 res.append([f"The value of (Kiactual-Kest)/Kiactual is {round((Kiactual - Kest) / Kiactual, 3)} is not < 0.06", Enums.TestResult.FAIL])
     #         else:
-    #             res.append([f"The K_est Value pacekt not found", "Fail"])
+    #             res.append([f"The K_est Value pacekt not found", Enums.TestResult.FAIL])
     #     else:
-    #         res.append([f"The Kest_First_Set_Value packet not found", "Fail"])
+    #         res.append([f"The Kest_First_Set_Value packet not found", Enums.TestResult.FAIL])
     #     AllMeasures[CTSCheck] = res
     
 
@@ -3475,8 +3476,8 @@ class CommonCTSChecks():
         TempPkt1 = self.PktMethod.GetPacketDetails(packet=TempPkt[0],limit=Flow_limit,Type=TempPkt[1])
         if len(TempPkt1)>2:
             # if "FOD" not in self.TestID:
-            #     res.append([f"Stabilization found at {round(TempPkt1[0],3)}sec","Pass"])
-            res.append([f"{Check['ReceivedPower_offset']} offset applied from {TempPkt[0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}","Pass"])
+            #     res.append([f"Stabilization found at {round(TempPkt1[0],3)}sec",Enums.TestResult.PASS])
+            res.append([f"{Check['ReceivedPower_offset']} offset applied from {TempPkt[0]} at {self.PktMethod.Timeconvert(TempPkt1[0])}",Enums.TestResult.PASS])
             packetCount = 0
             #2.Find PLA packts has power offset
             id = TempPkt1[2]
@@ -3497,17 +3498,17 @@ class CommonCTSChecks():
                         if abs(Check['ReceivedPower_offset']) == RP_offset:
                             # print("same offset applied")
                             pass
-                        else: res.append([f"Mismatch in offset applied: {RP_offset} mW, Expected offset: {abs(Check['ReceivedPower_offset'])}", "Fail"])
+                        else: res.append([f"Mismatch in offset applied: {RP_offset} mW, Expected offset: {abs(Check['ReceivedPower_offset'])}", Enums.TestResult.FAIL])
 
                         calculated_pwr = (Received_Power + Check['ReceivedPower_offset'])
                         if calculated_pwr > 0:
                             if PLA_ReceivedPower == calculated_pwr:
-                                res.append([f"Received power in PLA packet: {PLA_ReceivedPower} mW is matching to calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", "Pass"])
-                            else: res.append([f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", "Fail"])
+                                res.append([f"Received power in PLA packet: {PLA_ReceivedPower} mW is matching to calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
+                            else: res.append([f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", Enums.TestResult.FAIL])
                         else:
                             if PLA_ReceivedPower == 0:
-                                res.append([f"Received power in PLA packet: {PLA_ReceivedPower} mW and calculated power {calculated_pwr} mW is considered as 0 mW as it is < 0 mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", "Pass"])
-                            else: res.append([f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", "Fail"])
+                                res.append([f"Received power in PLA packet: {PLA_ReceivedPower} mW and calculated power {calculated_pwr} mW is considered as 0 mW as it is < 0 mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
+                            else: res.append([f"Mismatch in received power in PLA packet: {PLA_ReceivedPower} mW with calculated power: {calculated_pwr} mW after applying {Check['ReceivedPower_offset']} mW offset at {round(TempPkt2[0],3)} sec", Enums.TestResult.FAIL])
                         
                         # PLA response
                         x = TempPkt2[2]+1
@@ -3519,15 +3520,15 @@ class CommonCTSChecks():
                                 if (TempPkt2[0] - TempPkt1[0]) < 60:
                                     if 'exp_resp' in Check:
                                         if self.file_list[x]['pktType'] in Check["exp_resp"]:
-                                            res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", "Pass"])
-                                        else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", "Fail"])
-                                    else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet at index@{x}", "Pass"])
+                                            res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", Enums.TestResult.PASS])
+                                        else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", Enums.TestResult.FAIL])
+                                    else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet at index@{x}", Enums.TestResult.PASS])
                             else:
                                 if 'exp_resp' in Check:
                                     if self.file_list[x]['pktType'] in Check["exp_resp"]:
-                                        res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", "Pass"])
-                                    else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", "Inconclusive"])
-                                else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet at index@{x}", "Pass"])
+                                        res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", Enums.TestResult.PASS])
+                                    else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet, Expected: {Check["exp_resp"]}", Enums.TestResult.INCONCLUSIVE])
+                                else: res.append([f"{self.file_list[x]['pktType']} response received for PLA packet at index@{x}", Enums.TestResult.PASS])
 
                         # Throttle check
                         if 'Throttle' in Check:
@@ -3545,25 +3546,25 @@ class CommonCTSChecks():
                                 
                                 if Check['Throttle']:
                                     if pwr_diff <= 50:    #P2-P1 <= 50mW --> Throttle
-                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
-                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Fail"])
+                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
+                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.FAIL])
                                 else:
                                     if pwr_diff <= 50:
-                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Fail"])
-                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
+                                        res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.FAIL])
+                                    else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to PLA packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
                             elif 'ACK' in self.file_list[x]['pktType']:
-                                res.append([f"PTx not throttled while sending ACK to PLA packet at {round(TempPkt2[0],3)} sec", "Pass"])
+                                res.append([f"PTx not throttled while sending ACK to PLA packet at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
                         
                         # if 'After1min_resp' in Check:
                         #     if (TempPkt2[0] - TempPkt1[0]) >= 60:
                         #         if Check["After1min_resp"]["resp_comp"] == "EQL":
                         #             if self.file_list[x]['pktType'] in Check["After1min_resp"]["resp_value"]:
-                        #                 res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: {Check["After1min_resp"]["resp_value"]}", "Pass"])
-                        #             else: res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: {Check["After1min_resp"]["resp_value"]}", "Fail"])
+                        #                 res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: {Check["After1min_resp"]["resp_value"]}", Enums.TestResult.PASS])
+                        #             else: res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: {Check["After1min_resp"]["resp_value"]}", Enums.TestResult.FAIL])
                         #         elif Check["After1min_resp"]["resp_comp"] == "NEQL":
                         #             if self.file_list[x]['pktType'] not in Check["After1min_resp"]["resp_value"]:
-                        #                 res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: not in {Check["After1min_resp"]["resp_value"]}", "Pass"])
-                        #             else: res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: not in {Check["After1min_resp"]["resp_value"]}", "Fail"])
+                        #                 res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: not in {Check["After1min_resp"]["resp_value"]}", Enums.TestResult.PASS])
+                        #             else: res.append([f"{self.file_list[x]['pktType']} response received for PLA_2 packet at index@{x}, Expected: not in {Check["After1min_resp"]["resp_value"]}", Enums.TestResult.FAIL])
                         
                         if 'NAK_Monitor1min' in Check:
                             if (TempPkt2[0] - TempPkt1[0]) >= 60:
@@ -3586,30 +3587,30 @@ class CommonCTSChecks():
                 if Check['Remove_Power']:
                     if len(sd)> 2:
                         removepwr = True
-                        res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
-                    else: res.append([f"PTx does not removed power", "Fail"])
+                        res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.PASS])
+                    else: res.append([f"PTx does not removed power", Enums.TestResult.FAIL])
                 else:
                     if len(sd)> 2:
                         removepwr = True
-                        res.append([f"PTx removed power at {round(sd[0],3)} sec", "Fail"])
-                    else: res.append([f"PTx does not removed power", "Pass"])
+                        res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.FAIL])
+                    else: res.append([f"PTx does not removed power", Enums.TestResult.PASS])
 
             if 'NAK_Monitor1min' in Check:
                 if NAK_Monitor_resp:
-                    res.append([f"NAK not observed to PLA packets for 1 min after applying offset", "Fail"])
+                    res.append([f"NAK not observed to PLA packets for 1 min after applying offset", Enums.TestResult.FAIL])
 
             if 'CheckDuration' in Check:
                 if not removepwr:
                     if duration_flag:
-                        res.append([f"TPR monitored PLA packets for at least 1 minute after stabilizing.", "Pass"])
-                    else: res.append([f"TPR monitored PLA packets for only {round(duration,3)} sec after stabilizing.", "Fail"])
+                        res.append([f"TPR monitored PLA packets for at least 1 minute after stabilizing.", Enums.TestResult.PASS])
+                    else: res.append([f"TPR monitored PLA packets for only {round(duration,3)} sec after stabilizing.", Enums.TestResult.FAIL])
 
             if packetCount == 0: 
-                res.append([f"No PLA packets found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec","Fail"])
+                res.append([f"No PLA packets found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec",Enums.TestResult.FAIL])
             elif not nak_chk:
-                res.append([f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec","Pass"])
-            else:res.append([f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec","Pass"])
-        else:res.append([f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec","Fail"])
+                res.append([f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec",Enums.TestResult.PASS])
+            else:res.append([f"Received {packetCount} PLA Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec",Enums.TestResult.PASS])
+        else:res.append([f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec",Enums.TestResult.FAIL])
         return res
     
     def PrectCompare(self, Flow_limit, Check):
@@ -3623,17 +3624,17 @@ class CommonCTSChecks():
             #1.Get Loads
             LoadPkt = self.PktMethod.GetPacketDetails(packet=f"Set_Load {int(ld)}",limit=Flow_limit,Type="TesterMsg")
             if len(LoadPkt)>2:
-                # res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec","Pass"])
+                # res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec",Enums.TestResult.PASS])
                 if cnt == 2:
                     PLA_middle = self.PktMethod.GetPacketDetails(packet="Power Loss Accounting",limit=[LoadPkt[2],Flow_limit[0]])
                     if len(PLA_middle) > 2:
-                        res.append([f"Power Loss Accounting packet found with start_time: {round(PLA_middle[0],3)} sec and stop_time: {round(PLA_middle[1],3)} sec", "Pass"])
-                        res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec","Pass"])
+                        res.append([f"Power Loss Accounting packet found with start_time: {round(PLA_middle[0],3)} sec and stop_time: {round(PLA_middle[1],3)} sec", Enums.TestResult.PASS])
+                        res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec",Enums.TestResult.PASS])
                         if PLA_middle[0]<LoadPkt[0]<PLA_middle[1]:
-                            res.append([f"Set Load packet for load {ld} mA recived inmiddle of Power Loss Accounting packet at {round(LoadPkt[0],3)}sec","Pass"])
-                        else: res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec, not recived inmiddle of Power Loss Accounting packet","Fail"])
-                    else: res.append([f"Power Loss Accounting packet not found after stabilizing the previous load.","Fail"])
-                else: res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec","Pass"])
+                            res.append([f"Set Load packet for load {ld} mA recived inmiddle of Power Loss Accounting packet at {round(LoadPkt[0],3)}sec",Enums.TestResult.PASS])
+                        else: res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec, not recived inmiddle of Power Loss Accounting packet",Enums.TestResult.FAIL])
+                    else: res.append([f"Power Loss Accounting packet not found after stabilizing the previous load.",Enums.TestResult.FAIL])
+                else: res.append([f"Set Load packet for load {ld} mA recived at {round(LoadPkt[0],3)}sec",Enums.TestResult.PASS])
 
                 nxt_setload = self.PktMethod.GetPacketDetails(packet=f"Set_Load",limit=[LoadPkt[2]+1,Flow_limit[1]],Type="TesterMsg")
                 if len(nxt_setload)>2:
@@ -3645,7 +3646,7 @@ class CommonCTSChecks():
                 #Get Stabilization
                 StablePkt = self.PktMethod.GetexactPacketDetails(packet="MPP_XCEV_Ideal",limit=search_lmt,Type="TesterMsg")
                 if len(StablePkt)>2:
-                    res.append([f"Stablization found for load {ld} mA at {round(StablePkt[0],3)} sec","Pass"])
+                    res.append([f"Stablization found for load {ld} mA at {round(StablePkt[0],3)} sec",Enums.TestResult.PASS])
                     #Get the PLA_2
                     XCE = self.PktMethod.GetPacketDetails(packet="Extended Control Error",limit=[StablePkt[2],LoadPkt[2]])
                     if len(XCE)>2:
@@ -3659,7 +3660,7 @@ class CommonCTSChecks():
                             ChkRes = CommonMethods.check_measure([11.88,12.12],vrect,0)
                             res.append([f"Prect{cnt} found at {round(XCE[0],3)}sec with Prect: {Prect} W, Vrect: {vrect} V, Irect: {irect} A, Expected: Vrect: {ChkRes[2]} V",ChkRes[1]])
                         else:
-                            res.append([f"Prect{cnt} found at {round(XCE[0],3)}sec with Prect: {Prect} W, Vrect: {vrect} V, Irect: {irect} A","Pass"])
+                            res.append([f"Prect{cnt} found at {round(XCE[0],3)}sec with Prect: {Prect} W, Vrect: {vrect} V, Irect: {irect} A",Enums.TestResult.PASS])
 
                         if cnt == 2:
                             # 50mA load dump
@@ -3669,30 +3670,30 @@ class CommonCTSChecks():
                                 if len(loaddone)>2:
                                     pla = self.PktMethod.GetPacketDetails(packet=f"Power Loss Accounting",limit=[Loaddump[2],Flow_limit[0]])
                                     if len(pla)>2:
-                                        res.append([f"Power Loss Accounting packet found with start_time: {round(pla[0],3)} sec and stop_time: {round(pla[1],3)} sec", "Pass"])
-                                        res.append([f"Set_Load 50mA found at {round(Loaddump[0],3)} sec", "Pass"])
-                                        res.append([f"Load Set Done found at {round(loaddone[0],3)} sec", "Pass"])
+                                        res.append([f"Power Loss Accounting packet found with start_time: {round(pla[0],3)} sec and stop_time: {round(pla[1],3)} sec", Enums.TestResult.PASS])
+                                        res.append([f"Set_Load 50mA found at {round(Loaddump[0],3)} sec", Enums.TestResult.PASS])
+                                        res.append([f"Load Set Done found at {round(loaddone[0],3)} sec", Enums.TestResult.PASS])
                                         # AllChannelData3 = self.PlotMethod.GetAllChannelData2('3',self.JapiData)
                                         irect2 = round(self.PktMethod.CalculateVoltTwindow(loaddone[2]+1, self.AllChannelData3)[0]*1000,3)
                                         ChkRes2 = CommonMethods.check_measure([49],irect2,"GTEQL")
                                         if pla[0]<Loaddump[0]<pla[1] and pla[0]<loaddone[0]<pla[1]:
-                                            res.append([f"Set_Load 50mA and Load set done are found inmiddle of Power Loss Accounting packet", "Pass"])
-                                        else: res.append([f"Set_Load 50mA and Load set done are not found inmiddle of Power Loss Accounting packet", "Fail"])
+                                            res.append([f"Set_Load 50mA and Load set done are found inmiddle of Power Loss Accounting packet", Enums.TestResult.PASS])
+                                        else: res.append([f"Set_Load 50mA and Load set done are not found inmiddle of Power Loss Accounting packet", Enums.TestResult.FAIL])
                                         res.append([f"Measured Irect is {irect2} mA at {round(loaddone[0],3)} sec, Expected: 50mA", ChkRes2[1]])
-                                    else: res.append([f"Power Loss Accounting not found","Fail"])
-                                else: res.append([f"Load Set Done not found for 50mA","Fail"])
-                            else: res.append([f"Set_Load {50} mA not found","Inconclusive"])
+                                    else: res.append([f"Power Loss Accounting not found",Enums.TestResult.FAIL])
+                                else: res.append([f"Load Set Done not found for 50mA",Enums.TestResult.FAIL])
+                            else: res.append([f"Set_Load {50} mA not found",Enums.TestResult.INCONCLUSIVE])
 
-                    else:res.append([f"Prect{cnt}:PLA_2 packet not found after the stabilization","Fail"])
-                else:res.append([f"Stablization not found for load {ld}","Fail"])
-            else:res.append([f"Set Load for {ld}mA not received","Inconclusive"])
+                    else:res.append([f"Prect{cnt}:PLA_2 packet not found after the stabilization",Enums.TestResult.FAIL])
+                else:res.append([f"Stablization not found for load {ld}",Enums.TestResult.FAIL])
+            else:res.append([f"Set Load for {ld}mA not received",Enums.TestResult.INCONCLUSIVE])
             cnt+=1
 
         if len(Prectlist)==2:
             if Prectlist[0]<Prectlist[1]:
-                res.append([f"Prect1 : {Prectlist[0]} W, Prect2:{Prectlist[1]} W, Expected: Prect1<Prect2","Pass"])
-            else:res.append([f"Prect1 : {Prectlist[0]} W, Prect2:{Prectlist[1]} W, Expected: Prect1<Prect2","Fail"])
-        else:res.append([f"Not found 2 prect values for the comparison","Inconclusive"])
+                res.append([f"Prect1 : {Prectlist[0]} W, Prect2:{Prectlist[1]} W, Expected: Prect1<Prect2",Enums.TestResult.PASS])
+            else:res.append([f"Prect1 : {Prectlist[0]} W, Prect2:{Prectlist[1]} W, Expected: Prect1<Prect2",Enums.TestResult.FAIL])
+        else:res.append([f"Not found 2 prect values for the comparison",Enums.TestResult.INCONCLUSIVE])
         return res
  
     def PLA_Throttle2(self, Flow_limit, Check):
@@ -3729,13 +3730,13 @@ class CommonCTSChecks():
                             if 'Response' in self.PktMethod.GetPacketType(x):
                                 if Check["exp_resp"]["resp_comp"] == "EQL":
                                     if self.file_list[x]['pktType'] in Check["exp_resp"]["resp_value"]:
-                                        res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: {Check["exp_resp"]["resp_value"]}", "Pass"])
-                                    else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: {Check["exp_resp"]["resp_value"]}", "Fail"])
+                                        res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: {Check["exp_resp"]["resp_value"]}", Enums.TestResult.PASS])
+                                    else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: {Check["exp_resp"]["resp_value"]}", Enums.TestResult.FAIL])
                                 elif Check["exp_resp"]["resp_comp"] == "NEQL":
                                     if self.file_list[x]['pktType'] not in Check["exp_resp"]["resp_value"]:
-                                        res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: not in {Check["exp_resp"]["resp_value"]}", "Pass"])
-                                    else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: not in {Check["exp_resp"]["resp_value"]}", "Fail"])
-                        else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}", "Pass"])
+                                        res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: not in {Check["exp_resp"]["resp_value"]}", Enums.TestResult.PASS])
+                                    else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}, Expected: not in {Check["exp_resp"]["resp_value"]}", Enums.TestResult.FAIL])
+                        else: res.append([f"{self.file_list[x]['pktType']} response received for Power Loss Accounting packet at index@{x}", Enums.TestResult.PASS])
 
                     # Throttle check
                     if 'Throttle' in Check:
@@ -3753,14 +3754,14 @@ class CommonCTSChecks():
                             
                             if Check['Throttle']:
                                 if pwr_diff <= 50:    #P2-P1 <= 50mW --> Throttle
-                                    res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
-                                else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Fail"])
+                                    res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
+                                else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.FAIL])
                             else:
                                 if pwr_diff <= 50:
-                                    res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Fail"])
-                                else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", "Pass"])
+                                    res.append([f"PTx throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.FAIL])
+                                else: res.append([f"PTx not throttled with power difference: {pwr_diff} mW, while sending NAK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec. Throttle condition: P2-P1 <= 50mW", Enums.TestResult.PASS])
                         elif 'ACK' in self.file_list[x]['pktType']:
-                            res.append([f"PTx not throttled while sending ACK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec", "Pass"])
+                            res.append([f"PTx not throttled while sending ACK to Power Loss Accounting packet at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
 
                     #check PLA until
                     if 'CheckDuration' in Check:
@@ -3778,26 +3779,26 @@ class CommonCTSChecks():
                 if Check['Remove_Power']:
                     if len(sd)> 2:
                         removepwr = True
-                        res.append([f"PTx removed power at {round(sd[0],3)} sec", "Pass"])
-                    else: res.append([f"PTx does not removed power", "Fail"])
+                        res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.PASS])
+                    else: res.append([f"PTx does not removed power", Enums.TestResult.FAIL])
                 else:
                     if len(sd)> 2:
                         removepwr = True
-                        res.append([f"PTx removed power at {round(sd[0],3)} sec", "Fail"])
-                    else: res.append([f"PTx does not removed power", "Pass"])
+                        res.append([f"PTx removed power at {round(sd[0],3)} sec", Enums.TestResult.FAIL])
+                    else: res.append([f"PTx does not removed power", Enums.TestResult.PASS])
 
             if 'CheckDuration' in Check:
                 if not removepwr:
                     if duration_flag:
-                        res.append([f"TPR monitored Power Loss Accounting packets for at least 1 minute after stabilizing.", "Pass"])
-                    else: res.append([f"TPR monitored Power Loss Accounting packets for only {round(duration,3)} sec after stabilizing.", "Fail"])
+                        res.append([f"TPR monitored Power Loss Accounting packets for at least 1 minute after stabilizing.", Enums.TestResult.PASS])
+                    else: res.append([f"TPR monitored Power Loss Accounting packets for only {round(duration,3)} sec after stabilizing.", Enums.TestResult.FAIL])
 
             if packetCount == 0: 
-                res.append([f"No Power Loss Accounting packets found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec","Fail"])
+                res.append([f"No Power Loss Accounting packets found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec",Enums.TestResult.FAIL])
             elif not nak_chk:
-                res.append([f"Received {packetCount} Power Loss Accounting Packets with all ACK responses, without Throttling and offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec","Pass"])
-            else:res.append([f"Received {packetCount} Power Loss Accounting Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec","Pass"])
-        else: res.append([f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec","Fail"])
+                res.append([f"Received {packetCount} Power Loss Accounting Packets with all ACK responses, without Throttling and offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec",Enums.TestResult.PASS])
+            else:res.append([f"Received {packetCount} Power Loss Accounting Packets with offset value between {round(TempPkt1[0],3)}sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}sec",Enums.TestResult.PASS])
+        else: res.append([f"Stablization not found between {round(self.file_list[Flow_limit[0]]['startTime'],3)}Sec - {round(self.file_list[Flow_limit[1]]['stopTime'],3)}Sec",Enums.TestResult.FAIL])
         return res
 
 
@@ -3806,17 +3807,17 @@ class CommonCTSChecks():
         id = Flow_limit[0]
         while id <= Flow_limit[1]:
             if "Get Request" in self.file_list[id]['pktType']:
-                res.append([f"{self.file_list[id]['pktType']} {self.file_list[id]['value']} packet found at {round(self.file_list[id]['startTime'],3)} sec", "Pass"])
+                res.append([f"{self.file_list[id]['pktType']} {self.file_list[id]['value']} packet found at {round(self.file_list[id]['startTime'],3)} sec", Enums.TestResult.PASS])
                 respid = self.PktMethod.GetPacketResponse2(id, [id+1, Flow_limit[1]])
                 if respid is not None:
-                    res.append([f"{self.file_list[respid]['pktType']} {self.file_list[respid]['value']} response received at {round(self.file_list[respid]['startTime'],3)} sec", "Pass"])
+                    res.append([f"{self.file_list[respid]['pktType']} {self.file_list[respid]['value']} response received at {round(self.file_list[respid]['startTime'],3)} sec", Enums.TestResult.PASS])
                     tdiff = round((self.file_list[respid]['startTime'] - self.file_list[id]['stopTime'])*1000,3)
                     if 3 <= tdiff <= 10:
-                        res.append([f"Measured Tresponse between {self.file_list[id]['pktType']} {self.file_list[id]['value']} and {self.file_list[respid]['pktType']} {self.file_list[respid]['value']} is {tdiff} ms, Expected: 3 to 10 ms", "Pass"])
+                        res.append([f"Measured Tresponse between {self.file_list[id]['pktType']} {self.file_list[id]['value']} and {self.file_list[respid]['pktType']} {self.file_list[respid]['value']} is {tdiff} ms, Expected: 3 to 10 ms", Enums.TestResult.PASS])
                     else:
-                        res.append([f"Measured Tresponse between {self.file_list[id]['pktType']} {self.file_list[id]['value']} and {self.file_list[respid]['pktType']} {self.file_list[respid]['value']} is {tdiff} ms, Expected: 3 to 10 ms", "Fail"])
+                        res.append([f"Measured Tresponse between {self.file_list[id]['pktType']} {self.file_list[id]['value']} and {self.file_list[respid]['pktType']} {self.file_list[respid]['value']} is {tdiff} ms, Expected: 3 to 10 ms", Enums.TestResult.FAIL])
                     id  =  respid
-                else: res.append([f"No Response received for {self.file_list[id]['pktType']} {self.file_list[id]['value']} packet", "Fail"])
+                else: res.append([f"No Response received for {self.file_list[id]['pktType']} {self.file_list[id]['value']} packet", Enums.TestResult.FAIL])
             id += 1 
         return res
 
@@ -3885,31 +3886,31 @@ class CommonCTSChecks():
                             if len(skippkt)>2:
                                 id = skippkt[2]+1
                                 continue
-                        # # print(f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt1[0],3)} sec", "Pass")
-                        # # print(f"{self.file_list[TempPkt2[2]]['pktType']} {pkt['packet2'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt2[0],3)} sec", "Pass")
+                        # # print(f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt1[0],3)} sec", Enums.TestResult.PASS)
+                        # # print(f"{self.file_list[TempPkt2[2]]['pktType']} {pkt['packet2'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS)
                         if "pkt1_resp" in pkt['packet2'][0]:
-                            res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0],3)} sec", "Pass"])
-                        else: res.append([f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt1[0],3)} sec", "Pass"])
-                        res.append([f"{self.file_list[TempPkt2[2]]['pktType']} {pkt['packet2'][0][2] if len(pkt['packet2'][0]) == 3 else ""} packet found at {round(TempPkt2[0],3)} sec", "Pass"])
+                            res.append([f"{pkt['packet1'][0]} packet found at {round(TempPkt1[0],3)} sec", Enums.TestResult.PASS])
+                        else: res.append([f"{pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ""} packet found at {round(TempPkt1[0],3)} sec", Enums.TestResult.PASS])
+                        res.append([f"{self.file_list[TempPkt2[2]]['pktType']} {pkt['packet2'][0][2] if len(pkt['packet2'][0]) == 3 else ""} packet found at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
 
                         Tresult = round((TempPkt2[0]-TempPkt1[1])*1000,3)
                         # print(f"{pkt['chk']}:", round((TempPkt2[0]-TempPkt1[1])*1000,3))
                         ChkRes = CommonMethods.check_measure(pkt['exp'],Tresult,pkt['comp'])
                         # print("ChkRes:",ChkRes)
 
-                        if 'Fail' in ChkRes[1]: res.append(ChkRes)
+                        if Enums.TestResult.FAIL in ChkRes[1]: res.append(ChkRes)
                         res.append([f"The Measured {pkt['chk']} between {pkt['packet1'][0]} {pkt['packet1'][2] if len(pkt['packet1']) == 3 else ""} and {pkt['packet2'][0][0]} {pkt['packet2'][0][2] if len(pkt['packet2'][0]) == 3 else ""} is: {ChkRes[3]} ms, Limit: {ChkRes[2]} ms", ChkRes[1]])
 
                         start += 1
                         id = TempPkt2[2]
                     elif "skippkt" not in pkt and cnt_end != "ALL":  
                         if start>=cnt_end: break
-                        res.append([f"{pkt['packet2'][0][0]} packet not found", "Fail"])
+                        res.append([f"{pkt['packet2'][0][0]} packet not found", Enums.TestResult.FAIL])
 
 
                 elif "skippkt" not in pkt and cnt_end != "ALL": 
                     if start>=cnt_end: break
-                    res.append([f"{pkt['packet1'][0]} packet not found", "Fail"])
+                    res.append([f"{pkt['packet1'][0]} packet not found", Enums.TestResult.FAIL])
                 id += 1
                 # print("start:",start)
                 if cnt_end != "ALL":
@@ -3918,8 +3919,8 @@ class CommonCTSChecks():
 
             if cnt_end != "ALL" and cnt_end > 1:
                 if start==cnt_end:
-                    res.append([f"Measured total {start} {pkt['chk']} between {pkt['packet1']} and {pkt['packet2'][0]}, Expected: {cnt_end}", "Pass"])
-                else: res.append([f"Measured total {start} {pkt['chk']} between {pkt['packet1']} and {pkt['packet2'][0]}, Expected: {cnt_end}", "Fail"])
+                    res.append([f"Measured total {start} {pkt['chk']} between {pkt['packet1']} and {pkt['packet2'][0]}, Expected: {cnt_end}", Enums.TestResult.PASS])
+                else: res.append([f"Measured total {start} {pkt['chk']} between {pkt['packet1']} and {pkt['packet2'][0]}, Expected: {cnt_end}", Enums.TestResult.FAIL])
             
             # print('failures:',res)
         return res
@@ -3929,24 +3930,24 @@ class CommonCTSChecks():
             header_time = 11.5#12 #ms
             ref_pkt = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0],value=pkt['refpkt'][2] if len(pkt['refpkt']) == 3 else None,limit=Flow_limit,Type=pkt['refpkt'][1])
             if len(ref_pkt)>2:
-                res.append([f"{pkt['refpkt'][0]} {pkt['refpkt'][1]} packet found at {round(ref_pkt[0],3)} sec", "Pass"])
+                res.append([f"{pkt['refpkt'][0]} {pkt['refpkt'][1]} packet found at {round(ref_pkt[0],3)} sec", Enums.TestResult.PASS])
                 limit = [ref_pkt[2]+1,Flow_limit[1]+1]
                 print("limit:",limit)
                 TempPkt1 =  self.PktMethod.GetPacketDetails(packet=pkt['packet1'][0],value=pkt['packet1'][2] if len(pkt['packet1']) == 3 else None,limit=limit,Type=pkt['packet1'][1])
                 print("TempPkt1:",TempPkt1)
                 if len(TempPkt1)>2:
-                    res.append([f"{pkt['packet1'][0]} {pkt['packet1'][1]} packet found at {round(TempPkt1[0],3)} sec", "Pass"])
+                    res.append([f"{pkt['packet1'][0]} {pkt['packet1'][1]} packet found at {round(TempPkt1[0],3)} sec", Enums.TestResult.PASS])
                     TempPkt2 =  self.PktMethod.GetPacketDetails(packet=pkt['packet2'][0],value=pkt['packet2'][2] if len(pkt['packet2']) == 3 else None,limit=[TempPkt1[2]+1,limit[1]+1],Type=pkt['packet2'][1])
                     print("TempPkt2:",TempPkt2)
                     if len(TempPkt2)>2:
-                        res.append([f"{pkt['packet2'][0]} {pkt['packet2'][1]} packet found at {round(TempPkt2[0],3)} sec", "Pass"])
+                        res.append([f"{pkt['packet2'][0]} {pkt['packet2'][1]} packet found at {round(TempPkt2[0],3)} sec", Enums.TestResult.PASS])
                         Tresult = round(((TempPkt2[0]-TempPkt1[0])*1000)-header_time,3)
                         ChkRes = CommonMethods.check_measure(pkt['exp'],Tresult,pkt['comp'])
-                        # if 'Fail' in ChkRes[1]: res.append(ChkRes)
+                        # if Enums.TestResult.FAIL in ChkRes[1]: res.append(ChkRes)
                         res.append([f"The Measured {pkt['chk']} between {pkt['packet1'][0]} {pkt['packet1'][1]} and {pkt['packet2'][0]} {pkt['packet2'][1]} is: {ChkRes[3]} ms, Limit: {ChkRes[2]} ms", ChkRes[1]])
-                    else: res.append([f"{pkt['packet2'][0]} packet not found", "Fail"])
-                else: res.append([f"{pkt['packet1'][0]} packet not found", "Fail"])
-            else: res.append([f"{pkt['refpkt'][0]} packet not found", "Fail"])
+                    else: res.append([f"{pkt['packet2'][0]} packet not found", Enums.TestResult.FAIL])
+                else: res.append([f"{pkt['packet1'][0]} packet not found", Enums.TestResult.FAIL])
+            else: res.append([f"{pkt['refpkt'][0]} packet not found", Enums.TestResult.FAIL])
         return res         
             
 
@@ -3969,8 +3970,8 @@ class CommonCTSChecks():
             if len(TS)>2:
                 # print(self.PktMethod.Timeconvert(TS[0]))
                 if TS[0] > 1800:
-                    res.append([f"Test has run for 30 minutes: Test_Stop is observed at {self.PktMethod.Timeconvert(TS[0])}", "Pass"])
-            else: res.append([f"Test_Stop not observed", "Fail"])
+                    res.append([f"Test has run for 30 minutes: Test_Stop is observed at {self.PktMethod.Timeconvert(TS[0])}", Enums.TestResult.PASS])
+            else: res.append([f"Test_Stop not observed", Enums.TestResult.FAIL])
 
         # CHECK 2: TFO exceeds the FO’s safe temperature limit.
         id = 0
@@ -3987,7 +3988,7 @@ class CommonCTSChecks():
         # print("Maxtemp:", max(tempdata), "time:",T2)
         if not self.test_halt:
             if Maxtemp > Check['FOtempLimit'][1]:
-                res.append([f"TFO exceeds the FO’s safe temperature limit: TFO: {Maxtemp} °C at {T2} sec, Maximum temperature limit of {Check['FOtempLimit'][0]}: {Check['FOtempLimit'][1]} °C", "Pass"])
+                res.append([f"TFO exceeds the FO’s safe temperature limit: TFO: {Maxtemp} °C at {T2} sec, Maximum temperature limit of {Check['FOtempLimit'][0]}: {Check['FOtempLimit'][1]} °C", Enums.TestResult.PASS])
                 self.test_halt = True
 
         # CHECK 3: TFO stabilizes to ±1 °C within 5 minutes
@@ -4007,7 +4008,7 @@ class CommonCTSChecks():
                     temp2 = round(self.AllChannelData12['RV']['displayDataChunk'][eindex], 3)
                     if abs(temp2 - temp1) <= 1:
                         # print("t1:",self.PktMethod.Timeconvert(t1),"temp1:",temp1,"t2:",self.PktMethod.Timeconvert(t2),"temp2:",temp2)
-                        res.append([f"TFO Stabilises to ±1 °C between {self.PktMethod.Timeconvert(t1)} with TFO: {temp1} °C and {self.PktMethod.Timeconvert(t2)} with TFO: {temp2} °C in 5 minutes period.", "Pass"])
+                        res.append([f"TFO Stabilises to ±1 °C between {self.PktMethod.Timeconvert(t1)} with TFO: {temp1} °C and {self.PktMethod.Timeconvert(t2)} with TFO: {temp2} °C in 5 minutes period.", Enums.TestResult.PASS])
                         self.test_halt = True
                         break
                 else: break
@@ -4025,10 +4026,10 @@ class CommonCTSChecks():
                 temp2 = round(self.AllChannelData12['RV']['displayDataChunk'][eindex],3)
                 if temp2 < (0.8*FOtemp):
                     # print("TFO < 0.8*maximum temperature after 10 minutes:", temp2, "Expected:>=",0.8*FOtemp)
-                    res.append([f"TFO < 0.8*maximum temperature after 10 minutes: TFO: {temp2} °C, Maximum temperature limit of {Check['FOtempLimit'][0]}: {FOtemp} °C", "Pass"])
+                    res.append([f"TFO < 0.8*maximum temperature after 10 minutes: TFO: {temp2} °C, Maximum temperature limit of {Check['FOtempLimit'][0]}: {FOtemp} °C", Enums.TestResult.PASS])
                     self.test_halt = True
 
-        res.append([f"Measured maximum temperature of FO is: {Maxtemp} °C, Maximum temperature limit of {Check['FOtempLimit'][0]}: {Check['FOtempLimit'][1]} °C", "Pass"])
+        res.append([f"Measured maximum temperature of FO is: {Maxtemp} °C, Maximum temperature limit of {Check['FOtempLimit'][0]}: {Check['FOtempLimit'][1]} °C", Enums.TestResult.PASS])
 
         # print("result_res:", res)
 
@@ -4085,13 +4086,13 @@ class CommonCTSChecks():
             open1_idx = sadc_open1[2]
             # print("sadc_open1:", sadc_open1)
             size1 = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(sadc_open1[2],"parameter")[0]['sRawData'])) #bytes
-            res.append([f"{chk['seq1']['action']} SADC_Open Stream with {size1} bytes is found @ {sadc_open1[2]} at {round(sadc_open1[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq1']['action']} SADC_Open Stream with {size1} bytes is found @ {sadc_open1[2]} at {round(sadc_open1[0],3)} sec", Enums.TestResult.PASS])
 
             sadc_close1 = self.PktMethod.GetPacketDetails(packet='SADC',value="Close Stream:",limit=[open1_idx, end],Type=chk['seq1']['packettype'][0])
             if not (len(sadc_close1) > 2):
                 # couldn't find close for the open; move id to just after open index
                 # print("No SADC close for seq1 after index", open1_idx)
-                res.append([f"SADC close NOT FOUND for {chk['seq1']['action']}", 'Fail'])
+                res.append([f"SADC close NOT FOUND for {chk['seq1']['action']}", Enums.TestResult.FAIL])
                 id = open1_idx + 1
                 continue
 
@@ -4110,17 +4111,17 @@ class CommonCTSChecks():
                         k = sadt[2]
                         # continue from sadt index (do not skip it unintentionally)
                 k += 1
-            res.append([f"{chk['seq1']['action']} SADC_Close Stream found @ {sadc_close1[2]} at {round(sadc_close1[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq1']['action']} SADC_Close Stream found @ {sadc_close1[2]} at {round(sadc_close1[0],3)} sec", Enums.TestResult.PASS])
 
             # ATN and DSR/POLL
             atn1 = self.PktMethod.GetPacketDetails(packet='ATN',limit=[sadc_close1[2], end],Type="Response")
             if len(atn1)>2:
-                res.append([f"PTx sent ATN after {chk['seq1']['action']} at {round(atn1[0],3)} sec", 'Pass'])
+                res.append([f"PTx sent ATN after {chk['seq1']['action']} at {round(atn1[0],3)} sec", Enums.TestResult.PASS])
                 dsr = self.PktMethod.GetPacketDetails(packet='DSR',value="POLL",limit=[atn1[2], end],Type="Packet")
                 if len(dsr)>2:
-                    res.append([f"PRx sent DSR/POLL after {chk['seq1']['action']} at {round(dsr[0],3)} sec", 'Pass'])
-                else: res.append([f"PRx not sent DSR/POLL after {chk['seq1']['action']}", 'Fail'])
-            else: res.append([f"PTx not sent ATN after {chk['seq1']['action']}", 'Fail'])
+                    res.append([f"PRx sent DSR/POLL after {chk['seq1']['action']} at {round(dsr[0],3)} sec", Enums.TestResult.PASS])
+                else: res.append([f"PRx not sent DSR/POLL after {chk['seq1']['action']}", Enums.TestResult.FAIL])
+            else: res.append([f"PTx not sent ATN after {chk['seq1']['action']}", Enums.TestResult.FAIL])
             
 
             # ----- SEQ2 (response) -----
@@ -4138,7 +4139,7 @@ class CommonCTSChecks():
             open2_idx = sadc_open2[2]
             # print("sadc_open2:", sadc_open2)
             size2 = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(sadc_open2[2],"parameter")[0]['sRawData'])) #bytes
-            res.append([f"{chk['seq2']['action']} SADC_Open Stream with {size2} bytes is found @ {sadc_open2[2]} at {round(sadc_open2[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq2']['action']} SADC_Open Stream with {size2} bytes is found @ {sadc_open2[2]} at {round(sadc_open2[0],3)} sec", Enums.TestResult.PASS])
 
             if 'Tdts' in chk:
                 if len(sadc_close2data)>2:
@@ -4151,7 +4152,7 @@ class CommonCTSChecks():
             if not (len(sadc_close2) > 2):
                 # print("No SADC close for seq2 after index", open2_idx)
                 if 'errorchk' not in chk['seq2']:
-                    res.append([f"SADC close NOT FOUND for {chk['seq2']['action']}", 'Fail'])
+                    res.append([f"SADC close NOT FOUND for {chk['seq2']['action']}", Enums.TestResult.FAIL])
                     # move id forward to avoid endless loop
                     id = open2_idx + 1
                     continue
@@ -4176,7 +4177,7 @@ class CommonCTSChecks():
                     sdsrnak = self.PktMethod.GetPacketDetails(packet='SDSR',value='Type: NAK',limit=[k, close2_idx],Type=chk['seq2']['packettype'][1])
                     # print("sdsrnak:",sdsrnak)
                     if len(sdsrnak) > 2:
-                        res.append([f"In {chk['seq2']['action']}, SDSR NAK is observed at {round(sdsrnak[0],3)} sec", 'Fail'])
+                        res.append([f"In {chk['seq2']['action']}, SDSR NAK is observed at {round(sdsrnak[0],3)} sec", Enums.TestResult.FAIL])
                         self.nakflag = True
                         sdsr = sdsrnak
 
@@ -4185,7 +4186,7 @@ class CommonCTSChecks():
                     # print("sdsrerr:",sdsrerr)
                     if len(sdsrerr) > 2:
                         if sdsr[2] >= sdsrerr[2]:
-                            res.append([f"{chk['seq2']['action']}, {chk['seq2']['errorchk'][0]}_{chk['seq2']['errorchk'][1]} is observed at {round(sdsrerr[0],3)} sec", 'Pass'])
+                            res.append([f"{chk['seq2']['action']}, {chk['seq2']['errorchk'][0]}_{chk['seq2']['errorchk'][1]} is observed at {round(sdsrerr[0],3)} sec", Enums.TestResult.PASS])
                             self.sdsrerrflag = True
                             sdsr = sdsrerr
                     
@@ -4201,9 +4202,9 @@ class CommonCTSChecks():
                         if 'errorchk' in chk['seq2']:
                             if self.sdsrerrflag:
                                 if sadt_retry[-2] == self.file_list[sadt[2]]['pktType']:
-                                    res.append([f"PTx retried for {self.file_list[sadt[2]]['pktType']} is observed at {round(sadt[0],3)} sec", 'Pass'])
-                                else: res.append([f"Observed {self.file_list[sadt[2]]['pktType']}, PTx not retried for previous SADT", 'Fail'])
-                            else: res.append([f"{chk['seq2']['action']}, {self.file_list[sadt[2]]['pktType']} is observed at {round(sadt[0],3)} sec", 'Pass'])
+                                    res.append([f"PTx retried for {self.file_list[sadt[2]]['pktType']} is observed at {round(sadt[0],3)} sec", Enums.TestResult.PASS])
+                                else: res.append([f"Observed {self.file_list[sadt[2]]['pktType']}, PTx not retried for previous SADT", Enums.TestResult.FAIL])
+                            else: res.append([f"{chk['seq2']['action']}, {self.file_list[sadt[2]]['pktType']} is observed at {round(sadt[0],3)} sec", Enums.TestResult.PASS])
 
                         rece_data_type = rece_data[1][1]
                         if 'Tdts' in chk:
@@ -4232,28 +4233,28 @@ class CommonCTSChecks():
                         t3 = (sadc_close2[0]-sadt_data[0])*1000
                         chk3 = CommonMethods.check_measure([5000],t3,"LTEQL")
                         res.append([f"Tdts between PTx SADT_{'even' if rece_data_type == 'e' else 'odd'} at {round(sadt_data[0],3)} and PTx SADC close at {round(sadc_close2[0],3)} sec is {round(chk3[3],3)} ms, Expected: {chk3[2]} ms", chk3[1]])
-                    else: res.append([f"In {chk['seq2']['action']}, SADT data not observed", 'Fail'])
+                    else: res.append([f"In {chk['seq2']['action']}, SADT data not observed", Enums.TestResult.FAIL])
 
             if 'NAKchk' in chk['seq2']:
-                # if not self.nakflag: res.append([f"In {chk['seq2']['action']}, completely SDSR ACK is observed ", 'Pass'])
+                # if not self.nakflag: res.append([f"In {chk['seq2']['action']}, completely SDSR ACK is observed ", Enums.TestResult.PASS])
                 tpr_resp = self.TPR_response([open2_idx,close2_idx])
                 # print("tpr_resp:",tpr_resp)
                 if tpr_resp:
                     # res.extend(tpr_resp)
                     if tpr_resp[0] == "True":
-                        res.append([f"In {chk['seq2']['action']}, TPR Responded with SDSR-ACK throughout the {chk['seq2']['action']} flow", 'Pass'])
+                        res.append([f"In {chk['seq2']['action']}, TPR Responded with SDSR-ACK throughout the {chk['seq2']['action']} flow", Enums.TestResult.PASS])
                     elif tpr_resp[0] == "False":
-                        res.append([f"In {chk['seq2']['action']}, TPR Responded with {tpr_resp[2]}({tpr_resp[3]})", 'Fail'])
-                else:res.append([f"In {chk['seq2']['action']}, TPR Response not observed", 'Fail'])
+                        res.append([f"In {chk['seq2']['action']}, TPR Responded with {tpr_resp[2]}({tpr_resp[3]})", Enums.TestResult.FAIL])
+                else:res.append([f"In {chk['seq2']['action']}, TPR Response not observed", Enums.TestResult.FAIL])
 
             if 'errorchk' not in chk['seq2']: 
-                res.append([f"{chk['seq2']['action']} SADC_Close Stream found @ {sadc_close2[2]} at {round(sadc_close2[0],3)} sec", 'Pass'])
+                res.append([f"{chk['seq2']['action']} SADC_Close Stream found @ {sadc_close2[2]} at {round(sadc_close2[0],3)} sec", Enums.TestResult.PASS])
                 # if chk['seq2'].get("Endtest") and chk['seq2']['Endtest']: 
                 #     # print("Ending test")
                     # break
             if "CRCchk" in chk['seq2']:
                 crc_value = self.PktMethod.GetPayloadDetails(sadc_close2[2],"parameter")[0]['sRawData'].strip()
-                res.append([f"In {chk['seq2']['action']}, Calculated CRC {crc_value} from {chk['seq2']['action']} chain was matches with SADC/Close CRC value {crc_value} at index@ {sadc_close2[2]}", 'Pass'])
+                res.append([f"In {chk['seq2']['action']}, Calculated CRC {crc_value} from {chk['seq2']['action']} chain was matches with SADC/Close CRC value {crc_value} at index@ {sadc_close2[2]}", Enums.TestResult.PASS])
                 
                     
             # After successful processing of both seq1 and seq2 streams, advance id to after seq2 close
@@ -4261,8 +4262,8 @@ class CommonCTSChecks():
             # print("ADVANCING id to", id, "end:", end)
 
         if len(chain)>2:
-            res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} found  @ {chain[2]} at {round(chain[0],3)} sec", 'Pass'])
-        else: res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} not found", 'Fail'])
+            res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} found  @ {chain[2]} at {round(chain[0],3)} sec", Enums.TestResult.PASS])
+        else: res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} not found", Enums.TestResult.FAIL])
         
         # print("AUTH_res:",res)
         return res
@@ -4331,13 +4332,13 @@ class CommonCTSChecks():
             open1_idx = sadc_open1[2]
             # print("sadc_open1:", sadc_open1)
             size1 = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(sadc_open1[2],"parameter")[0]['sRawData'])) #bytes
-            res.append([f"{chk['seq1']['action']} SADC_Open Stream with {size1} bytes is found @ {sadc_open1[2]} at {round(sadc_open1[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq1']['action']} SADC_Open Stream with {size1} bytes is found @ {sadc_open1[2]} at {round(sadc_open1[0],3)} sec", Enums.TestResult.PASS])
 
             sadc_close1 = self.PktMethod.GetPacketDetails(packet='SADC',value="Close Stream:",limit=[open1_idx, end],Type=chk['seq1']['packettype'][0])
             if not (len(sadc_close1) > 2):
                 # couldn't find close for the open; move id to just after open index
                 # print("No SADC close for seq1 after index", open1_idx)
-                res.append([f"SADC close NOT FOUND for {chk['seq1']['action']}", 'Fail'])
+                res.append([f"SADC close NOT FOUND for {chk['seq1']['action']}", Enums.TestResult.FAIL])
                 id = open1_idx + 1
                 continue
 
@@ -4356,7 +4357,7 @@ class CommonCTSChecks():
                         k = sadt[2]
                         # continue from sadt index (do not skip it unintentionally)
                 k += 1
-            res.append([f"{chk['seq1']['action']} SADC_Close Stream found @ {sadc_close1[2]} at {round(sadc_close1[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq1']['action']} SADC_Close Stream found @ {sadc_close1[2]} at {round(sadc_close1[0],3)} sec", Enums.TestResult.PASS])
 
             # ----- SEQ2 (response) -----
             # print("RESPONSE", chk['seq2']['action'])
@@ -4372,7 +4373,7 @@ class CommonCTSChecks():
             open2_idx = sadc_open2[2]
             # print("sadc_open2:", sadc_open2)
             size2 = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(sadc_open2[2],"parameter")[0]['sRawData'])) #bytes
-            res.append([f"{chk['seq2']['action']} SADC_Open Stream with {size2} bytes is found @ {sadc_open2[2]} at {round(sadc_open2[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq2']['action']} SADC_Open Stream with {size2} bytes is found @ {sadc_open2[2]} at {round(sadc_open2[0],3)} sec", Enums.TestResult.PASS])
 
             sadc_close2 = self.PktMethod.GetPacketDetails(packet='SADC',value="Close Stream:",limit=[open2_idx, end],Type=chk['seq2']['packettype'][0])
             if not (len(sadc_close2) > 2):
@@ -4396,7 +4397,7 @@ class CommonCTSChecks():
                         rec_size = rec_size + int(rece_data[1][0])
                         k = sadt[2]
                 k += 1
-            res.append([f"{chk['seq2']['action']} SADC_Close Stream found @ {sadc_close2[2]} at {round(sadc_close2[0],3)} sec", 'Pass'])
+            res.append([f"{chk['seq2']['action']} SADC_Close Stream found @ {sadc_close2[2]} at {round(sadc_close2[0],3)} sec", Enums.TestResult.PASS])
 
             
             # After successful processing of both seq1 and seq2 streams, advance id to after seq2 close
@@ -4409,9 +4410,9 @@ class CommonCTSChecks():
                 if len(atn)>2:
                     t = round((atn[0] - sadc_close1[1])*1000,3) #sec
                     if t <= 3000:
-                        res.append([f"Measured {chk['seq1']['resptime']} is {t} ms, Expected: <= 3000 ms", "Pass"])
-                    else: res.append([f"Measured {chk['seq1']['resptime']} is {t} ms, Expected: <= 3000 ms", "Fail"])
-                else: res.append([f"PTx didn't sent ATN response", "Fail"])
+                        res.append([f"Measured {chk['seq1']['resptime']} is {t} ms, Expected: <= 3000 ms", Enums.TestResult.PASS])
+                    else: res.append([f"Measured {chk['seq1']['resptime']} is {t} ms, Expected: <= 3000 ms", Enums.TestResult.FAIL])
+                else: res.append([f"PTx didn't sent ATN response", Enums.TestResult.FAIL])
                
 
         if 'expBytes' in chk['seq2']:
@@ -4419,23 +4420,23 @@ class CommonCTSChecks():
                 ChkRes = CommonMethods.check_measure(chk['seq2']['expBytes'][1],rec_size,chk['seq2']['expBytes'][2])
                 # if chk['seq2']['expBytes'][1] == rec_size:
                 res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets, Expected: {ChkRes[2]} bytes", ChkRes[1]])
-                # else: res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets, Expected: {chk['seq2']['expBytes'][1]} bytes", 'Fail'])
+                # else: res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets, Expected: {chk['seq2']['expBytes'][1]} bytes", Enums.TestResult.FAIL])
             
             elif 'Slots_Returned_Mask' in chk['seq2']['expBytes'][0]:
                 sadt1 = self.PktMethod.GetPacketDetails(packet='SADT',limit=[open2_idx, close2_idx],Type=chk['seq2']['packettype'][0])
                 if len(sadt1)>2:
                     val = self.PktMethod.GetPayloadDetails(sadt1[2],"Slots_Returned_Mask")[0]['sRawData'].strip()
-                    res.append([f"Slot Returned Mask value is {val}({int(val, 16).bit_count()} bits set to ONE) in {chk['seq2']['action']}","Pass"])
+                    res.append([f"Slot Returned Mask value is {val}({int(val, 16).bit_count()} bits set to ONE) in {chk['seq2']['action']}",Enums.TestResult.PASS])
                     exp = (int(val, 16).bit_count()*32)+2
                     if exp == rec_size:
-                        res.append([f"Number of bytes in Digests response is {rec_size} matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", "Pass"])
-                    else: res.append([f"Number of bytes in Digests response is {rec_size} not matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", "Fail"])
-                else: res.append([f"Digests response is not found","Fail"])
+                        res.append([f"Number of bytes in Digests response is {rec_size} matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", Enums.TestResult.PASS])
+                    else: res.append([f"Number of bytes in Digests response is {rec_size} not matching with (No.of bits set to ONE in Slot Returned Mask *32)+2: {exp}", Enums.TestResult.FAIL])
+                else: res.append([f"Digests response is not found",Enums.TestResult.FAIL])
         else:
-            res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets", 'Pass'])
+            res.append([f"Total {rec_size} bytes of data received for {chk['seq2']['action']} in SADT packets", Enums.TestResult.PASS])
         if len(chain)>2:
-            res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} found  @ {chain[2]} at {round(chain[0],3)} sec", 'Pass'])
-        else: res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} not found", 'Fail'])
+            res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} found  @ {chain[2]} at {round(chain[0],3)} sec", Enums.TestResult.PASS])
+        else: res.append([f"{chk['seq2']['endassertion'][0]} {chk['seq2']['endassertion'][1]} not found", Enums.TestResult.FAIL])
         
 
         # print("AUTH_res:",res)
@@ -4466,12 +4467,12 @@ class CommonCTSChecks():
                         if len(ADC_End_TPT)>2:
                             id=ADC_End_TPT[2]+1
                             seq=True
-                            results.append([f'PRx & PTx Sucessfully completed Authentication- {Authvalue1} Chain Sequence from id:{ADC_Auth[2]} to id :{ADC_End_TPT[2]}', 'Pass'])
-                        else:results.append([f'PTx did not Closed {Authvalue2} Authentication Sequence', 'Inconclusive'])                                                        
-                    else:results.append([f'PTx did not Initiated {Authvalue2} Authentication Sequence', 'Inconclusive'])
-                else:results.append([f'Prx did not Closed Authentication Sequence', 'Inconclusive'])
-            else:results.append([f'Prx did not sent {Authvalue1}', 'Inconclusive'])
-        else:results.append([f'Prx did not Initiated Authentication:{Authvalue1} Sequence', 'Inconclusive'])
+                            results.append([f'PRx & PTx Sucessfully completed Authentication- {Authvalue1} Chain Sequence from id:{ADC_Auth[2]} to id :{ADC_End_TPT[2]}', Enums.TestResult.PASS])
+                        else:results.append([f'PTx did not Closed {Authvalue2} Authentication Sequence', Enums.TestResult.INCONCLUSIVE])                                                        
+                    else:results.append([f'PTx did not Initiated {Authvalue2} Authentication Sequence', Enums.TestResult.INCONCLUSIVE])
+                else:results.append([f'Prx did not Closed Authentication Sequence', Enums.TestResult.INCONCLUSIVE])
+            else:results.append([f'Prx did not sent {Authvalue1}', Enums.TestResult.INCONCLUSIVE])
+        else:results.append([f'Prx did not Initiated Authentication:{Authvalue1} Sequence', Enums.TestResult.INCONCLUSIVE])
         return results,id,seq
 
 ###API Functions #########################################################################################################################
@@ -4687,7 +4688,7 @@ class CommonCTSChecks():
                     if PktFlag==True:
                         PktCount+=1
                         #count check    
-                        SubChecks.append([f"The expected packet {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} found at {round(pktres[0],3)}sec","Pass"]) # SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} found at {round(pktres[0],3)}sec","Pass"])
+                        SubChecks.append([f"The expected packet {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} found at {round(pktres[0],3)}sec",Enums.TestResult.PASS]) # SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} found at {round(pktres[0],3)}sec",Enums.TestResult.PASS])
                         #Get the payload values results
                         for ck in BITSck['Checks']:
                             # # print(ck)
@@ -4699,25 +4700,25 @@ class CommonCTSChecks():
                                 for pyload in payloadDetails:
                                     if BITSck['Checks'][ck]['comp']=="str":
                                         if BITSck['Checks'][ck]['expected'] in pyload[BITSck['Checks'][ck]['flag']]:
-                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value of {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value of {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
                                         elif 'random' in BITSck['Checks'][ck]['expected']:
                                             if BITSck['Checks'][ck].get('except'):
                                                 if pyload[BITSck['Checks'][ck]['flag']] not in BITSck['Checks'][ck]['except']:
-                                                    SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}","Pass"])
-                                                else: SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}","Fail"])
-                                            else: SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random value","Pass"])
-                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} is not expected value of {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                    SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}",Enums.TestResult.PASS])
+                                                else: SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}",Enums.TestResult.FAIL])
+                                            else: SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random value",Enums.TestResult.PASS])
+                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} is not expected value of {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                     elif BITSck['Checks'][ck]['comp']=="str_Reverse":
                                         if BITSck['Checks'][ck]['expected'] in pyload[BITSck['Checks'][ck]['flag']]:
-                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value of {BITSck['Checks'][ck]['expected']}","Fail"])
-                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} is not expected value of {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value of {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
+                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} is not expected value of {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
                                     elif BITSck['Checks'][ck]['comp']=="btw":
                                         # # print(int(pyload[BITSck['Checks'][ck]['flag']]),BITSck['Checks'][ck]['expected'])
                                         if int(pyload[BITSck['Checks'][ck]['flag']]) >= BITSck['Checks'][ck]['expected'][0] and int(pyload[BITSck['Checks'][ck]['flag']]) <= BITSck['Checks'][ck]['expected'][1]:
-                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value in limit of  {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}","Pass"])
-                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as not expected value in limit of  {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}","Fail"])
+                                            SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as expected value in limit of  {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}",Enums.TestResult.PASS])
+                                        else:SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]} as not expected value in limit of  {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}",Enums.TestResult.FAIL])
                                     elif BITSck['Checks'][ck]['comp']=="Present":
-                                        SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}","Pass"])
+                                        SubChecks.append([f"The Recevied {ck} is {pyload[BITSck['Checks'][ck]['flag']]}",Enums.TestResult.PASS])
                                     else:
                                         if ':' in pyload[BITSck['Checks'][ck]['flag']]:
                                             pyaloadli = pyload[BITSck['Checks'][ck]['flag']].split(':')
@@ -4728,21 +4729,21 @@ class CommonCTSChecks():
                                         # print("revdval:",revdval)
                                         if BITSck['Checks'][ck]['comp'] == 'GTEQL':
                                             if  revdval[0] >= BITSck['Checks'][ck]['expected']:
-                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is >= {BITSck['Checks'][ck]['expected']}","Pass"])
-                                            else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not >= {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is >= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
+                                            else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not >= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                         elif BITSck['Checks'][ck]['comp'] == 'LTEQL':
                                             if  revdval[0] <= BITSck['Checks'][ck]['expected']:
-                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is <= {BITSck['Checks'][ck]['expected']}","Pass"])
-                                            else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not <= {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is <= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
+                                            else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not <= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                         elif BITSck['Checks'][ck]['comp'] == 'EQL':
                                             if 'comp1' == BITSck['Checks'][ck]['expected'] or 'comp2' == BITSck['Checks'][ck]['expected']:
                                                 BitsCompare[BITSck['Checks'][ck]['expected']] = [ck,revdval[0]]
-                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}","Pass"])
+                                                SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}",Enums.TestResult.PASS])
                                             else:
                                                 if  revdval[0] == float(BITSck['Checks'][ck]['expected']):
-                                                    SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is == {BITSck['Checks'][ck]['expected']}","Pass"])
-                                                else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not == {BITSck['Checks'][ck]['expected']}","Fail"])
-                            else:SubChecks.append([f"The payload {ck} for packet {'_'.join(ExpPacket)} not found for the packet {'_'.join(ExpPacket)}","Fail"])
+                                                    SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is == {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
+                                                else:SubChecks.append([f"The Recevied value of {ck} is {revdval[0]}, which is not == {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
+                            else:SubChecks.append([f"The payload {ck} for packet {'_'.join(ExpPacket)} not found for the packet {'_'.join(ExpPacket)}",Enums.TestResult.FAIL])
                     if 'PacketCount' not in BITSck:
                         break
                     if 'PacketCount' in BITSck:
@@ -4755,24 +4756,24 @@ class CommonCTSChecks():
                 else:
                     if 'PacketCount' in BITSck:
                         if BITSck['PacketCount'] == "ALL":
-                            SubChecks.append([f"Received {PktCount} {'_'.join(ExpPacket)} packets","Pass"])
+                            SubChecks.append([f"Received {PktCount} {'_'.join(ExpPacket)} packets",Enums.TestResult.PASS])
                         else:
                             if PktCount < BITSck['PacketCount']:
-                                SubChecks.append([f"Out of {BITSck['PacketCount']} Received only {PktCount} {'_'.join(ExpPacket)} packets","Fail"])
+                                SubChecks.append([f"Out of {BITSck['PacketCount']} Received only {PktCount} {'_'.join(ExpPacket)} packets",Enums.TestResult.FAIL])
                     else:
                         if PktCount==0:
-                            SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} not found between {round(self.file_list[limit[0]]['startTime'],3)}sec to {round(self.file_list[limit[1]]['stopTime'],3)}sec ","Fail"])
+                            SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} not found between {round(self.file_list[limit[0]]['startTime'],3)}sec to {round(self.file_list[limit[1]]['stopTime'],3)}sec ",Enums.TestResult.FAIL])
                     break
             expvalues.append(expvalue)
 
             if len(BitsCompare)>0:
                 if BitsCompare['comp1'][1] == BitsCompare['comp2'][1]:
-                    SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}","Pass"])
-                else: SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is not equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}","Fail"])
+                    SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}",Enums.TestResult.PASS])
+                else: SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is not equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}",Enums.TestResult.FAIL])
 
         # AllMeasures['BitsCheck_exp'] = ';'.join(expvalues)
-        # AllMeasures['BitsCheck'] = 'Found Issues' if any(res[1]=="Fail" for res in SubChecks) else 'No Issues'
-        # AllMeasures['BitsCheck_res'] = 'Fail' if any(res[1]=="Fail" for res in SubChecks) else 'Pass'
+        # AllMeasures['BitsCheck'] = 'Found Issues' if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else 'No Issues'
+        # AllMeasures['BitsCheck_res'] = Enums.TestResult.FAIL if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else Enums.TestResult.PASS
         # AllMeasures['BitsCheck_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
         # AllMeasures['BitsCheck_Details']=SubChecks
         # print("SubChecks:",SubChecks)
@@ -5031,32 +5032,32 @@ class CommonCTSChecks():
                 exp_vals.append(exp_val[0])
                 if comp =='GTEQL':
                     if  obsr_val >= exp_val[0]:
-                        res =  'Pass'
+                        res =  Enums.TestResult.PASS
                     else:  
-                        res = 'Fail'
+                        res = Enums.TestResult.FAIL
                     compval=f'>={exp_val[0]}'
                 elif comp =='LTEQL':
                     if  obsr_val <= exp_val[0]:
-                        res =  'Pass'
+                        res =  Enums.TestResult.PASS
                     else:  
-                        res = 'Fail'
+                        res = Enums.TestResult.FAIL
                     compval=f'<={exp_val[0]}'
                 elif comp =='EQL':
                     if  obsr_val == exp_val[0]:
-                        res =  'Pass'
+                        res =  Enums.TestResult.PASS
                     else:  
-                        res = 'Fail'
+                        res = Enums.TestResult.FAIL
                     compval=f'=={exp_val[0]}'
                 #add for rql,lseql
             else:
                 exp_vals=exp_val
                 compval=','.join(map(str,exp_vals))
                 if obsr_val >= exp_vals[0] and obsr_val <= exp_vals[1]:
-                    res =  'Pass'
+                    res =  Enums.TestResult.PASS
                 else:  
-                    res = 'Fail'
+                    res = Enums.TestResult.FAIL
         else:
-            res = 'Fail'
+            res = Enums.TestResult.FAIL
         return [exp_vals,res,compval]
     #4. Find the XCE stable between the limits
     def GetStableBtwLimits(self,limit):
@@ -5113,117 +5114,117 @@ class CommonCTSChecks():
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':NEG='+str(exp))
     #                         # # print('neg',self.file_list[pktindex]['header_Payload']['childelement'][4]['childelement'][0]['sRawData'],BITSck['Checks'][ck]['expected'])
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][4]['childelement'][0]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':NEG='+str(self.file_list[pktindex]['header_Payload']['childelement'][4]['childelement'][0]['sRawData']))
                                 
     #                     if ck == 'Mjrver':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Mjrver='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Mjrver='+str(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sRawData']))
     #                     if ck == 'Mnrver':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Mnrver='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][1]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Mnrver='+str(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][1]['sRawData']))
     #                     if ck=='XIDvalue':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':XIDvalue='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sDescription'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':XIDvalue='+str(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sDescription']))
     #                     if ck=='Restricted':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Restricted='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Restricted='+str(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData']))
     #                     if ck=='Ext':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Ext='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][0]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Ext='+str(self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][0]['sRawData']))
     #                     if ck=='PCHtime':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':PCHtime='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':PCHtime='+str(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][0]['sRawData']))
     #                     if ck=='CLkpingValue':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkpingValue='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][1]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkpingValue='+str(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][1]['sRawData']))
     #                     if ck=='CLkdelay':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkdelay='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkdelay='+str(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData']))
     #                     if ck=='CLkdetctPing':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkdetctPing='+str(BITSck['Checks'][ck]['expected']))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][1]['sRawData'] != BITSck['Checks'][ck]['expected']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkdetctPing='+str(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][1]['sRawData']))
     #                     if ck=='CLkReason':
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkReason='+str(BITSck['Checks'][ck]['expected']))
     #                         if BITSck['Checks'][ck]['expected'] not in self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][1]['sDescription']:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CLkReason='+str(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][1]['sDescription']))
     #                     if ck=='NegoPwr':
     #                         exp = '-'.join(map(str,BITSck['Checks'][ck]['expected']))
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':NegoPwr='+str(exp))
     #                         negolist = GeneralMethods.GetFloatFromStr(self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][1]['sDescription'])
     #                         res = self.check_measure(BITSck['Checks'][ck]['expected'],negolist[0],BITSck['Checks'][ck]['comp'])
-    #                         if res[1] == 'Fail':
-    #                             reslt.append('Fail')
+    #                         if res[1] == Enums.TestResult.FAIL:
+    #                             reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':NegoPwr='+str(negolist[0]))
     #                     if ck=='PotentialPow':
     #                         exp = '-'.join(map(str,BITSck['Checks'][ck]['expected']))
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':PotentialPow='+str(exp))
     #                         potnlist = GeneralMethods.GetFloatFromStr(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][1]['sDescription'])
     #                         res = self.check_measure(BITSck['Checks'][ck]['expected'],potnlist[0],BITSck['Checks'][ck]['comp'])
-    #                         if res[1] == 'Fail':
-    #                             reslt.append('Fail')
+    #                         if res[1] == Enums.TestResult.FAIL:
+    #                             reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':PotentialPow='+str(potnlist[0]))
     #                     if ck=='ReferencePower':
     #                         exp = BITSck['Checks'][ck]['expected'][0]
     #                         res = GeneralMethods.GetFloatFromStr(self.file_list[pktindex]['header_Payload']['childelement'][0]['childelement'][1]['sDescription'])
     #                         reslt1 = self.check_measure(BITSck['Checks'][ck]['expected'],res[0],BITSck['Checks'][ck]['comp'])
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':ReferencePower'+str(reslt1[2])+str(exp))
-    #                         if reslt1[1] == 'Fail':reslt.append('Fail')
+    #                         if reslt1[1] == Enums.TestResult.FAIL:reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':ReferencePower='+str(res[0]))
     #                     if ck=='ReservedBit':
     #                         exp = BITSck['Checks'][ck]['expected']
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':ReservedBit='+str(exp))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':ReservedBit='+str(self.file_list[pktindex]['header_Payload']['childelement'][1]['childelement'][0]['sRawData']))
     #                     if ck=='CNFB2B3':
     #                         exp = BITSck['Checks'][ck]['expected']
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CNFB2B3='+str(exp))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][3]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CNFB2B3='+str(self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][3]['sRawData']))
     #                     if ck=='CNFB2B7':
     #                         exp = BITSck['Checks'][ck]['expected']
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CNFB2B7='+str(exp))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][0]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':CNFB2B7='+str(self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][0]['sRawData']))
     #                     if ck=='Count':
     #                         exp = BITSck['Checks'][ck]['expected']
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Count='+str(exp))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][5]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':Count='+str(self.file_list[pktindex]['header_Payload']['childelement'][2]['childelement'][5]['sRawData']))
     #                     if ck=='WindowSize':
     #                         exp = BITSck['Checks'][ck]['expected']
     #                         expvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':WindowSize='+str(exp))
     #                         if self.file_list[pktindex]['header_Payload']['childelement'][3]['childelement'][0]['sRawData'] != exp:
-    #                                 reslt.append('Fail')
+    #                                 reslt.append(Enums.TestResult.FAIL)
     #                         resvalue.append(str(BITSck['packet'][0])+'_'+str(BITSck['packet'][1])+':WindowSize='+str(self.file_list[pktindex]['header_Payload']['childelement'][3]['childelement'][0]['sRawData']))
     #             # # print(reslt)
     #             AllMeasures['BitsCheck'] =  ','.join(resvalue) if len(resvalue)>0 else 'NA'
     #             AllMeasures['BitsCheck_exp'] = ','.join(expvalue) if len(expvalue)>0 else 'NA'
-    #             # AllMeasures['BitsCheck_res'] ='Fail' if len(reslt)>0 else 'Pass'
-    #             AllMeasures['BitsCheck_res'] = 'Fail' if any(res[1]=="Fail" for res in resvalue) else 'Pass'
+    #             # AllMeasures['BitsCheck_res'] =Enums.TestResult.FAIL if len(reslt)>0 else Enums.TestResult.PASS
+    #             AllMeasures['BitsCheck_res'] = Enums.TestResult.FAIL if any(res[1]==Enums.TestResult.FAIL for res in resvalue) else Enums.TestResult.PASS
     #             AllMeasures['BitsCheck_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
     #     except Exception as e:
     #         traceback.print_exc()
@@ -5235,7 +5236,7 @@ class CommonCTSChecks():
     #     expvalue = []
     #     for pkt in Check['ChecksList']:
     #         # # print(pkt)
-    #         AllMeasures['PacketCheck_res']='Fail'
+    #         AllMeasures['PacketCheck_res']=Enums.TestResult.FAIL
     #         # # print('pkt',pkt)
     #         evalue = str(pkt['packet'][0])+'_'+str(pkt['packet'][1])+';Phase: '+str(pkt['phase']) if pkt['packet'][1]!= None else str(pkt['packet'][0])+';Phase: '+str(pkt['phase'])
     #         pres = 'None'
@@ -5271,7 +5272,7 @@ class CommonCTSChecks():
     #                         # # print(pkt['phase'],id,'-',self.file_list[id].get('description'))
     #                         if pkt['phase'] != None:
     #                             if pkt['phase'] == self.file_list[id].get('description'):
-    #                                 Details.append([f"Packet {expPkt[0]}_{expPkt[1]} found at {round(self.file_list[id]['startTime'],2)} sec","Pass"])
+    #                                 Details.append([f"Packet {expPkt[0]}_{expPkt[1]} found at {round(self.file_list[id]['startTime'],2)} sec",Enums.TestResult.PASS])
     #                                 pres = self.file_list[id].get('pktType')+'_'+self.file_list[id].get('value') if expPkt[1] is not None else self.file_list[id].get('pktType')
     #                                 pres=pres+'@'+str(id)+';Phase: '+str(pkt['phase'])
     #                                 if 'Pkt_count' in pkt: pkcount +=1
@@ -5308,18 +5309,18 @@ class CommonCTSChecks():
     #                         if rs[0] not in pkt['Pkt_response']:
     #                             TPkRes.append('@'.join(map(str,rs)))
     #                     if len(TPkRes)>0:
-    #                         reslt.append('Fail')
+    #                         reslt.append(Enums.TestResult.FAIL)
     #                         pres=pres+';Response:'+','.join(TPkRes)
     #                     else:pres=pres+';Response:'+'No mismatch'
-    #                     # if any(rs not in pkt['Pkt_response'] for rs in PkRes): reslt.append('Fail')
+    #                     # if any(rs not in pkt['Pkt_response'] for rs in PkRes): reslt.append(Enums.TestResult.FAIL)
     #                 else:
     #                     if 'NOResp' not in pkt['Pkt_response']:
-    #                         reslt.append('Fail')
+    #                         reslt.append(Enums.TestResult.FAIL)
     #                     pres=pres+';Response:None'
     #             if 'Pkt_count' in pkt:
     #                 evalue = evalue+';Count:'+str(pkt['Pkt_count'])
     #                 pres=pres+';Count:'+str(pkcount)
-    #                 if pkcount < pkt['Pkt_count']:reslt.append('Fail')
+    #                 if pkcount < pkt['Pkt_count']:reslt.append(Enums.TestResult.FAIL)
     #             if 'Pkt_Tresponse' in pkt:
     #                 evalue = evalue+';Tresponse:'+'-'.join(str(a) for a in pkt['Pkt_Tresponse'])+'ms'
     #                 if len(pkTresp)>0:
@@ -5328,14 +5329,14 @@ class CommonCTSChecks():
     #                         if rs[0] < pkt['Pkt_Tresponse'][0] or rs[0] > pkt['Pkt_Tresponse'][1]:
     #                             TpkTresp.append(str(rs[0])+'@'+str(rs[1]))
     #                     if len(TpkTresp)>0:
-    #                         reslt.append('Fail')
+    #                         reslt.append(Enums.TestResult.FAIL)
     #                         pres=pres+';Tresponse:'+','.join(TpkTresp)
     #                     else:pres=pres+';Tresponse:'+'No mismatch'
     #                     # pres=pres+';Tresponse:'+'|'.join(str(a) for a in pkTresp)
-    #                     # if any(rs < pkt['Pkt_Tresponse'][0] or rs > pkt['Pkt_Tresponse'][1] for rs in pkTresp): reslt.append('Fail')
+    #                     # if any(rs < pkt['Pkt_Tresponse'][0] or rs > pkt['Pkt_Tresponse'][1] for rs in pkTresp): reslt.append(Enums.TestResult.FAIL)
     #                 else:
     #                     pres=pres+';Tresponse:None'
-    #                     reslt.append('Fail')
+    #                     reslt.append(Enums.TestResult.FAIL)
     #             if 'Pkt_Interval' in pkt:
     #                 TPktInter=[]
     #                 evalue = evalue+';Interval:'+'-'.join(str(a) for a in pkt['Pkt_Interval'])+'ms'
@@ -5344,19 +5345,19 @@ class CommonCTSChecks():
     #                         if rs[0] < pkt['Pkt_Interval'][0] or rs[0] > pkt['Pkt_Interval'][1]:
     #                             TPktInter.append(str(rs[0])+'@'+str(rs[1]))
     #                     if len(TPktInter)>0:
-    #                         reslt.append('Fail')
+    #                         reslt.append(Enums.TestResult.FAIL)
     #                         pres=pres+';Interval:'+','.join(TPktInter)
     #                     else:pres=pres+';Interval:'+'No mismatch'
     #                     # pres=pres+';Interval:'+'|'.join(str(a) for a in PktInter)
-    #                     # if any(rs != pkt['Pkt_Interval'] for rs in PktInter): reslt.append('Fail')
+    #                     # if any(rs != pkt['Pkt_Interval'] for rs in PktInter): reslt.append(Enums.TestResult.FAIL)
     #                 else:
     #                     pres=pres+';Interval:None'
-    #                     reslt.append('Fail')
+    #                     reslt.append(Enums.TestResult.FAIL)
     #             expvalue.append(evalue)
     #             resvalue.append(pres)
     #         AllMeasures['PacketCheck_exp'] = ','.join(expvalue)
     #         AllMeasures['PacketCheck'] = ','.join(resvalue)
-    #         AllMeasures['PacketCheck_res'] = 'Pass' if len(reslt) == 0 else 'Fail'
+    #         AllMeasures['PacketCheck_res'] = Enums.TestResult.PASS if len(reslt) == 0 else Enums.TestResult.FAIL
     #         AllMeasures['PacketCheck_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
     #8. Get voltage for given time
     def CalculateVoltageOnTime(self,AllChannelData,time):
@@ -5428,8 +5429,8 @@ class CommonCTSChecks():
                     if PktFlag==True:
                         PktCount+=1
                         #count check    
-                        # SubChecks.append([f"The expected packet {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} found at {round(pktres[0],3)}sec","Pass"]) # SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} found at {round(pktres[0],3)}sec","Pass"])
-                        SubChecks.append([f"{BITSck['CheckName'] if 'CheckName' in BITSck else ""}The Expected {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} {PktType} found at {round(pktres[0],3)}sec","Pass"])
+                        # SubChecks.append([f"The expected packet {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} found at {round(pktres[0],3)}sec",Enums.TestResult.PASS]) # SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} found at {round(pktres[0],3)}sec",Enums.TestResult.PASS])
+                        SubChecks.append([f"{BITSck['CheckName'] if 'CheckName' in BITSck else ""}The Expected {self.file_list[pktres[2]]['pktType']}_{self.file_list[pktres[2]]['value']} {PktType} found at {round(pktres[0],3)}sec",Enums.TestResult.PASS])
                         #Get the payload values results
                         for ck in BITSck['Checks']:
                             # # print(ck)
@@ -5442,33 +5443,33 @@ class CommonCTSChecks():
                                     if BITSck['Checks'][ck]['comp']=="str":
                                         if BITSck['Checks'][ck]['expected'] in pyload[BITSck['Checks'][ck]['flag']]:
                                             # print("custom_name:",BITSck['Checks'][ck].get("custom_name"), "ck:",ck)
-                                            SubChecks.append([f"Recevied {ck} {'['+BITSck['Checks'][ck].get("custom_name")+']' if BITSck['Checks'][ck].get("custom_name") else ""} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            SubChecks.append([f"Recevied {ck} {'['+BITSck['Checks'][ck].get("custom_name")+']' if BITSck['Checks'][ck].get("custom_name") else ""} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
                                             
                                         elif 'random' in BITSck['Checks'][ck]['expected']:
                                             if BITSck['Checks'][ck].get('except'):
                                                 if pyload[BITSck['Checks'][ck]['flag']] not in BITSck['Checks'][ck]['except']:
-                                                    SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}","Pass"])
+                                                    SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}",Enums.TestResult.PASS])
 
-                                                else: SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}","Fail"])
-                                            else: SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random value","Pass"])
+                                                else: SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random and should not be in {BITSck['Checks'][ck]['except']}",Enums.TestResult.FAIL])
+                                            else: SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Random value",Enums.TestResult.PASS])
                                         elif "NEQL" in BITSck['Checks'][ck]['expected']:
                                             if BITSck['Checks'][ck]['val'] != pyload[BITSck['Checks'][ck]['flag']]:
-                                                SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Not equal to {BITSck['Checks'][ck]['val']}","Pass"])
+                                                SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Not equal to {BITSck['Checks'][ck]['val']}",Enums.TestResult.PASS])
                                             else:
-                                                SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Not equal to {BITSck['Checks'][ck]['val']}","Fail"])
-                                        else:SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: Not equal to {BITSck['Checks'][ck]['val']}",Enums.TestResult.FAIL])
+                                        else:SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                         break
                                     elif BITSck['Checks'][ck]['comp']=="str_Reverse":
                                         if BITSck['Checks'][ck]['expected'] in pyload[BITSck['Checks'][ck]['flag']]:
-                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Fail"])
-                                        else:SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
+                                        else:SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
                                     elif BITSck['Checks'][ck]['comp']=="btw":
                                         # # print(int(pyload[BITSck['Checks'][ck]['flag']]),BITSck['Checks'][ck]['expected'])
                                         if int(pyload[BITSck['Checks'][ck]['flag']]) >= BITSck['Checks'][ck]['expected'][0] and int(pyload[BITSck['Checks'][ck]['flag']]) <= BITSck['Checks'][ck]['expected'][1]:
-                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}","Pass"])
-                                        else:SubChecks.append([f"Recevied {ck} valueis {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}","Fail"])
+                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}",Enums.TestResult.PASS])
+                                        else:SubChecks.append([f"Recevied {ck} valueis {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected'][0]}-{BITSck['Checks'][ck]['expected'][1]}",Enums.TestResult.FAIL])
                                     elif BITSck['Checks'][ck]['comp']=="Present":
-                                        SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}","Pass"])
+                                        SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}",Enums.TestResult.PASS])
                                     else:
                                         if ':' in pyload[BITSck['Checks'][ck]['flag']]:
                                             pyaloadli = pyload[BITSck['Checks'][ck]['flag']].split(':')
@@ -5483,25 +5484,25 @@ class CommonCTSChecks():
                                         # print("revdval2:",revdval)
                                         if BITSck['Checks'][ck]['comp'] == 'GTEQL':
                                             if  revdval[0] >= BITSck['Checks'][ck]['expected']:
-                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is >= {BITSck['Checks'][ck]['expected']}","Pass"])
-                                            else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is not >= {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is >= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
+                                            else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is not >= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                         elif BITSck['Checks'][ck]['comp'] == 'LTEQL':
                                             if  revdval[0] <= BITSck['Checks'][ck]['expected']:
-                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is <= {BITSck['Checks'][ck]['expected']}","Pass"])
-                                            else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is not <= {BITSck['Checks'][ck]['expected']}","Fail"])
+                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is <= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
+                                            else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]}, which is not <= {BITSck['Checks'][ck]['expected']}",Enums.TestResult.FAIL])
                                         elif BITSck['Checks'][ck]['comp'] == 'EQL':
                                             if 'comp1' == BITSck['Checks'][ck]['expected'] or 'comp2' == BITSck['Checks'][ck]['expected']:
                                                 BitsCompare[BITSck['Checks'][ck]['expected']] = [ck,revdval[0]]
-                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}","Pass"])
+                                                SubChecks.append([f"Recevied value of {ck} is {revdval[0]}",Enums.TestResult.PASS])
                                             else:
                                                 if revdval[0] == float(BITSck['Checks'][ck]['expected']):
-                                                    SubChecks.append([f"Recevied value of {ck} is {revdval[0]} {BITSck['Checks'][ck].get("units","")}, Expected: {BITSck['Checks'][ck]['expected']} {BITSck['Checks'][ck].get("units","")}","Pass"])
-                                                else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]} {BITSck['Checks'][ck].get("units","")}, Expected: {BITSck['Checks'][ck]['expected']} {BITSck['Checks'][ck].get("units","")}","Fail"])
+                                                    SubChecks.append([f"Recevied value of {ck} is {revdval[0]} {BITSck['Checks'][ck].get("units","")}, Expected: {BITSck['Checks'][ck]['expected']} {BITSck['Checks'][ck].get("units","")}",Enums.TestResult.PASS])
+                                                else:SubChecks.append([f"Recevied value of {ck} is {revdval[0]} {BITSck['Checks'][ck].get("units","")}, Expected: {BITSck['Checks'][ck]['expected']} {BITSck['Checks'][ck].get("units","")}",Enums.TestResult.FAIL])
                                         elif BITSck['Checks'][ck]['comp'] == 'no':
-                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}","Pass"])
+                                            SubChecks.append([f"Recevied {ck} value is {pyload[BITSck['Checks'][ck]['flag']]}, Expected: {BITSck['Checks'][ck]['expected']}",Enums.TestResult.PASS])
 
 
-                            else: SubChecks.append([f"The payload {ck} for packet {'_'.join(ExpPacket)} not found for the packet {'_'.join(ExpPacket)}","Fail"])
+                            else: SubChecks.append([f"The payload {ck} for packet {'_'.join(ExpPacket)} not found for the packet {'_'.join(ExpPacket)}",Enums.TestResult.FAIL])
                     if 'PacketCount' not in BITSck:
                         break
                     if 'PacketCount' in BITSck:
@@ -5514,24 +5515,24 @@ class CommonCTSChecks():
                 else:
                     if 'PacketCount' in BITSck:
                         if BITSck['PacketCount'] == "ALL":
-                            SubChecks.append([f"Received {PktCount} {'_'.join(ExpPacket)} packets","Pass"])
+                            SubChecks.append([f"Received {PktCount} {'_'.join(ExpPacket)} packets",Enums.TestResult.PASS])
                         else:
                             if PktCount < BITSck['PacketCount']:
-                                SubChecks.append([f"Out of {BITSck['PacketCount']} Received only {PktCount} {'_'.join(ExpPacket)} packets","Fail"])
+                                SubChecks.append([f"Out of {BITSck['PacketCount']} Received only {PktCount} {'_'.join(ExpPacket)} packets",Enums.TestResult.FAIL])
                     else:
                         if PktCount==0:
-                            SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} not found between {round(self.file_list[limit[0]]['startTime'],3)}sec to {round(self.file_list[limit[1]]['stopTime'],3)}sec ","Fail"])
+                            SubChecks.append([f"The expected packet {'_'.join(ExpPacket)} not found between {round(self.file_list[limit[0]]['startTime'],3)}sec to {round(self.file_list[limit[1]]['stopTime'],3)}sec ",Enums.TestResult.FAIL])
                     break
             expvalues.append(expvalue)
 
             if len(BitsCompare)>0:
                 if BitsCompare['comp1'][1] == BitsCompare['comp2'][1]:
-                    SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}","Pass"])
-                else: SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is not equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}","Fail"])
+                    SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}",Enums.TestResult.PASS])
+                else: SubChecks.append([f"{BitsCompare['comp1'][0]}: {BitsCompare['comp1'][1]} is not equal to {BitsCompare['comp2'][0]}: {BitsCompare['comp2'][1]}",Enums.TestResult.FAIL])
 
         # AllMeasures['BitsCheck_exp'] = ';'.join(expvalues)
-        # AllMeasures['BitsCheck'] = 'Found Issues' if any(res[1]=="Fail" for res in SubChecks) else 'No Issues'
-        # AllMeasures['BitsCheck_res'] = 'Fail' if any(res[1]=="Fail" for res in SubChecks) else 'Pass'
+        # AllMeasures['BitsCheck'] = 'Found Issues' if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else 'No Issues'
+        # AllMeasures['BitsCheck_res'] = Enums.TestResult.FAIL if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else Enums.TestResult.PASS
         # AllMeasures['BitsCheck_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
         # AllMeasures['BitsCheck_Details']=SubChecks
         return SubChecks
@@ -5582,7 +5583,7 @@ class CommonCTSChecks():
             if 'Pkt_response' in pkt : expval=expval+f"Response in {','.join(pkt['Pkt_response'])}"
             if 'Pkt_count' in pkt : expval=expval+f"Pacekt Count= {pkt['Pkt_count']}"
             if limit != None:
-                # SubChecks.append([f"Packet check for {'_'.join(ExpPacket)} initiated on limit {round(self.file_list[limit[0]]['startTime'],2)}Sec to {round(self.file_list[limit[1]]['startTime'],2)}Sec","Pass"])
+                # SubChecks.append([f"Packet check for {'_'.join(ExpPacket)} initiated on limit {round(self.file_list[limit[0]]['startTime'],2)}Sec to {round(self.file_list[limit[1]]['startTime'],2)}Sec",Enums.TestResult.PASS])
                 #Iterate on limit and get the matching packets
                 id = limit[0]
 
@@ -5594,7 +5595,7 @@ class CommonCTSChecks():
                             if self.GetPacketType(id) == pkt['PktType'] if 'PktType' in pkt else "Packet":
                                 # print("GetPacketType:",self.GetPacketType(id))
                                 Pktcount+=1
-                                SubChecks.append([f"{pkt['chkname'] if "chkname" in pkt else ""}{self.file_list[id]['pktType']} {self.file_list[id]['value']} Packet found at {round(self.file_list[id]['startTime'],3)} sec","Pass"])
+                                SubChecks.append([f"{pkt['chkname'] if "chkname" in pkt else ""}{self.file_list[id]['pktType']} {self.file_list[id]['value']} Packet found at {round(self.file_list[id]['startTime'],3)} sec",Enums.TestResult.PASS])
                                 # print("pktfound:",f"{'_'.join(ExpPacket)} Packet found at {round(self.file_list[id]['startTime'],3)} sec")
                                 #Apply additional checks for the packet
                                 #############################################################
@@ -5607,15 +5608,15 @@ class CommonCTSChecks():
                                             if any(res in self.file_list[tmpid]['pktType'] for res in pkt['Pkt_response']):
                                                 # print("response:",self.file_list[tmpid]['pktType'])
                                                 RespFlag=True
-                                                SubChecks.append([f"Found {self.file_list[tmpid]['pktType']}_{self.file_list[tmpid]['value']} response for {'_'.join(ExpPacket)} packet at {round(self.file_list[tmpid]['startTime'],2)}sec, Which is expected amoung: [{','.join(pkt['Pkt_response'])}]","Pass"])
-                                            else: SubChecks.append([f"Found response {self.file_list[tmpid]['pktType']} at {round(self.file_list[tmpid]['startTime'],2)}sec, Which is not expected amoung: [{','.join(pkt['Pkt_response'])}]","Fail"])
+                                                SubChecks.append([f"Found {self.file_list[tmpid]['pktType']}_{self.file_list[tmpid]['value']} response for {'_'.join(ExpPacket)} packet at {round(self.file_list[tmpid]['startTime'],2)}sec, Which is expected amoung: [{','.join(pkt['Pkt_response'])}]",Enums.TestResult.PASS])
+                                            else: SubChecks.append([f"Found response {self.file_list[tmpid]['pktType']} at {round(self.file_list[tmpid]['startTime'],2)}sec, Which is not expected amoung: [{','.join(pkt['Pkt_response'])}]",Enums.TestResult.FAIL])
                                         elif self.GetPacketType(tmpid) =="Packet":break
                                         tmpid+=1
                                     if RespFlag == False:
                                         if "No" in pkt['Pkt_response']:
-                                            SubChecks.append([f"Response not found for received packet.","Pass"])
+                                            SubChecks.append([f"Response not found for received packet.",Enums.TestResult.PASS])
                                         else:
-                                            SubChecks.append([f"Response not found for received packet.","Fail"])
+                                            SubChecks.append([f"Response not found for received packet.",Enums.TestResult.FAIL])
                                     if not pkt.get('Pkt_count'):
                                         break
                                 elif not pkt.get('Pkt_count'):break
@@ -5624,22 +5625,22 @@ class CommonCTSChecks():
                 else:
                     # Packet not found
                     if (not pkt.get('Pkt_count')) or (pkt.get('Pkt_count') and Pktcount==0):
-                        SubChecks.append([f"{ExpPacket[0]} {f'({ExpPacket[1]})' if len(ExpPacket)==2 else ""} not found","Inconclusive"])
-            else:SubChecks.append([f"Packet check for {'_'.join(ExpPacket)} not initiated, limit not found","Fail"])
+                        SubChecks.append([f"{ExpPacket[0]} {f'({ExpPacket[1]})' if len(ExpPacket)==2 else ""} not found",Enums.TestResult.INCONCLUSIVE])
+            else:SubChecks.append([f"Packet check for {'_'.join(ExpPacket)} not initiated, limit not found",Enums.TestResult.FAIL])
             # # print("SubChecks:",SubChecks)
             #check for pacekt count
             if 'Pkt_count' in pkt:
                 if "ALL" in str(pkt['Pkt_count']):
-                    SubChecks.append([f"The received pacekt count is {Pktcount}","Pass"])
+                    SubChecks.append([f"The received pacekt count is {Pktcount}",Enums.TestResult.PASS])
                 else:
                     if Pktcount >= int(pkt['Pkt_count']):
-                        SubChecks.append([f"The received pacekt count is {Pktcount},Which is expected count of {pkt['Pkt_count']}","Pass"])
-                    else:SubChecks.append([f"The received pacekt count is {Pktcount},Which is not expected count of {pkt['Pkt_count']}","Fail"])
+                        SubChecks.append([f"The received pacekt count is {Pktcount},Which is expected count of {pkt['Pkt_count']}",Enums.TestResult.PASS])
+                    else:SubChecks.append([f"The received pacekt count is {Pktcount},Which is not expected count of {pkt['Pkt_count']}",Enums.TestResult.FAIL])
             expvalues.append(expval)
         # if not returndata:
         #     AllMeasures['PacketCheck_exp'] = ';'.join(expvalues)
-        #     AllMeasures['PacketCheck'] = 'Found Issues' if any(res[1]=="Fail" for res in SubChecks) else 'No Issues'
-        #     AllMeasures['PacketCheck_res'] = 'Fail' if any(res[1]=="Fail" for res in SubChecks) else 'Pass'
+        #     AllMeasures['PacketCheck'] = 'Found Issues' if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else 'No Issues'
+        #     AllMeasures['PacketCheck_res'] = Enums.TestResult.FAIL if any(res[1]==Enums.TestResult.FAIL for res in SubChecks) else Enums.TestResult.PASS
         #     AllMeasures['PacketCheck_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
         #     AllMeasures['PacketCheck_Details']=SubChecks
         # else: return SubChecks

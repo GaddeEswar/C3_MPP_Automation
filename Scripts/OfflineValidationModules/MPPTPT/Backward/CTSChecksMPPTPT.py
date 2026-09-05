@@ -8,6 +8,7 @@ import json
 import math
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
+from Enums import Enums
 from OfflineValidationModules.MPPTPT.CommonHelper import CommonCTSChecks
 
 
@@ -58,26 +59,26 @@ class CTSChecks_MPPTPT():
 
                     #by default all the checks has sub-checks ensure the sub-checks results for main check pass / fail 
                     AllMeasures[f"{CTSCheck}_SEQ"] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
-                    AllMeasures[f'{CTSCheck}_res']='Fail'
+                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                     AllMeasures[f'{CTSCheck}_remarks']='NA'
                     if len(AllMeasures[f"{CTSCheck}_Details"]) >0:
                         tempRes = AllMeasures[f"{CTSCheck}_Details"]
                         # print('Tempres',tempRes)
-                        if 'Fail' in [item[1] for item in tempRes]:
+                        if Enums.TestResult.FAIL in [item[1] for item in tempRes]:
                             if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                            AllMeasures[f'{CTSCheck}_res']="Fail"
+                            AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                         else:
-                            if 'Inconclusive' in [item[1] for item in tempRes]:
+                            if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                 if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                             else:
                                 if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                AllMeasures[f'{CTSCheck}_res']="Pass"
-                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                         AllMeasures[f'{CTSCheck}_Details']=tempRes
                         # Update Validation for Eye Diagram
                         if 'ASK_MOD' in self.Header['TestcaseID']:
-                            if 'Pass' in tempRes[-1]: AllMeasures[f'{CTSCheck}_res']="Pass"
+                            if Enums.TestResult.PASS in tempRes[-1]: AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
                                
                                 
                     #Update Final Result
@@ -86,12 +87,12 @@ class CTSChecks_MPPTPT():
                         # print(Header)
                         if self.Header['TCresult'] == 'NA':
                             self.Header['TCresult'] = AllMeasures[str(CTSCheck)+'_res']
-                        elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                            self.Header['TCresult']='Fail'
-                        elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Pass') or (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                            self.Header['TCresult']='Inconclusive'
-                        elif (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res']=='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res']=='Pass'):
-                            self.Header['TCresult']='Fail' #Add remarks for the test fail
+                        elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            self.Header['TCresult']=Enums.TestResult.FAIL
+                        elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            self.Header['TCresult']=Enums.TestResult.INCONCLUSIVE
+                        elif (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                            self.Header['TCresult']=Enums.TestResult.FAIL #Add remarks for the test fail
                     
                     # Update TestResult to Not-Run if SW result is NotRun
                     if self.Header['SWresult']=="Not Run":self.Header['TCresult']='NA'

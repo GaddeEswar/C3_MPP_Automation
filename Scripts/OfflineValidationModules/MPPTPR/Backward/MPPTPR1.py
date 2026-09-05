@@ -6,6 +6,7 @@ import traceback
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
+from Enums import Enums
 from datetime import datetime,date
 from OfflineValidationModules.MPPTPR.MPPTPR1_CommonHelper import CommonCTSChecks
 # from collections import deque
@@ -124,28 +125,28 @@ class CTSChecks_MPP_TPR1():
                                     reslt = self.check_measure(exp, AllMeasures[CTSCheck],Check['comp'])
                                     AllMeasures[str(CTSCheck)+'_exp']=reslt[2]+str(reslt[0][0]) if reslt[2] != 0 else str(reslt[0][0])+'-'+str(reslt[0][1])
                                     AllMeasures[str(CTSCheck)+'_res'] = reslt[1]
-                                    if reslt[1]=='Pass':
-                                        AllMeasures[f'{CTSCheck}_Details'].append([f"The Measured {CTSCheck} is {AllMeasures[CTSCheck]}, which is in limit: [{reslt[2]}]","Pass"])
-                                    else:AllMeasures[f'{CTSCheck}_Details'].append([f"The Measured {CTSCheck} is {AllMeasures[CTSCheck]}, which is not in limit: [{reslt[2]}]","Fail"])
+                                    if reslt[1]==Enums.TestResult.PASS:
+                                        AllMeasures[f'{CTSCheck}_Details'].append([f"The Measured {CTSCheck} is {AllMeasures[CTSCheck]}, which is in limit: [{reslt[2]}]",Enums.TestResult.PASS])
+                                    else:AllMeasures[f'{CTSCheck}_Details'].append([f"The Measured {CTSCheck} is {AllMeasures[CTSCheck]}, which is not in limit: [{reslt[2]}]",Enums.TestResult.FAIL])
                                 else:
                                     # print("hi2")
                                     # AllMeasures[str(CTSCheck)+'_exp'] = str(exp[0])+'-'+str(exp[1]) if len(exp)>1 else exp[0]
-                                    AllMeasures[str(CTSCheck)+'_res']="Pass"
+                                    AllMeasures[str(CTSCheck)+'_res']=Enums.TestResult.PASS
                                 if len(AllMeasures[f"{CTSCheck}_Details"]) >0:
                                     # print("hi3")
                                     tempRes = AllMeasures[f"{CTSCheck}_Details"]
                                     # print('Tempres:',tempRes)
-                                    if 'Fail' in [item[1] for item in tempRes]:
+                                    if Enums.TestResult.FAIL in [item[1] for item in tempRes]:
                                         if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                        AllMeasures[f'{CTSCheck}_res']="Fail"
+                                        AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                     else:
-                                        if 'Inconclusive' in [item[1] for item in tempRes]:
+                                        if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                             if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                            AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                            AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                         else:
                                             if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                            AllMeasures[f'{CTSCheck}_res']="Pass"
-                                    AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                            AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                                    AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                                     AllMeasures[f'{CTSCheck}_Details']=tempRes
                                   
                         #For Str based exp results calucaltion
@@ -153,20 +154,20 @@ class CTSChecks_MPP_TPR1():
                             # print("Str based exp results calucaltion")
                             if CTSCheck in [CTSCheck]:
                                 AllMeasures[f'{CTSCheck}_exp'] =exp
-                                AllMeasures[f'{CTSCheck}_res']='Fail'
+                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                 AllMeasures[f'{CTSCheck}_remarks']='NA'
                                 if AllMeasures[CTSCheck] is not None or len(AllMeasures[f"{CTSCheck}_Details"]) >0:
                                    
                                     if exp=='VrectF0>VrectF1>VrectF2':
                                         if None not in [AllMeasures['Vrectfinal0'],AllMeasures['Vrectfinal1'],AllMeasures['Vrectfinal2']]:
                                             if AllMeasures['Vrectfinal0'] > AllMeasures['Vrectfinal1'] and AllMeasures['Vrectfinal1'] > AllMeasures['Vrectfinal2']:
-                                                AllMeasures['VrecrfinalComp_res'] = 'Pass'
+                                                AllMeasures['VrecrfinalComp_res'] = Enums.TestResult.PASS
                                    
                                    
                                     
                                     elif exp=="PTphaseCheck" and CTSCheck in ["PTPhase"]:
                                         AllMeasures[f'{CTSCheck}_exp'] =exp
-                                        AllMeasures[f'{CTSCheck}_res']='Pass'
+                                        AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
                                         # AllMeasures[f'{CTSCheck}_remarks']=f"PT phase started on {AllMeasures[CTSCheck]}sec."
                                    
                                     # elif exp in ["RenegoCheck","LoadForNegoPower","PLAOffsetCheck","DPlossCalibrationCheck","RenegoPRECTInterval","ChargeStatus","Linearization","KestCheck"]:
@@ -177,29 +178,29 @@ class CTSChecks_MPP_TPR1():
                                         throttle_failcnt = 0
                                  
                                         for item in tempRes:
-                                            if item[1]=="Fail" and "not throttled" in item[0]:
+                                            if item[1]==Enums.TestResult.FAIL and "not throttled" in item[0]:
                                                 throttle_failcnt+=1
                                                 if throttle_failcnt>=3:
-                                                    AllMeasures[f'{CTSCheck}_res']="Fail"
+                                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                                     break
-                                                else: AllMeasures[f'{CTSCheck}_res']="Pass"
+                                                else: AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
 
                                             else:
-                                                if 'Inconclusive' in [item[1] for item in tempRes]:
+                                                if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                                    AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                                 else:
                                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                                    AllMeasures[f'{CTSCheck}_res']="Pass"
+                                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
                                         
                                         for item in tempRes:
-                                            if item[1]=="Fail" and "not throttled" not in item[0]:
-                                                AllMeasures[f'{CTSCheck}_res']="Fail"
+                                            if item[1]==Enums.TestResult.FAIL and "not throttled" not in item[0]:
+                                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                                 break
 
 
                                        
-                                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                                         AllMeasures[f'{CTSCheck}_Details']=tempRes
                                     
                                     
@@ -207,39 +208,39 @@ class CTSChecks_MPP_TPR1():
                                     else:
                                         tempRes = AllMeasures[f"{CTSCheck}_Details"]
                                         # print('Tempres:',tempRes)
-                                        if 'Fail' in [item[1] for item in tempRes]:
+                                        if Enums.TestResult.FAIL in [item[1] for item in tempRes]:
                                             if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                            AllMeasures[f'{CTSCheck}_res']="Fail"
+                                            AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                         else:
-                                            if 'Inconclusive' in [item[1] for item in tempRes]:
+                                            if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                                 if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                                AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                             else:
                                                 if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                                AllMeasures[f'{CTSCheck}_res']="Pass"
-                                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                                AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                                        AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                                         AllMeasures[f'{CTSCheck}_Details']=tempRes
                                         # print("AllMeasures:",AllMeasures)
                     else:
                         if CTSCheck in [CTSCheck]:
                             AllMeasures[f'{CTSCheck}_exp'] =CTSCheck
-                            AllMeasures[f'{CTSCheck}_res']='Fail'
+                            AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                             AllMeasures[f'{CTSCheck}_remarks']='NA'
                             AllMeasures[f'{CTSCheck}_SEQ'] = Check['CheckSEQ'] if 'CheckSEQ' in Check else 0
                             if AllMeasures[CTSCheck] is not None or len(AllMeasures[f"{CTSCheck}_Details"]) >0:          
                                 tempRes = AllMeasures[f"{CTSCheck}_Details"]
                                 # print('Tempres:',tempRes)
-                                if 'Fail' in [item[1] for item in tempRes]:
+                                if Enums.TestResult.FAIL in [item[1] for item in tempRes]:
                                     if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                    AllMeasures[f'{CTSCheck}_res']="Fail"
+                                    AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.FAIL
                                 else:
-                                    if 'Inconclusive' in [item[1] for item in tempRes]:
+                                    if Enums.TestResult.INCONCLUSIVE in [item[1] for item in tempRes]:
                                         if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"Issue in {CTSCheck}"
-                                        AllMeasures[f'{CTSCheck}_res']="Inconclusive"
+                                        AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.INCONCLUSIVE
                                     else:
                                         if AllMeasures[CTSCheck] is None: AllMeasures[CTSCheck]=f"No Issue  in {CTSCheck}"
-                                        AllMeasures[f'{CTSCheck}_res']="Pass"
-                                AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]=="Fail"])
+                                        AllMeasures[f'{CTSCheck}_res']=Enums.TestResult.PASS
+                                AllMeasures[f'{CTSCheck}_remarks']=';'.join([item[0] for item in tempRes if item[1]==Enums.TestResult.FAIL])
                                 AllMeasures[f'{CTSCheck}_Details']=tempRes
 
 
@@ -247,12 +248,12 @@ class CTSChecks_MPP_TPR1():
                     # # print(Header)
                     if self.Header['TCresult'] == 'NA':
                         self.Header['TCresult'] = AllMeasures[str(CTSCheck)+'_res']
-                    elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                        self.Header['TCresult']='Fail'
-                    elif (self.Header['TCresult'] == 'Inconclusive' and AllMeasures[str(CTSCheck)+'_res'] =='Pass') or (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res'] =='Inconclusive') :
-                        self.Header['TCresult']='Inconclusive'
-                    elif (self.Header['TCresult'] == 'Pass' and AllMeasures[str(CTSCheck)+'_res']=='Fail') or (self.Header['TCresult'] == 'Fail' and AllMeasures[str(CTSCheck)+'_res']=='Pass'):
-                        self.Header['TCresult']='Fail' #Add remarks for the test fail
+                    elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                        self.Header['TCresult']=Enums.TestResult.FAIL
+                    elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                        self.Header['TCresult']=Enums.TestResult.INCONCLUSIVE
+                    elif (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                        self.Header['TCresult']=Enums.TestResult.FAIL #Add remarks for the test fail
                     
                     # Update TestResult to Not-Run if SW result is NotRun
                     if self.Header['SWresult']=="Not Run":self.Header['TCresult']='NA'
