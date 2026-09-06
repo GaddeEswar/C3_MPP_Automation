@@ -1,5 +1,9 @@
 import traceback
 from MainModule import JsonOperations,APIOperations,GeneralMethods
+from Enums import Enums
+from dataclasses import dataclass
+from typing import List, Any, Union
+from Scripts.TestConfigs import *
 import os
 import zipfile
 import io
@@ -15,39 +19,25 @@ class PacketMethods:
         # JapiDatatemp =self.Japi.read_file()
         # self.JapiData = JapiDatatemp['API']
 
+        if self.Header.get('Mode') == Enums.Mode.TPR: self._get_type = self._classify_tpr
+        else: self._get_type = self._classify_tpt
+
+    def _classify_tpr(self, pkt):
+        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'): return 'TesterMsg'
+        return 'Packet' if pkt.get('isTesterPkt') else 'Response'
+
+    def _classify_tpt(self, pkt):
+        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'):return 'TesterMsg'
+        return 'Response' if pkt.get('isTesterPkt') else 'Packet'
+    
     #1.Get packet Type, testermsg/packet/response
-    def GetPacketType(self,id):
-        if self.Header['Product'] == "C3":
-            if self.Header['Mode'] == 'TPT':
-                if self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Packet'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Response'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
-                    return 'TesterMsg'
-            elif self.Header['Mode'] =="TPR":
-                if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Packet'
-                elif self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Response'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
-                    return 'TesterMsg'
-        elif self.Header['Product'] == "MPP":
-            if self.Header['Mode']=="TPR":
-                if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Packet'
-                elif self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Response'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
-                    return 'TesterMsg'
-            elif self.Header['Mode']=="TPT":
-                if self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Packet'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
-                    return 'Response'
-                elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
-                    return 'TesterMsg'
-        return None
+    def GetPacketType(self, id):
+        try:
+            return self._get_type(self.file_list[id])
+        except Exception as e:
+            print(f"Error in GetPacketType: {e}")
+            traceback.print_exc()
+            return None
 
     def NextOcuurance(self,Type,limit):
         id = limit[0]

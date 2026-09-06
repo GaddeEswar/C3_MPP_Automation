@@ -8,7 +8,8 @@ import zipfile
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Enums import Enums
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 from datetime import datetime,date
 
 # from collections import deque
@@ -23,15 +24,15 @@ class CommonCTSChecks():
 
         self.JapiData = JapiData
         self.Header = Header
-        self.Product = self.Header['Product']
-        self.Mode = self.Header['Mode']
+        self.Product = GeneralConfig.Product
+        self.Mode = GeneralConfig.Mode
         self.TestCaseName = self.Header['TestcaseName']
         self.ProjectJson = ProjectJson
         self.file_list = file_list
         BKjson = JsonOperations(BackupJson)
         self.BKjsonData = BKjson.read_file()
 
-        self.AuthPktAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['Authmeassges'],retype='json')
+        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         #Define modules
         self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
@@ -217,7 +218,7 @@ class CommonCTSChecks():
         res = []
         for pkt in Check['expected']:
             limit = Flow_limit
-            if 'CLOAK' in self.Header['TestcaseID']:
+            if 'CLOAK' in TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
                 limit = Flow_limit
             elif "PktLimit" in pkt:
@@ -1375,7 +1376,7 @@ class CommonCTSChecks():
         return res
     def Test_Results(self, Flow_limit, Check):
         res = []
-        data = APIOperations(url=self.JapiData[self.Product][self.Mode]['GetWaveformTestResult'], retype='json').GetRequest()
+        data = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformTestResult'], retype='json').GetRequest()
 
         if data is not None:
             for level1 in data:
@@ -1993,7 +1994,7 @@ class CommonCTSChecks():
                     else: 
                         res.append([f"Once in the Cloak state, TPR did not sent ASK packet for 1 sec",Enums.TestResult.PASS])
 
-                if "ENTER" not in self.Header['TestcaseID']:
+                if "ENTER" not in TestCaseConfig.TestcaseID:
                     if len(clk_exit) > 2:
                         res.append([f"Cloak exit found at {round(clk_exit[0], 3)} sec", Enums.TestResult.PASS])
                     else:
@@ -2889,7 +2890,7 @@ class CommonCTSChecks():
         Pkt_res = self.GetPacketDetails(packet="CAL_ENTER_RSP", limit=Flow_limit)
         if len(Pkt_res) > 2:
             calduration = int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0])
-            if self.Mode == "TPT":
+            if GeneralConfig.Mode == Enums.Mode.TPT:
                 calduration = calduration * 60
             calbPoints = int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][1]['childelement'][1]['sDescription'])[0])
             res.append([f"Received CAL_ENTER_RSP packet at {round(Pkt_res[0], 2)} sec, with Calib points of {calbPoints}", Enums.TestResult.PASS])
@@ -2905,7 +2906,7 @@ class CommonCTSChecks():
         TempLimit = [id, pkt_cmt[2]] if len(pkt_cmt) > 2 else [id, Flow_limit[1]]
         while id < TempLimit[1]:
             if 'CAL_CAPTURE' in self.file_list[id]['pktType']:
-                if self.GetPacketType(id) == "Packet" if self.Mode == "TPT" else self.GetPacketType(id) == "Response":
+                if self.GetPacketType(id) == "Packet" if GeneralConfig.Mode == Enums.Mode.TPT else self.GetPacketType(id) == "Response":
                     if CAL_CAPTURE_cnt == 1:
                         CalStart = round(self.file_list[id]['startTime'], 2)
                     CalEnd = round(self.file_list[id]['stopTime'], 2)
@@ -2972,7 +2973,7 @@ class CommonCTSChecks():
                         while id <= CALLVL[1]:
                             TempPkt = self.GetPacketDetails(packet="CAL_CAPTURE", limit=[id, CALLVL[1]])
                             if len(TempPkt) > 2:
-                                if self.GetPacketType(id) == "Packet" if self.Mode == "TPT" else self.GetPacketType(id) == "Response":
+                                if self.GetPacketType(id) == "Packet" if GeneralConfig.Mode == Enums.Mode.TPT else self.GetPacketType(id) == "Response":
                                     CalLvlCnt += 1
                                 id = TempPkt[2] + 1
                             else:
@@ -2988,7 +2989,7 @@ class CommonCTSChecks():
                         while id <= CALLVL[1]:
                             TempPkt = self.GetPacketDetails(packet="CAL_CAPTURE", limit=[id, CALLVL[1]])
                             if len(TempPkt) > 2:
-                                if self.GetPacketType(id) == "Packet" if self.Mode == "TPT" else self.GetPacketType(id) == "Response":
+                                if self.GetPacketType(id) == "Packet" if GeneralConfig.Mode == Enums.Mode.TPT else self.GetPacketType(id) == "Response":
                                     CalLvlPrect.append(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt[2], 'PRECT')[0]['sDescription'])[0])
                                     reslt = self.check_measure(Check['AddChecks'][addcheck][f'Level{Level}']['expected'], CalLvlPrect[len(CalLvlPrect) - 1])
                                     res.append([f"Level{Level}: Received PRECT is {CalLvlPrect[len(CalLvlPrect) - 1]}W on {TempPkt[0]}sec, Limit:{reslt[2]}", reslt[1]])
@@ -3002,7 +3003,7 @@ class CommonCTSChecks():
                     while id <= TempLimit[1]:
                         TempPkt = self.GetPacketDetails(packet="CAL_CAPTURE", limit=[id, TempLimit[1]])
                         if len(TempPkt) > 2:
-                            if self.GetPacketType(TempPkt[2]) == "Packet" if self.Mode == "TPT" else self.GetPacketType(TempPkt[2]) == "Response":
+                            if self.GetPacketType(TempPkt[2]) == "Packet" if GeneralConfig.Mode == Enums.Mode.TPT else self.GetPacketType(TempPkt[2]) == "Response":
                                 TempValList.append(GeneralMethods.GetFloatFromStr(self.GetPayloadDetails(TempPkt[2], 'PRECT')[0]['sDescription'])[0])
                             id = TempPkt[2] + 1
                         else:
@@ -3832,7 +3833,7 @@ class CommonCTSChecks():
             
             id = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0],value=pkt['refpkt'][2] if len(pkt['refpkt']) == 3 else None,limit=xlimit,Type=pkt['refpkt'][1])[2]
 
-            if 'CLOAK' in self.Header['TestcaseID']:
+            if 'CLOAK' in TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
             elif "PktLimit" in pkt:
                 if pkt['PktLimit'] == "refCustom":
@@ -4486,7 +4487,7 @@ class CommonCTSChecks():
             else:
                 plottime = int(((TestTime[1]*1000)/1.0510)-80)
             # # print(plottime)
-            SignalAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
+            SignalAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
             data = SignalAPI.GetRequest()
             if index in data:
                 ACD['RV']=data[index]
@@ -4501,9 +4502,9 @@ class CommonCTSChecks():
 ###Support Functions ####################################################################################################################
     #-Get Run time of the testcase, returns start time and end in nanoseconds,
     def GetRunTime(self):
-        TcStartAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['GetWaveformStartTime'],retype='json')
+        TcStartAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStartTime'],retype='json')
         TCstartTime = TcStartAPI.GetRequest()
-        TcStopAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['GetWaveformStopTime'],retype='json')
+        TcStopAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStopTime'],retype='json')
         TCstopTime = TcStopAPI.GetRequest()
         return[TCstartTime,TCstopTime/100000000]
     #-Create log releated to a testcase validation steps. update same into debug logfile
@@ -4590,30 +4591,30 @@ class CommonCTSChecks():
                 else: id-=1
         return[0]
     def GetAuthPacketType(self,id):
-        if self.Product == "C3":
-            if self.Mode == 'TPT':
+        if GeneralConfig.Product == Enums.Product.C3:
+            if GeneralConfig.Mode == Enums.Mode.TPT:
                 if self.Auth_file_list[id]['isTesterPkt']==False and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-            elif self.Mode =="TPR":
+            elif GeneralConfig.Mode == Enums.Mode.TPR:
                 if self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.Auth_file_list[id]['isTesterPkt']==False and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-        elif self.Product == "MPP":
-            if self.Mode=="TPR":
+        elif GeneralConfig.Product == Enums.Product.MPP:
+            if GeneralConfig.Mode == Enums.Mode.TPR:
                 if self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.Auth_file_list[id]['isTesterPkt']==False and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-            elif self.Mode=="TPT":
+            elif GeneralConfig.Mode == Enums.Mode.TPT:
                 if self.Auth_file_list[id]['isTesterPkt']==True and self.Auth_file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.Auth_file_list[id]['isTesterPkt']==False and self.Auth_file_list[id]['isFWTestermessage']==False:
@@ -4781,30 +4782,30 @@ class CommonCTSChecks():
 
     # - Get packet Type, testermsg/packet/response
     def GetPacketType(self,id):
-        if self.Product == "C3":
-            if self.Mode == 'TPT':
+        if GeneralConfig.Product == Enums.Product.C3:
+            if GeneralConfig.Mode == Enums.Mode.TPT:
                 if self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-            elif self.Mode =="TPR":
+            elif GeneralConfig.Mode == Enums.Mode.TPR:
                 if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-        elif self.Product == "MPP":
-            if self.Mode=="TPR":
+        elif GeneralConfig.Product == Enums.Product.MPP:
+            if GeneralConfig.Mode == Enums.Mode.TPR:
                 if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                     return 'Packet'
                 elif self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==True:
                     return 'TesterMsg'
-            elif self.Mode=="TPT":
+            elif GeneralConfig.Mode == Enums.Mode.TPT:
                 if self.file_list[id]['isTesterPkt']==True and self.file_list[id]['isFWTestermessage']==False:
                     return 'Response'
                 elif self.file_list[id]['isTesterPkt']==False and self.file_list[id]['isFWTestermessage']==False:

@@ -7,7 +7,8 @@ import time
 import json
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Enums import Enums
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 from OfflineValidationModules.C3TPT.CommonHelper import CommonCTSChecks
 
 class CTSChecks_C3TPT():
@@ -19,8 +20,8 @@ class CTSChecks_C3TPT():
         # self.JCTSData = JCTSData
         self.JapiData = JapiData
         self.Header = Header
-        self.Product = self.Header['Product']
-        self.Mode = self.Header['Mode']
+        self.Product = GeneralConfig.Product
+        self.Mode = GeneralConfig.Mode
         self.file_list = file_list
         BKjson = JsonOperations(BackupJson)
         self.BKjsonData = BKjson.read_file()
@@ -30,7 +31,7 @@ class CTSChecks_C3TPT():
         #Define modules
         self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
         self.PlotMethod = PlotMethods(Header=self.Header)
-        self.CTSMethod=CommonCTSChecks(file_list=self.file_list,Header=self.Header,JapiData=JapiData,BackupJson=BackupJson,Product=self.Product,Mode=self.Mode)
+        self.CTSMethod=CommonCTSChecks(file_list=self.file_list,Header=self.Header,JapiData=JapiData,BackupJson=BackupJson,Product=GeneralConfig.Product,Mode=GeneralConfig.Mode)
         self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
 
     def CTSChecks(self,flwID,flows,CTSJson):
@@ -76,13 +77,13 @@ class CTSChecks_C3TPT():
             
             if Check['Result_check'] == True:
                 # print(Header)
-                if self.Header['TCresult'] == 'NA':
-                    self.Header['TCresult'] = AllMeasures[str(CTSCheck)+'_res']
-                elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                    self.Header['TCresult']=Enums.TestResult.FAIL
-                elif (self.Header['TCresult'] == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                    self.Header['TCresult']=Enums.TestResult.INCONCLUSIVE
-                elif (self.Header['TCresult'] == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (self.Header['TCresult'] == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
-                    self.Header['TCresult']=Enums.TestResult.FAIL #Add remarks for the test fail
+                if TestCaseConfig.AutomationResult == Enums.TestResult.NOT_RUN:
+                    TestCaseConfig.AutomationResult = AllMeasures[str(CTSCheck)+'_res']
+                elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                    TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
+                elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                    TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
+                elif (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                    TestCaseConfig.AutomationResult=Enums.TestResult.FAIL #Add remarks for the test fail
 
         return AllMeasures

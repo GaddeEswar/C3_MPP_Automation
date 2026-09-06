@@ -8,23 +8,24 @@ import re
 import math
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Enums import Enums
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 
 
 
 
 class CommonCTSChecks:
-    def __init__(self,file_list,Header,JapiData,BackupJson,Product,Mode):
+    def __init__(self,file_list,Header,JapiData,BackupJson,Product=None,Mode=None):
         self.file_list=file_list
-        self.Product=Product
-        self.Mode=Mode
+        self.Product = GeneralConfig.Product
+        self.Mode = GeneralConfig.Mode
         self.JapiData = JapiData
         self.Header=Header
         self.PktMethod = PacketMethods(file_list,Header)
         self.PlotMethod = PlotMethods(Header)
         BKjson = JsonOperations(BackupJson)
         self.BKjsonData = BKjson.read_file()
-        self.AuthPktAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['Authmeassges'],retype='json')
+        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
         self.TestResultsjson = JsonOperations("json/TestResults.json")
@@ -51,7 +52,7 @@ class CommonCTSChecks:
                     PktsCount+=1
                     nextid=self.findTypeid(limit=[pkt1[2]+1,self.Flow_limit[1]],Type='Packet')
                     if nextid is not None:
-                        if 'XCEP_INTERVAL' in self.Header['TestcaseID']:
+                        if 'XCEP_INTERVAL' in TestCaseConfig.TestcaseID:
                             iid=id=nextid
                             while iid < self.Flow_limit[1]:
                                 pkt2= self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],limit=[iid,self.Flow_limit[1]])
@@ -69,14 +70,14 @@ class CommonCTSChecks:
                             id=nextid
                     else:break
                 else:break
-            if 'XCEP_INTERVAL' in self.Header['TestcaseID']:
+            if 'XCEP_INTERVAL' in TestCaseConfig.TestcaseID:
                 min_item = min(Timings, key=lambda x: x[0])
                 max_item = max(Timings, key=lambda x: x[0])
                 if FailCount >  int(0.05 * len(Timings)):res.append([f'More than 5% of the Intervals met the fail criteria', Enums.TestResult.FAIL])
                 else:res.append([f'More than 95% of the Intervals met the Pass criteria', Enums.TestResult.PASS])
                 res.append([f'Measured  Max {Check['TimingCheck']} from XCE at {max_item[1]}  to XCE at {max_item[2]}  is {max_item[0]} mS , Min {Check['TimingCheck']} from XCE at {min_item[1]}  to XCE at {min_item[2]}  is {min_item[0]} mS Limit : <={Check['Limit'][1] }', Enums.TestResult.PASS])
 
-            if 'XCEP_HANDLING' in self.Header['TestcaseID']:
+            if 'XCEP_HANDLING' in TestCaseConfig.TestcaseID:
                 min_item = min(Handling, key=lambda x: x[0])
                 max_item = max(Handling, key=lambda x: x[0])
                 res.append([f'Measured  Max Interval -- txce_responsetimeout + tdelay + tcontrol from {max_item[1]} Sec to {round(max_item[2],3)} Sec is {max_item[0]} mS , Limit : >={PchTime+24+19 }', Enums.TestResult.PASS if PchTime+24+19 else Enums.TestResult.FAIL])
@@ -488,7 +489,7 @@ class CommonCTSChecks:
         KestMsg=self.PktMethod.GetPacketDetails(packet="K_est Value",Type="TesterMsg", limit=[0,len(self.file_list)-1])
         if len(KestMsg)>2:
             KestVal=float(self.file_list[KestMsg[2]]['pktType'].split("|")[1].replace(";",""))
-            if 'P1' in self.Header['TestcaseID']:
+            if 'P1' in TestCaseConfig.TestcaseID:
                 Kest=self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P1']
             else:Kest=self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P2']
             K_Error = round(abs(Kest - KestVal) / Kest,3)
@@ -708,16 +709,16 @@ class CommonCTSChecks:
                         if AveragePFO==-1:res.append([f'TPT Cannot Calculate the PFO', Enums.TestResult.FAIL])
                         else:
                             TestKey=f'{self.Certification}_Link'
-                            if self.JCTSData[self.Product][self.Mode][self.Header['TestcaseID']].get(TestKey,False):
+                            if self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID].get(TestKey,False):
                                                            
                             # if Check.get("TestLink",False): # Check Average PFO form Other Tcs
                                 TCExist=True
                                 TCPFO=[]
-                                for Tc in self.JCTSData[self.Product][self.Mode][self.Header['TestcaseID']][TestKey]["TestLink"]:
+                                for Tc in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]:
                                     if Tc not in self.TestData['TestResults']:TCExist=False
                                     else:TCPFO.append(self.TestData['TestResults'][Tc])
-                                if TCExist:res.append([f'Average PFO calculated in the current Tc is {AveragePFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets and max PFO value from {self.JCTSData[self.Product][self.Mode][self.Header['TestcaseID']][TestKey]["TestLink"]} is {max(TCPFO)} mW', Enums.TestResult.PASS if AveragePFO >= max(TCPFO) else Enums.TestResult.FAIL])  
-                                else:res.append([f'Average PFO measurements of TCs { self.JCTSData[self.Product][self.Mode][self.Header['TestcaseID']][TestKey]["TestLink"]} are not available ', Enums.TestResult.INCONCLUSIVE])
+                                if TCExist:res.append([f'Average PFO calculated in the current Tc is {AveragePFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets and max PFO value from {self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]} is {max(TCPFO)} mW', Enums.TestResult.PASS if AveragePFO >= max(TCPFO) else Enums.TestResult.FAIL])  
+                                else:res.append([f'Average PFO measurements of TCs { self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]} are not available ', Enums.TestResult.INCONCLUSIVE])
                             else:res.append([f'Calculated Average PFO Value for the {pkts} {Check['Pkt'][0]} Packets  is {AveragePFO} mW  Expected >=0mW', Enums.TestResult.PASS if AveragePFO >=0 else Enums.TestResult.FAIL])                    
             else:
                 result,PowerVals=self.PLA_MSR(NegotiablePower=NPower,Check=Check,limit=[PhaseLimit[0],self.Flow_limit[1]])
@@ -1176,7 +1177,7 @@ class CommonCTSChecks:
                         id=Response[2]+1
                     else:
                         if 'ATN' in Response[0]:
-                            if 'RESPONSE_TIME' in self.Header['TestcaseID']: res.append([f'TPT sent {Response[0]} Response for the {'First XCE Packet' if count==1 else f'First XCE Packet at {{{XCE[2]}}} after Stabilization '}',Enums.TestResult.PASS])
+                            if 'RESPONSE_TIME' in TestCaseConfig.TestcaseID: res.append([f'TPT sent {Response[0]} Response for the {'First XCE Packet' if count==1 else f'First XCE Packet at {{{XCE[2]}}} after Stabilization '}',Enums.TestResult.PASS])
                             else:res.append([f'TPT sent {Response[0]} Response for the XCE Packet at {{{XCE[2]}}}',Enums.TestResult.PASS])
                             # check Dsr
                             XcePkt=True
@@ -1620,9 +1621,9 @@ class CommonCTSChecks:
         res=[]
         if flwID==2: self.Flow_limit = flows[flwID]['Limit']
         else:
-            if self.TestData['FileList_Data'][self.Header['TestcaseID']]['flows'][str(flwID)] is not None:
-                self.Flow_limit = self.TestData['FileList_Data'][self.Header['TestcaseID']]['flows'][str(flwID)]['Limit']
-                self.file_list=self.TestData['FileList_Data'][self.Header['TestcaseID']]['Json']
+            if self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['flows'][str(flwID)] is not None:
+                self.Flow_limit = self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['flows'][str(flwID)]['Limit']
+                self.file_list=self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['Json']
                 self.PktMethod.file_list=self.file_list
             else: return [f'Test Data not Found after removing the Magnetic Cover',Enums.TestResult.INCONCLUSIVE]
 
@@ -2176,7 +2177,7 @@ class CommonCTSChecks:
                
                 results.append([f'Calculated Max PFO Value is {MaxPFO} mW and Min PFO Value is {MinPFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets, Expected range :{ Check['PFORange'][Level]['2']} , Power level : {PL}' ,Enums.TestResult.PASS])
                 AveragePFO=round((sum(AveragePFO)/len(AveragePFO)),3)
-                self.TestData['TestResults'][self.Header['TestcaseID']]=AveragePFO # Store the Average PFO value in Json
+                self.TestData['TestResults'][TestCaseConfig.TestcaseID]=AveragePFO # Store the Average PFO value in Json
                 self.TestResultsjson.update_file(self.TestData)
                 results.append([f'Calculated Average PFO value for the {pkts} {Check['Pkt'][0]} Packets is {AveragePFO} mW , Expected range :{ Check['PFORange'][Level]['1']},Power level : {PL}',Enums.TestResult.FAIL if AveragePFO < Check['PFORange'][Level]['1'][0] or AveragePFO >=Check['PFORange'][Level]['1'][1] else 'pass'])
         return results 

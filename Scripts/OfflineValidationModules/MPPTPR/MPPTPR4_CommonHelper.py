@@ -5,7 +5,8 @@ import os
 import csv
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Enums import Enums
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 from pathlib import Path
 import pandas as pd1
 
@@ -20,8 +21,8 @@ class CommonCTSChecks():
         # self.JCTSData = JCTSData
         self.JapiData = JapiData
         self.Header = Header
-        self.Product = self.Header['Product']
-        self.Mode = self.Header['Mode']
+        self.Product = GeneralConfig.Product
+        self.Mode = GeneralConfig.Mode
         self.TestCaseName = self.Header['TestcaseName']
         self.ProjectJson = ProjectJson
         self.file_list = file_list
@@ -31,7 +32,7 @@ class CommonCTSChecks():
         # self.TestData = self.TestResultsjson.read_file()
         # with open('BckupJson.json', 'w') as json_file:
         #     json.dump(self.BKjsonData, json_file, indent=4)
-        self.AuthPktAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['Authmeassges'],retype='json')
+        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         #Define modules
         self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
@@ -114,7 +115,7 @@ class CommonCTSChecks():
         Pkt_res = self.PktMethod.GetPacketDetails(packet="CAL_ENTER_RSP",limit=Flow_limit)
         if len(Pkt_res)>2:
             calduration =int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][2]['childelement'][0]['sDescription'])[0])
-            if self.Mode=="TPT":calduration=calduration*60
+            if GeneralConfig.Mode==Enums.Mode.TPT:calduration=calduration*60
             calbPoints = int(GeneralMethods.GetFloatFromStr(self.file_list[Pkt_res[2]]['header_Payload']['childelement'][1]['childelement'][1]['sDescription'])[0])
             res.append([f"Received CAL_ENTER_RSP packet at {round(Pkt_res[0],2)} sec, with Calib points of {calbPoints}",Enums.TestResult.PASS])
         else:res.append([f"CAL_ENTER_RSP packet not recevied",Enums.TestResult.FAIL])
@@ -131,7 +132,7 @@ class CommonCTSChecks():
         # # print('TempLimit',TempLimit)
         while id < TempLimit[1]:
             if 'CAL_CAPTURE' in self.file_list[id]['pktType']:
-                if self.PktMethod.GetPacketType(id)=="Response" if self.Mode=="TPT" else self.PktMethod.GetPacketType(id)=="Packet":
+                if self.PktMethod.GetPacketType(id)=="Response" if GeneralConfig.Mode==Enums.Mode.TPT else self.PktMethod.GetPacketType(id)=="Packet":
                     if CAL_CAPTURE_cnt == 1: CalStart =round(self.file_list[id]['startTime'],2)
                     CalEnd = round(self.file_list[id]['stopTime'],2)
                     #Find the levels, if the diff of prect in 2 CAL_cap pkts more that 1.5W then its a break.
@@ -201,7 +202,7 @@ class CommonCTSChecks():
                         while id <= CALLVL[1]:
                             TempPkt = self.PktMethod.GetPacketDetails(packet="CAL_CAPTURE",limit=[id,CALLVL[1]])
                             if len(TempPkt)>2:
-                                if self.PktMethod.GetPacketType(id)=="Packet" if self.Mode=="TPT" else self.PktMethod.GetPacketType(id)=="Response":
+                                if self.PktMethod.GetPacketType(id)=="Packet" if GeneralConfig.Mode==Enums.Mode.TPT else self.PktMethod.GetPacketType(id)=="Response":
                                     CalLvlCnt+=1
                                 id = TempPkt[2]+1
                             else:break
@@ -216,7 +217,7 @@ class CommonCTSChecks():
                         while id <= CALLVL[1]:
                             TempPkt = self.PktMethod.GetPacketDetails(packet="CAL_CAPTURE",limit=[id,CALLVL[1]])
                             if len(TempPkt)>2:
-                                if self.PktMethod.GetPacketType(id)=="Packet" if self.Mode=="TPT" else self.PktMethod.GetPacketType(id)=="Response":
+                                if self.PktMethod.GetPacketType(id)=="Packet" if GeneralConfig.Mode==Enums.Mode.TPT else self.PktMethod.GetPacketType(id)=="Response":
                                     CalLvlPrect.append(GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt[2],'PRECT')[0]['sDescription'])[0])
                                     reslt = CommonMethods.check_measure(Check['AddChecks'][addcheck][f'Level{Level}']['expected'],CalLvlPrect[len(CalLvlPrect)-1])
                                     res.append([f"Level{Level}: Received PRECT is {CalLvlPrect[len(CalLvlPrect)-1]}W on {TempPkt[0]}sec, Limit:{reslt[2]}",reslt[1]])
@@ -229,7 +230,7 @@ class CommonCTSChecks():
                         while id <= TempLimit[1]:
                             TempPkt = self.PktMethod.GetPacketDetails(packet="CAL_CAPTURE",limit=[id,TempLimit[1]])
                             if len(TempPkt)>2:
-                                if self.PktMethod.GetPacketType(TempPkt[2])=="Packet" if self.Mode=="TPT" else self.PktMethod.GetPacketType(TempPkt[2])=="Response": 
+                                if self.PktMethod.GetPacketType(TempPkt[2])=="Packet" if GeneralConfig.Mode==Enums.Mode.TPT else self.PktMethod.GetPacketType(TempPkt[2])=="Response": 
                                     TempValList.append(GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt[2],'PRECT')[0]['sDescription'])[0])
                                 id = TempPkt[2]+1
                             else:break
@@ -1005,16 +1006,16 @@ class CommonCTSChecks():
 
     def KestCheck(self,Flow_limit,Check):
         res = []
-        if 'SLIDING' not in self.Header['TestcaseID']:
+        if 'SLIDING' not in TestCaseConfig.TestcaseID:
             #1. Get K_est Value from Estimated_K packet.
             TempPkt1 = self.PktMethod.GetPacketDetails(packet=self.Kest_pkt,limit=Flow_limit,Type="Response")
             # print("TempPkt1:",TempPkt1)
             if len(TempPkt1)>2:
                 # print(GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt1[2],'Estimated_K_Value')[0]['sDescription'])[0])
                 Kest = GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt1[2],'Estimated_K_Value')[0]['sDescription'])[0]
-                if 'P1' in self.Header['TestcaseID']:
+                if 'P1' in TestCaseConfig.TestcaseID:
                     Kiactual = self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P1']
-                elif 'P2' in self.Header['TestcaseID']:
+                elif 'P2' in TestCaseConfig.TestcaseID:
                     Kiactual = self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P2']
             
                         
@@ -2113,7 +2114,7 @@ class CommonCTSChecks():
         
         
         for tests in self.BKjsonData['testBkpTestResultsandPath']:
-            if self.Header['TestcaseID'] == tests['testcaseDetails']['m_TestId']:
+            if TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
                 basepath = Path(os.path.dirname(self.ProjectJson))
                 path1 = Path(tests["actualIndividualTestcaseFolder"])
                 # # print("\\".join(path1.parts[-2:]))
@@ -2264,7 +2265,7 @@ class CommonCTSChecks():
         for pkt in Check['expected']:
             id = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0],value=pkt['refpkt'][2] if len(pkt['refpkt']) == 3 else None,limit=Flow_limit,Type=pkt['refpkt'][1])[2]
 
-            if 'CLOAK' in self.Header['TestcaseID']:
+            if 'CLOAK' in TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
             elif "PktLimit" in pkt:
                 if pkt['PktLimit'] == "refCustom":
@@ -2394,7 +2395,7 @@ class CommonCTSChecks():
 
 
 
-                        if 'Cloak_Ping' in self.Header['TestcaseID']:
+                        if 'Cloak_Ping' in TestCaseConfig.TestcaseID:
                             TempPkt2 = self.PktMethod.GetPacketDetails(packet="Cloak",limit=[id,tmplimit[1]],Type="Packet")
                         else: TempPkt2 = self.PktMethod.GetPacketDetails(packet="Signal strength",limit=[id,tmplimit[1]],Type="Packet")
                         if len(TempPkt2)> 2:
@@ -2510,7 +2511,7 @@ class CommonCTSChecks():
         #     TempPkt1 = self.PktMethod.GetPacketDetails(packet="Ping Detected",limit=[id,tmplimit[1]],Type="TesterMsg")
         #     # # print(TempPkt1)
         #     if len(TempPkt1)>2:
-        #         if 'Cloak_Ping' in self.Header['TestcaseID']:
+        #         if 'Cloak_Ping' in TestCaseConfig.TestcaseID:
         #             TempPkt2 = self.PktMethod.GetPacketDetails(packet="Cloak",limit=[id,tmplimit[1]],Type="Packet")
         #         else: TempPkt2 = self.PktMethod.GetPacketDetails(packet="Signal strength",limit=[id,tmplimit[1]],Type="Packet")
         #         if len(TempPkt2)> 2:
@@ -3901,7 +3902,7 @@ class CommonCTSChecks():
         res = []
         Flow_limit = Flow_limit
         for tests in self.BKjsonData['testBkpTestResultsandPath']:
-            if self.Header['TestcaseID'] == tests['testcaseDetails']['m_TestId']:
+            if TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
                 basepath = Path(os.path.dirname(self.ProjectJson))
                 path1 = tests["actualIndividualTestcaseFolder"]
                 # print(path1.split("\\")[-2])

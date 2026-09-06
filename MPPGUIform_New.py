@@ -1,3 +1,4 @@
+from Scripts.TestConfigs import GeneralConfig
 import csv
 # import shutil
 import sys, subprocess
@@ -16,6 +17,8 @@ from Scripts.postool import PosTool
 from Scripts.OptimumPosition import GetOptimumPosition
 from Scripts.LIcenseVerifyMini import GrlEthernetLink_C2
 from Scripts.JsonSchema import C3_MPP_JsonSchema,C3_MPP_PdfSchema
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 
 #from Scripts.OtherReports import XLreport
 from Scripts.RunTests import RunTests
@@ -139,21 +142,18 @@ class MPPGUI(tk.Tk):
         self.SM1_frame = Menu(self,height=795,width=100,bg=self.Ccodes["blue"],x=0,y=0)
         self.SM2_frame = Menu(self,height=795,width=950,bg=self.Ccodes["grey"],x=100,y=0)
         #Add Combo to choose Mode
-        self.Product = self.JAllMOIData['Product']
-        self.Mode = self.JAllMOIData['Mode']
-        self.switch = self.JAllMOIData['Switch'] 
         self.Offline = tk.PhotoImage(file='./Resources/img/Offline.png')
         self.Online = tk.PhotoImage(file='./Resources/img/Online.png')
         self.TPRTGIMG = tk.PhotoImage(file='./Resources/img/TPR.png')
         self.TPTTGIMG = tk.PhotoImage(file='./Resources/img/TPT.png')    
         # self.RN_FR6 = tk.Frame(self.SM2_frame)
         Labels(self.SM1_frame,text="Product:",x=2,y=2,width=13,bg=self.Ccodes["blue"],fg=self.Ccodes["white"],font=self.FT10BW)
-        self.ProdCB = Combo(self.SM1_frame,width=12,name="prodcb",state="readonly",font=self.FT10BW,val=list(self.JMOIData['Versions'].keys()),bg=self.Ccodes["text_bg"],fg=self.Ccodes["black"],x=2,y=20,selectedVal=self.JAllMOIData['Product'])
+        self.ProdCB = Combo(self.SM1_frame,width=12,name="prodcb",state="readonly",font=self.FT10BW,val=[Enums.Product.C3,Enums.Product.MPP],bg=self.Ccodes["text_bg"],fg=self.Ccodes["black"],x=2,y=20,selectedVal=GeneralConfig.Product)
         self.ProdCB.bind("<<ComboboxSelected>>",self.RestoreRun)
         self.Modeswitch = Buttons(self.SM1_frame,x=6,y=45,height=32,width=80,bg=self.Ccodes["blue"],command=self.SwitchMode)
-        self.Modeswitch['image']=self.TPRTGIMG if self.Mode=='TPR' else self.TPTTGIMG
+        self.Modeswitch['image']=self.TPRTGIMG if GeneralConfig.Mode==Enums.Mode.TPR else self.TPTTGIMG
         self.Runswitch = Buttons(self.SM1_frame, x=6,y=90,height=32,width=80, bg=self.Ccodes["blue"], command=self.SwitchRun)
-        self.Runswitch['image'] = self.Offline if self.switch=='Offline' else self.Online
+        self.Runswitch['image'] = self.Offline if GeneralConfig.Switch==Enums.Switch.OFFLINE else self.Online
         # if self.switch == "online":
         # #Version selection
         # Labels(self.SM1_frame,text="Certification:",x=2,y=115,width=13,bg=self.Ccodes["blue"],fg=self.Ccodes["white"],font=self.FT10BW)
@@ -219,7 +219,9 @@ class MPPGUI(tk.Tk):
             with open(json_file_path, "rb") as file:   # binary mode required
                 data = orjson.loads(file.read())
                 if all(res in data for res in ["Header","QIconfig","TestConfig"]):
-                    self.JAllMOIData['Mode'] = data["Header"]['Mode']
+                    GeneralConfig.Mode= data["Header"]['Mode']
+                    GeneralConfig.Certification= data["Header"]['Certification']
+                    GeneralConfig.PowerProfile= data["Header"]['powerProfile']
                     self.JAllMOIData['Certification']=data["Header"]['Certification']
                     self.JAllMOIData['powerProfile']=data["Header"]['powerProfile']
                     self.JAllMOI.update_file(self.JAllMOIData)
@@ -259,10 +261,8 @@ class MPPGUI(tk.Tk):
             #     self.VerCB.set(list(self.JMOIData['Versions'][self.ProdCB.get()][self.Mode].keys())[0]) 
                 # self.PPCB['values']=self.JMOIData['Versions'][self.ProdCB.get()][self.Mode][self.VerCB.get()]
                 # self.PPCB.set(self.JMOIData['Versions'][self.ProdCB.get()][self.Mode][self.VerCB.get()][0])
-            self.Product = self.JAllMOIData['Product'] = self.ProdCB.get() 
-            # self.JAllMOIData['Certificate'] = self.VerCB.get() 
-            # self.JAllMOIData['PowerProfile'] = next((item["value"] for item in self.JEsdfData[self.Product][self.Mode]['Esdf_Elements'] if item["field"] == "PowerProfile"))#self.PPCB.get()
-            self.JAllMOI.update_file(self.JAllMOIData)
+            # self.Product = self.JAllMOIData['Product'] = self.ProdCB.get() 
+            GeneralConfig.Product= self.ProdCB.get() 
             if ts.widget.winfo_name() == "prodcb": Run(self)
         else:
             Run(self)
@@ -277,37 +277,36 @@ class MPPGUI(tk.Tk):
             #shutil.copyfile('json/DebugLogs.json',f'Logs/DebugLogs_{timestamp}.txt')
         except Exception as e:print(e)
     def SwitchRun(self):
-        print("Switching from",self.switch)
+        print("Switching from",GeneralConfig.Switch)
         # self.SQLConn.ExecutebyQuery("DELETE FROM TestFilters")
         # self.SQLConn.ExecutebyQuery("DELETE FROM AllTestcases")
-        if self.switch == 'Offline':
+        if GeneralConfig.Switch == Enums.Switch.OFFLINE:
             self.Runswitch['image'] = self.Online
             # self.switch = self.JsettingsData['Switch'] = 'online'
-            self.switch = self.JAllMOIData['Switch'] = 'online'
+            GeneralConfig.Switch=Enums.Switch.ONLINE
         else:
             self.Runswitch['image'] = self.Offline
-            self.switch = self.JAllMOIData['Switch'] =  'Offline'
-        self.JAllMOI.update_file(self.JAllMOIData)
+            GeneralConfig.Switch=Enums.Switch.OFFLINE
         # self.Jsettings.update_file(self.JsettingsData)  
         # self.JsettingsData = self.Jsettings.read_file()
         self.RestoreRun("NA")
     def SwitchMode(self):
         self.SQLConn.ExecutebyQuery("DELETE FROM TestFilters")
         self.SQLConn.ExecutebyQuery("DELETE FROM AllTestcases")
-        if self.Mode=='TPT':
+        if GeneralConfig.Mode==Enums.Mode.TPT:
             self.Modeswitch['image']=self.TPRTGIMG  
-            self.Mode = self.JAllMOIData['Mode'] = 'TPR'
+            GeneralConfig.Mode = Enums.Mode.TPR
         else:
             self.Modeswitch['image']=self.TPTTGIMG
-            self.Mode=self.JAllMOIData['Mode'] = 'TPT'
+            GeneralConfig.Mode = Enums.Mode.TPT
         #self.JAllMOIData['Switch'] = 'Offline'
-        self.Jsettings.update_file(self.JsettingsData)
-        self.JAllMOI.update_file(self.JAllMOIData)
+        # self.Jsettings.update_file(self.JsettingsData)
+        # self.JAllMOI.update_file(self.JAllMOIData)
         #self.VerCB['values'] = list(self.JMOIData['Versions'][self.Product][self.Mode].keys())
         #self.PPCB['values'] = self.JMOIData['Versions'][self.Product][self.Mode][self.VerCB.get()]
         #self.VerCB.set(list(self.JMOIData['Versions'][self.Product][self.Mode].keys())[0])
         #self.PPCB.set(self.JMOIData['Versions'][self.Product][self.Mode][self.VerCB.get()][0])
-        self.AllMOIModule.Mode = self.Mode
+        self.AllMOIModule.Mode =  GeneralConfig.Mode
         # print(APIOperations(url=self.JapiData[self.Product][self.Mode]['GetSoftwareVersion'], retype='json').GetRequest())
         self.RestoreRun("NA")
     def ClearFrame(self,frm):
@@ -330,17 +329,17 @@ class Run(MPPGUI):
         self.master = master    
         self.master.ClearFrame(self.master.SM2_frame)
         self.CreateRUNUI()  
-        if self.master.switch =="Offline":
-            self.update_logs("UI",f"Automation tool set for {self.master.Product} {self.master.Mode} in {self.master.switch} mode.")
+        if GeneralConfig.Switch == Enums.Switch.OFFLINE:
+            self.update_logs("UI",f"Automation tool set for {GeneralConfig.Product} {GeneralConfig.Mode} in {GeneralConfig.Switch} mode.")
         else: 
-            self.update_logs("UI",f"Automation tool set for {self.master.Product} {self.master.Mode} in {self.master.switch} mode.")
+            self.update_logs("UI",f"Automation tool set for {GeneralConfig.Product} {GeneralConfig.Mode} in {GeneralConfig.Switch} mode.")
         # self.P_OnlineValidation =  threading.Thread(target=self.RunTest)
         # self.P_OfflineValidaton = threading.Thread(target=self.TesterConnect)
         # self.P_Updatelogs = threading.Thread(target=self.LogsUI)
         self.master.postool.Disconnection()
     
     def CreateRUNUI(self):
-        if self.master.switch=='online':
+        if GeneralConfig.Switch == Enums.Switch.ONLINE:
             #print(self.JsettingsData['Switch'])
             #create frames for runs
             self.RN_FR1 = Menu(self.master.SM2_frame,height=150,width=300,bg=self.master.Ccodes["frame_bg"],x=5,y=5)
@@ -358,7 +357,7 @@ class Run(MPPGUI):
             #Optimum 
             #self.RN_FR8 = Menu(self.master.SM2_frame,height=195,width=305,bg=self.master.Ccodes["frame_bg"],x=310,y=260)
             #License verification
-            if self.master.Product == 'MPP' and self.master.Mode == 'TPR':
+            if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR:
                 self.RN_FR2 = Menu(self.master.SM2_frame,height=475,width=300,bg=self.master.Ccodes["frame_bg"],x=5,y=160)#5,160  x=310,y=5
                 self.RN_FR8 = Menu(self.master.SM2_frame,height=145,width=300,bg=self.master.Ccodes["frame_bg"],x=5,y=640)#5,465   x=310,y=310
             else:
@@ -414,30 +413,30 @@ class Run(MPPGUI):
         # self.master
         self.master.ClearFrame(self.RN_FR1)
         Labels(self.RN_FR1,text="Connect Tester",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=42,font=self.master.FT10BW)
-        self.TesterIP = Entries(self.RN_FR1,width=20,x=5,y=30,font=self.master.FT12BW,textvar=self.master.JtesterData[self.master.Product][self.master.Mode]['TesterIP'],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+        self.TesterIP = Entries(self.RN_FR1,width=20,x=5,y=30,font=self.master.FT12BW,textvar=self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['TesterIP'],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
         Buttons(self.RN_FR1,text='Connect',x=170,y=30,bg=self.master.Ccodes["blue"],fg="#FFFFFF",font=self.master.FT10BW,command=self.TesterConnect)
-        Labels(self.RN_FR1,text=f"Status    :{self.master.JtesterData[self.master.Product][self.master.Mode]['status']}",x=5,y=65,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
-        Labels(self.RN_FR1,text=f"BoardNo   :{self.master.JtesterData[self.master.Product][self.master.Mode]['BoardNo']}",x=5,y=85,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
-        Labels(self.RN_FR1,text=f"SWVersion :{self.master.JtesterData[self.master.Product][self.master.Mode]['SWVersion']}",x=5,y=105,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
-        Labels(self.RN_FR1,text=f"FWversion :{self.master.JtesterData[self.master.Product][self.master.Mode]['FWversion']}",x=5,y=125,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)   
+        Labels(self.RN_FR1,text=f"Status    :{self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['status']}",x=5,y=65,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
+        Labels(self.RN_FR1,text=f"BoardNo   :{self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['BoardNo']}",x=5,y=85,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
+        Labels(self.RN_FR1,text=f"SWVersion :{self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['SWVersion']}",x=5,y=105,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)
+        Labels(self.RN_FR1,text=f"FWversion :{self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['FWversion']}",x=5,y=125,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],font=self.master.FT10BW)   
     #old format 
     def PutQiInputUI(self):
         self.master.ClearFrame(self.RN_FR2)
         Labels(self.RN_FR2,text="Qi Configurations",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=42,font=self.master.FT10BW)
-        inputs = self.master.JMOIData['TestIP'][self.master.Product][self.master.Mode]
+        inputs = self.master.JMOIData['TestIP'][GeneralConfig.Product][GeneralConfig.Mode]
         rw = 27
         for key,value in inputs.items():
             Labels(self.RN_FR2,text=key,font=self.master.FT10BW,x=2,y=rw,width=20,fg=self.master.Ccodes["black"],bg=self.master.Ccodes["white"],anchor=tk.E)
             if value['Type'] =='TextBox':
-                Entries(self.RN_FR2,font=self.master.FT10BW,name=value['key'],x=150,y=rw,width=20,textvar=self.master.JQIData[self.master.Product][self.master.Mode][value['key']],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
-                #print(self.master.JQIData[self.master.Product][self.master.Mode][value['key']])
+                Entries(self.RN_FR2,font=self.master.FT10BW,name=value['key'],x=150,y=rw,width=20,textvar=self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][value['key']],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+                #print(self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][value['key']])
             if value['Type'] =='List':
-                ListBx(self.RN_FR2,width=20,height=3,font=self.master.FT10BW,name=value['key'],x=150,y=rw,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=value['values'], selectedVal =self.master.JQIData[self.master.Product][self.master.Mode][value['key']] )
+                ListBx(self.RN_FR2,width=20,height=3,font=self.master.FT10BW,name=value['key'],x=150,y=rw,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=value['values'], selectedVal =self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][value['key']] )
                 rw=rw+40
             elif value['Type'] =='Combo':
-                Combo(self.RN_FR2,width=18,state="readonly",font=self.master.FT10BW,val=value['values'],name=value['key'],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],x=150,y=rw,selectedVal =self.master.JQIData[self.master.Product][self.master.Mode][value['key']] )
+                Combo(self.RN_FR2,width=18,state="readonly",font=self.master.FT10BW,val=value['values'],name=value['key'],bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],x=150,y=rw,selectedVal =self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][value['key']] )
             elif value['Type'] =='Check':
-                CheckBtn(self.RN_FR2,font=self.master.FT10BW,name=value['key'],x=150,y=rw,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.JQIData[self.master.Product][self.master.Mode][value['key']])
+                CheckBtn(self.RN_FR2,font=self.master.FT10BW,name=value['key'],x=150,y=rw,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][value['key']])
             rw+=21
         Buttons(self.RN_FR2,text='Load Opti. Data',x=50,y=rw+15,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.LoadOptData)
         Buttons(self.RN_FR2,text='Refresh1',x=150,y=rw+15,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.PutQiInputUI)
@@ -450,16 +449,16 @@ class Run(MPPGUI):
         self.ProjectName = Entries(self.RN_FR2,textvar=self.master.JAllMOIData['Run']['Project'],font=self.master.FT10BW,x=95,y=25,width=15,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
         Buttons(self.RN_FR2,text='Upload Project',x=210,y=23,width=11,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.UploadProject)
         
-        Labels(self.RN_FR2,text="PRMC Code :" if self.master.Mode == "TPR" else "PTMC Code :",x=5,y=50,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],font=self.master.FT10BW)
+        Labels(self.RN_FR2,text="PRMC Code :" if GeneralConfig.Mode == Enums.Mode.TPR else "PTMC Code :",x=5,y=50,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],font=self.master.FT10BW)
         # self.pooldataentry = Entries(self.RN_FR2,textvar=self.master.poolvar.get(),font=self.master.FT10BW,x=95,y=52,width=15,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
         # self.pooldatabtn = Buttons(self.RN_FR2,text='Load Pool data',x=210,y=50,width=11,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.PoolData)
-        self.select_prmc = Combo(self.RN_FR2,width=13,state="readonly",font=self.master.FT10BW,val=["PRMC" if self.master.Mode == "TPR" else "PTMC","Use Pool Data","Load Pool Data"],selectedVal="PRMC" if self.master.Mode == "TPR" else "PTMC",bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=95,y=52)
+        self.select_prmc = Combo(self.RN_FR2,width=13,state="readonly",font=self.master.FT10BW,val=["PRMC" if GeneralConfig.Mode == Enums.Mode.TPR else "PTMC","Use Pool Data","Load Pool Data"],selectedVal="PRMC" if GeneralConfig.Mode == Enums.Mode.TPR else "PTMC",bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=95,y=52)
         self.pooldataentry = Entries(self.RN_FR2,textvar=self.master.poolvar.get(),font=self.master.FT10BW,x=210,y=52,width=12,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
         self.select_prmc.bind("<<ComboboxSelected>>", self.prmc_update)
 
 
-        self.Exculde_ptmc_prmc_cbtn = CheckBtn(self.RN_FR2,text="Exclude DUT PTMC" if self.master.Mode == "TPR" else "Exclude DUT PRMC",x=5,y=80,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
-        self.Random_prmc_ptmc_cbtn = CheckBtn(self.RN_FR2,text="Random PRMC" if self.master.Mode == "TPR" else "Random PTMC",x=150,y=80,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
+        self.Exculde_ptmc_prmc_cbtn = CheckBtn(self.RN_FR2,text="Exclude DUT PTMC" if GeneralConfig.Mode == Enums.Mode.TPR else "Exclude DUT PRMC",x=5,y=80,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
+        self.Random_prmc_ptmc_cbtn = CheckBtn(self.RN_FR2,text="Random PRMC" if GeneralConfig.Mode == Enums.Mode.TPR else "Random PTMC",x=150,y=80,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
 
 
         self.uploadesdfbtn = Buttons(self.RN_FR2,text='Upload ESDF',x=10,y=120,width=27,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.LoadESDFFile)
@@ -470,7 +469,7 @@ class Run(MPPGUI):
         self.createprojbtn = Buttons(self.RN_FR2,text='Create Project',x=150,y=230,width=12,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.Updateall)
         Buttons(self.RN_FR2,text='Refresh',x=30,y=230,width=10,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.RefreshTestExe)
         
-        if self.master.Product == 'MPP' and self.master.Mode == 'TPR':
+        if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR:
             self.EnableSmartSwich = CheckBtn(self.RN_FR2,font=self.master.FT10BW,text="Enable Smart Plug:",x=5,y=330,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],command=self.UpdateSmartSwitch,selectedVal=self.master.JAllMOIData['Run']['EnableSmartSwitch'])
             self.SelSmarSwitch = Combo(self.RN_FR2,width=10,state="readonly",font=self.master.FT10BW,val=['SP-e6:21','SP-06:da'],selectedVal=self.master.JAllMOIData['SP_MAC'],bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=135,y=335)
             Buttons(self.RN_FR2,text='Connect',x=228,y=333,width=9,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.SSCreateHS)
@@ -482,7 +481,7 @@ class Run(MPPGUI):
         print("testing:",self.select_prmc.get())
         self.pooldataentry.destroy()
         
-        if self.select_prmc.get() == ("PRMC" if self.master.Mode == "TPR" else "PTMC"):
+        if self.select_prmc.get() == ("PRMC" if GeneralConfig.Mode == Enums.Mode.TPR else "PTMC"):
             result = "0x010E"
         elif self.select_prmc.get() == "Use Pool Data":
             result = "0x01BD,0x01BF,0x007C,0x0016,0x00AF,0x0051,0x0097,0x013F,0x0082,0x0131,0x7846,0x562A,0xBE50,0x44F7,0xF7F1,0x7FDB,0xD3FB,0x074E,0x9791,0xFE0E,0xE65C,0x011B,0x0116,0x012F,0x018F,0x006E,0x0108,0x0022,0x0072,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x005A,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042,0x0042"
@@ -490,7 +489,7 @@ class Run(MPPGUI):
             if self.PoolData() is not None:
                 result = self.PoolData() 
             else:
-                self.select_prmc.set("PRMC" if self.master.Mode == "TPR" else "PTMC")
+                self.select_prmc.set("PRMC" if GeneralConfig.Mode == Enums.Mode.TPR else "PTMC")
                 result = "0x010E"
 
         self.master.poolvar.set(result)
@@ -507,14 +506,14 @@ class Run(MPPGUI):
 
         self.Powerprofile="MPP25" 
         self.SupportedSpecification="2.3.0"
-        for elements in self.EsdfData_Notal[self.master.Product][self.master.Mode]['Esdf_Elements']:
+        for elements in self.EsdfData_Notal[GeneralConfig.Product][GeneralConfig.Mode]['Esdf_Elements']:
             if elements['Field']=='PowerProfile':
                 self.Powerprofile=elements['Value']
             if elements['Field']=='SupportedSpecification':
                 self.SupportedSpecification=elements['Value']
-                if self.master.Product=="C3":self.SupportedSpecification=str('V_'+self.SupportedSpecification)
+                if GeneralConfig.Product == Enums.Product.C3:self.SupportedSpecification=str('V_'+self.SupportedSpecification)
         y=20
-        for key,Notal in self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['notal'].items():
+        for key,Notal in self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['notal'].items():
             if self.SupportedSpecification in Notal['appModeDescription']:
                 if self.Powerprofile in Notal['dutProfile']:
                     CheckBtn(self.cpopup,text=Notal['displayString'],name= key[0].lower() + key[1:],x=0,y=y,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=Notal['isActive'])
@@ -527,18 +526,18 @@ class Run(MPPGUI):
        
         Tcs=[]
         # List Tcs Which are Applicable to ESDF
-        for TestID in self.master.EsdfTestData[self.master.Product][self.master.Mode][self.SupportedSpecification]['Tests'].keys():
-            for Profile,ESDF  in self.master.EsdfTestData[self.master.Product][self.master.Mode][self.SupportedSpecification]['Tests'][TestID]['EsdfFields'].items():
+        for TestID in self.master.EsdfTestData[GeneralConfig.Product][GeneralConfig.Mode][self.SupportedSpecification]['Tests'].keys():
+            for Profile,ESDF  in self.master.EsdfTestData[GeneralConfig.Product][GeneralConfig.Mode][self.SupportedSpecification]['Tests'][TestID]['EsdfFields'].items():
                 if self.Powerprofile==Profile:
                     if not ESDF[0]:Tcs.append(TestID)
                     else:
                         res=self.ESDFValidate(TestID,ESDF)
                         if len(res)>0:Tcs.extend(res)
         # List Tcs which are Applicable/Not According to NOTAL
-        Notal=self.master.EsdfTestData[self.master.Product][self.master.Mode][self.SupportedSpecification]['Notals'][self.Powerprofile]
+        Notal=self.master.EsdfTestData[GeneralConfig.Product][GeneralConfig.Mode][self.SupportedSpecification]['Notals'][self.Powerprofile]
         if  Notal[0]:
             for NotalName,Tests in Notal[1][0].items():
-                if self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['notal'][NotalName]['isActive']:
+                if self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['notal'][NotalName]['isActive']:
                     for Test in Tests:
                         if not Test[0]:
                             if Test[1] in Tcs:
@@ -553,7 +552,7 @@ class Run(MPPGUI):
                                     if len(res)>0:Tcs.append(res[0])
                                 else:Tcs.append(Test[1])                        
         # Compare Automation vs Software Test LisTing Through DB
-        SupportedSpecification=self.SupportedSpecification if self.master.Product=="C3" else str('MPP_V'+SupportedSpecification)
+        SupportedSpecification=self.SupportedSpecification if GeneralConfig.Product == Enums.Product.C3 else str('MPP_V'+SupportedSpecification)
         SupportedSpecification=SupportedSpecification.replace('.','_')
         self.master.SQLConn.ExecutebyQuery(f"DELETE FROM EsdfTests ")
         SW_TC=self.master.SQLConn.FetchDataFromQRY(  f"SELECT Testcase FROM AllTestcases " )
@@ -583,7 +582,7 @@ class Run(MPPGUI):
         Applicability=True
         for Fields in ESDF[1]:
             for FieldName ,values in Fields.items(): 
-                for elements in self.EsdfData_Notal[self.master.Product][self.master.Mode]['Esdf_Elements']:
+                for elements in self.EsdfData_Notal[GeneralConfig.Product][GeneralConfig.Mode]['Esdf_Elements']:
                     if elements['Field']==FieldName:
                         if values[2]=="Boolean": 
                             if elements['Value']!=values[0]:Applicability=False
@@ -618,8 +617,8 @@ class Run(MPPGUI):
                     try:
                         Notal=wdgt.winfo_name()[0].upper()+wdgt.winfo_name()[1:]
                         if wdgt.getvar(wdgt.winfo_name())=="0":
-                            self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['notal'][Notal]["isActive"]=False
-                        else:self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['notal'][Notal]["isActive"]=True
+                            self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['notal'][Notal]["isActive"]=False
+                        else:self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['notal'][Notal]["isActive"]=True
                     except Exception as e:
                         errors=True
                         remarks.append(f"{wdgt.winfo_name()} "+str(e))
@@ -655,13 +654,13 @@ class Run(MPPGUI):
                     bkjson_path = os.path.join(folder_path,file)
                     # print(bkjson_path)
                     break
-            APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutClearCapture']).PutRequest()
-            loadproj = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutloadGProj'],json={"Uploadtype":"gprojReport","gProjFilePath":bkjson_path}).PutRequest()
+            APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutClearCapture']).PutRequest()
+            loadproj = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutloadGProj'],json={"Uploadtype":"gprojReport","gProjFilePath":bkjson_path}).PutRequest()
             if loadproj == 200:
                 self.master.projloaded = True
-                projconfigdata = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetProjectConfiguration'], retype='json').GetRequest()
-                APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['UpdateProjectConfiguration'],json=projconfigdata).PutRequest()
-                APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutApplicationActiveStatus']+"/false").PutRequest()
+                projconfigdata = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetProjectConfiguration'], retype='json').GetRequest()
+                APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['UpdateProjectConfiguration'],json=projconfigdata).PutRequest()
+                APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutApplicationActiveStatus']+"/false").PutRequest()
 
                 # with open(bkjson_path, "r",encoding="utf-8") as rf:
                 #     BKJSONData = json.load(rf)
@@ -672,7 +671,7 @@ class Run(MPPGUI):
                     testresults.append([TCdata['testcaseDetails']['m_DisplayName'],TCdata['testinformation']['TestResult']])
                     self.master.SQLConn.ExecutebyQuery(f"UPDATE AllTestcases SET TestResult = '{TCdata['testinformation']['TestResult']}' WHERE Testcase = '{TCdata['testcaseDetails']['m_DisplayName']}'")
                 
-                # print("pooldata:",BKJSONData['testBkpProjectConfiguration']['TesterConfigurationModel']['prmcCode' if self.master.Mode == "TPR" else 'ptmcCode'])
+                # print("pooldata:",BKJSONData['testBkpProjectConfiguration']['TesterConfigurationModel']['prmcCode' if GeneralConfig.Mode == Enums.Mode.TPR else 'ptmcCode'])
 
                 self.ProjectName = Entries(self.RN_FR2,textvar=BKJSONData['testBkpProjectConfiguration']['ProjectConfigurationModel']['projectName'],font=self.master.FT10BW,x=95,y=25,width=15,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
                 self.UpdateMOI()
@@ -683,7 +682,7 @@ class Run(MPPGUI):
                 self.testerconfigbtn.config(state="disabled")
                 self.createprojbtn.config(state="disabled")
             else: messagebox.showerror("Load Project", "Project not loaded, please try again")
-            self.master.alloptimumcoils = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetCoilFilter'], retype='json').GetRequest()
+            self.master.alloptimumcoils = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCoilFilter'], retype='json').GetRequest()
             # print(self.master.alloptimumcoils)
         else:messagebox.showerror("Load Project folder", "Please load the proper project folder")
     
@@ -727,37 +726,37 @@ class Run(MPPGUI):
             #testing
             # self.UpdateTesterConfig()
 
-            VerifyESDF = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutVerifyEsdfData'])
+            VerifyESDF = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutVerifyEsdfData'])
             MainESDF = JsonOperations('json/ESDF.json')
             MainESDFData = MainESDF.read_file()
             #Verify the ESDF data
-            # print("esdf:",MainESDFData[self.master.Product][self.master.Mode])
-            VerifyESDF.json = MainESDFData[self.master.Product][self.master.Mode]
+            # print("esdf:",MainESDFData[GeneralConfig.Product][GeneralConfig.Mode])
+            VerifyESDF.json = MainESDFData[GeneralConfig.Product][GeneralConfig.Mode]
             APIres = VerifyESDF.PutRequest()
             if APIres == 200:
                 self.update_logs("UI","ESDF Data Verified Successfully")
                 #Up
             else:self.update_logs("UI","Issue in ESDF Data Verification")   
 
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['IsNewProjCreation']+"true").GetRequest())
-            # print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutApplicationActiveStatus']+"/false").PutRequest())
-            # print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutApplicationActiveStatus']+"/true").PutRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetChannelList']).GetRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutClearCapture']).PutRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['IsNewProjCreation']+"true").GetRequest())
+            # print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutApplicationActiveStatus']+"/false").PutRequest())
+            # print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutApplicationActiveStatus']+"/true").PutRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetChannelList']).GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutClearCapture']).PutRequest())
             self.CreateProjectByPopUp()
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['IsNewProjCreation']+"false").GetRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetTestCaseList']).GetRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetOptimumCoilValues']).GetRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetCoilFilter']).GetRequest())
-            print(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetCoilFilter']).GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['IsNewProjCreation']+"false").GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetTestCaseList']).GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetOptimumCoilValues']).GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCoilFilter']).GetRequest())
+            print(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCoilFilter']).GetRequest())
 
             # if bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name()))):
-            #     PutcoilAPI = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutOptimumCoilValues'])
+            #     PutcoilAPI = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutOptimumCoilValues'])
             #     PutcoilAPI.json = self.OptimumCoilValues
             #     res= PutcoilAPI.PutRequest()
             #     print(res)
     
-            self.master.alloptimumcoils = list(APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetCoilFilter'], retype='json').GetRequest())
+            self.master.alloptimumcoils = list(APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCoilFilter'], retype='json').GetRequest())
             print("alloptimumcoils:",self.master.alloptimumcoils)
 
             self.UpdateMOI()
@@ -820,7 +819,7 @@ class Run(MPPGUI):
         
 
     def LicenseUI(self):
-        if self.master.Product == 'MPP' and self.master.Mode == 'TPR':
+        if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR:
             self.master.ClearFrame(self.RN_FR8)
             Labels(self.RN_FR8,text="License Verification",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=45,font=self.master.FT10BW)
             self.PermLicense = CheckBtn(self.RN_FR8,text="Permanent License",x=10,y=30,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=True)
@@ -844,7 +843,7 @@ class Run(MPPGUI):
                     self.LicValid_flag = True
                     self.master.JsettingsData['_stop_flag'] = False
                     self.master.Jsettings.update_file(self.master.JsettingsData)
-                    ethernet_link = GrlEthernetLink_C2(bool(int(self.PermLicense.getvar(self.PermLicense.winfo_name()))),bool(int(self.Perm_DemoLicense.getvar(self.Perm_DemoLicense.winfo_name()))),bool(int(self.DemoLicense.getvar(self.DemoLicense.winfo_name()))),self.master.Mode)
+                    ethernet_link = GrlEthernetLink_C2(bool(int(self.PermLicense.getvar(self.PermLicense.winfo_name()))),bool(int(self.Perm_DemoLicense.getvar(self.Perm_DemoLicense.winfo_name()))),bool(int(self.DemoLicense.getvar(self.DemoLicense.winfo_name()))),GeneralConfig.Mode)
                     threading.Thread(target=self.StatusRefresh,daemon=True).start()
                     ethernet_link.PreExecute()
                     self.update_logs("UI","License Verification Finished")
@@ -886,35 +885,35 @@ class Run(MPPGUI):
         self.cpopup.geometry("250x200")
         self.cpopup.title("Tester Configuration")
         self.cpopup.resizable(False,False)
-        if self.master.Product == "MPP":
+        if GeneralConfig.Product == Enums.Product.MPP:
             self.KiP1 = Labels(self.cpopup,text="Ki_actual_P1(0,0):",x=0,y=0,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-            self.KiP1En = Entries(self.cpopup,name="ki1",textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P1'],x=110,y=0,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+            self.KiP1En = Entries(self.cpopup,name="ki1",textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P1'],x=110,y=0,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
             self.KiP2 = Labels(self.cpopup,text="Ki_actual_P2(2,2):",x=0,y=30,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-            self.KiP2En = Entries(self.cpopup,name="ki2",textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P2'],x=110,y=30,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
-            self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
-            if self.master.Mode == "TPR":
-                self.EnableAmbient = CheckBtn(self.cpopup,text="Enable Ambient Temperature Check",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['ambientTempCheck'])
-                self.EnableCoilRemovePlace = CheckBtn(self.cpopup,text="Enable Coil Remove/Place popups",x=0,y=90,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'])
-            elif self.master.Mode == "TPT":
-                self.EnableDUT = CheckBtn(self.cpopup,text="Enable popup to control DUT power",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'])
-                self.EnableEDS = CheckBtn(self.cpopup,text="Enable TPT popup for PRx EDS packet",x=0,y=90,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isEDSPopUpReq'])
+            self.KiP2En = Entries(self.cpopup,name="ki2",textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P2'],x=110,y=30,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+            self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
+            if GeneralConfig.Mode == Enums.Mode.TPR:
+                self.EnableAmbient = CheckBtn(self.cpopup,text="Enable Ambient Temperature Check",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['ambientTempCheck'])
+                self.EnableCoilRemovePlace = CheckBtn(self.cpopup,text="Enable Coil Remove/Place popups",x=0,y=90,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'])
+            elif GeneralConfig.Mode == Enums.Mode.TPT:
+                self.EnableDUT = CheckBtn(self.cpopup,text="Enable popup to control DUT power",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'])
+                self.EnableEDS = CheckBtn(self.cpopup,text="Enable TPT popup for PRx EDS packet",x=0,y=90,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isEDSPopUpReq'])
             self.KiP1En.bind('<KeyRelease>',self.ValidateKi)
             self.KiP2En.bind('<KeyRelease>',self.ValidateKi)
-        elif self.master.Product == "C3":
-            if self.master.Mode == "TPR":
+        elif GeneralConfig.Product == Enums.Product.C3:
+            if GeneralConfig.Mode == Enums.Mode.TPR:
                 Labels(self.cpopup,text="Basic device identifier:",x=0,y=0,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-                self.bdi = Entries(self.cpopup,textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['bdiValue'],x=130,y=0,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
-                self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=30,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
-                self.MultiPings = CheckBtn(self.cpopup,text="PTx Supports Multi pings",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isPtxSupportsMultiPings'])
-                self.EnableCoilRemovePlace = CheckBtn(self.cpopup,text="Enable Coil Remove/Place popups",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'])
-            elif self.master.Mode == "TPT":
+                self.bdi = Entries(self.cpopup,textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['bdiValue'],x=130,y=0,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+                self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=30,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
+                self.MultiPings = CheckBtn(self.cpopup,text="PTx Supports Multi pings",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isPtxSupportsMultiPings'])
+                self.EnableCoilRemovePlace = CheckBtn(self.cpopup,text="Enable Coil Remove/Place popups",x=0,y=70,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'])
+            elif GeneralConfig.Mode == Enums.Mode.TPT:
                 Labels(self.cpopup,text="ft (kHz):",x=0,y=0,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-                self.ft = Entries(self.cpopup,textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['referenceResonance'],x=60,y=0,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+                self.ft = Entries(self.cpopup,textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['referenceResonance'],x=60,y=0,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
                 Labels(self.cpopup,text="Qt:",x=0,y=20,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-                self.qt = Entries(self.cpopup,textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['referenceQuality'],x=60,y=20,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
-                self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
-                self.EnableDUTpopup = CheckBtn(self.cpopup,text="Enable Popup to control DUT power",x=0,y=75,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'])
-                self.EnableEDSpopup = CheckBtn(self.cpopup,text="Enable TPT popup for PRx EDS",x=0,y=100,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isEDSPopUpReq'])
+                self.qt = Entries(self.cpopup,textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['referenceQuality'],x=60,y=20,width=15,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+                self.EnableOptimum = CheckBtn(self.cpopup,text="Enable Optimum Position",x=0,y=50,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'])
+                self.EnableDUTpopup = CheckBtn(self.cpopup,text="Enable Popup to control DUT power",x=0,y=75,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'])
+                self.EnableEDSpopup = CheckBtn(self.cpopup,text="Enable TPT popup for PRx EDS",x=0,y=100,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isEDSPopUpReq'])
 
         Buttons(self.cpopup,text='OK',x=50,y=130,width=10,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.UpdateTesterConfig)
     
@@ -924,9 +923,9 @@ class Run(MPPGUI):
         self.Rpopup.title("Report Configuration")
         self.Rpopup.resizable(False,False)
         y=0
-        for Field in  self.master.TesterConfigData[self.master.Product][self.master.Mode]['ReportConfigurationModel']:
+        for Field in  self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['ReportConfigurationModel']:
             Labels(self.Rpopup,text=Field,x=5,y=y,fg=self.master.Ccodes["black"],font=self.master.FT10BW)
-            Entries(self.Rpopup,name=Field,textvar=self.master.TesterConfigData[self.master.Product][self.master.Mode]['ReportConfigurationModel'][Field],x=120,y=y,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
+            Entries(self.Rpopup,name=Field,textvar=self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['ReportConfigurationModel'][Field],x=120,y=y,font=self.master.FT10BW,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"])
             y+=25
         Buttons(self.Rpopup,text='OK',x=50,y=190,width=10,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.UpdateReportConfig)
     
@@ -935,7 +934,7 @@ class Run(MPPGUI):
         if len(self.Rpopup.winfo_children()) > 0:
             for wdgt in self.Rpopup.winfo_children():
                 if wdgt.winfo_class() in ['Entry']:
-                        self.master.TesterConfigData[self.master.Product][self.master.Mode]['ReportConfigurationModel'][wdgt.winfo_name()]=wdgt.get()
+                        self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['ReportConfigurationModel'][wdgt.winfo_name()]=wdgt.get()
             self.master.TesterConfig.update_file(self.master.TesterConfigData)
             self.Rpopup.withdraw()
             self.update_logs("UI","Report Config Data updated Successfully")
@@ -946,9 +945,9 @@ class Run(MPPGUI):
             val = float(self.KiP1En.get()) if "ki1" in ch else float(self.KiP2En.get())
             if 0 <= val <= 1.0:
                 if "ki1" in ch:
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P1'] = val
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P1'] = val
                 else:
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P2'] = val
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P2'] = val
                 self.master.TesterConfig.update_file(self.master.TesterConfigData)
             else:
                 messagebox.showwarning("Ki value", "Please enter Ki in the limit(0,1.0)")  
@@ -959,32 +958,32 @@ class Run(MPPGUI):
         try:
             print("EnableOptimum:",bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name()))))
             self.LoadOptiButton.config(state="disabled" if not bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name()))) else "normal")
-            if self.master.Product == "MPP":
+            if GeneralConfig.Product == Enums.Product.MPP:
                 Kp1 = float(self.KiP1En.get())
                 Kp2 = float(self.KiP2En.get())
                 if Kp1>=0 and Kp1<=1:
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P1'] = Kp1
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P1'] = Kp1
                 else:self.update_logs("UI","Ki_Actual_P1 is not in limit, provivide value from 0-1")
                 if Kp2>=0 and Kp2<=1:
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['kiActual_P2'] = Kp2
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['kiActual_P2'] = Kp2
                 else:self.update_logs("UI","Ki_Actual_P2 is not in limit, provivide value from 0-1")
-                self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'] = bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name())))
-                if self.master.Mode == "TPR":
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['ambientTempCheck'] = bool(int(self.EnableAmbient.getvar(self.EnableAmbient.winfo_name())))
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'] = bool(int(self.EnableCoilRemovePlace.getvar(self.EnableCoilRemovePlace.winfo_name())))
-                elif self.master.Mode == "TPT":
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'] = bool(int(self.EnableDUT.getvar(self.EnableDUT.winfo_name())))
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isEDSPopUpReq'] = bool(int(self.EnableEDS.getvar(self.EnableEDS.winfo_name())))
-            elif self.master.Product == "C3":
-                self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'] = bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name())))
-                if self.master.Mode == "TPR":
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['bdiValue'] = self.bdi.get()
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isPtxSupportsMultiPings'] = bool(int(self.MultiPings.getvar(self.MultiPings.winfo_name())))
-                    self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'] = bool(int(self.EnableCoilRemovePlace.getvar(self.EnableCoilRemovePlace.winfo_name())))
-            self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['prmcCode' if self.master.Mode == "TPR" else "ptmcCode"] = self.master.poolvar.get()
-            self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['prmc_Ptmc_Source'] = self.select_prmc.get()
-            self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isExcludeDutPrmc'] = bool(int(self.Exculde_ptmc_prmc_cbtn.getvar(self.Exculde_ptmc_prmc_cbtn.winfo_name())))
-            self.master.TesterConfigData[self.master.Product][self.master.Mode]['TesterConfigurationModel']['isRandomPrmc'] = bool(int(self.Random_prmc_ptmc_cbtn.getvar(self.Random_prmc_ptmc_cbtn.winfo_name())))
+                self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'] = bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name())))
+                if GeneralConfig.Mode == Enums.Mode.TPR:
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['ambientTempCheck'] = bool(int(self.EnableAmbient.getvar(self.EnableAmbient.winfo_name())))
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'] = bool(int(self.EnableCoilRemovePlace.getvar(self.EnableCoilRemovePlace.winfo_name())))
+                elif GeneralConfig.Mode == Enums.Mode.TPT:
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isDUTPopupEnabled'] = bool(int(self.EnableDUT.getvar(self.EnableDUT.winfo_name())))
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isEDSPopUpReq'] = bool(int(self.EnableEDS.getvar(self.EnableEDS.winfo_name())))
+            elif GeneralConfig.Product == Enums.Product.C3:
+                self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isOptimumCoilEnable'] = bool(int(self.EnableOptimum.getvar(self.EnableOptimum.winfo_name())))
+                if GeneralConfig.Mode == Enums.Mode.TPR:
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['bdiValue'] = self.bdi.get()
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isPtxSupportsMultiPings'] = bool(int(self.MultiPings.getvar(self.MultiPings.winfo_name())))
+                    self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isCoilPlacePopupEnabled'] = bool(int(self.EnableCoilRemovePlace.getvar(self.EnableCoilRemovePlace.winfo_name())))
+            self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['prmcCode' if GeneralConfig.Mode == Enums.Mode.TPR else "ptmcCode"] = self.master.poolvar.get()
+            self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['prmc_Ptmc_Source'] = self.select_prmc.get()
+            self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isExcludeDutPrmc'] = bool(int(self.Exculde_ptmc_prmc_cbtn.getvar(self.Exculde_ptmc_prmc_cbtn.winfo_name())))
+            self.master.TesterConfigData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']['isRandomPrmc'] = bool(int(self.Random_prmc_ptmc_cbtn.getvar(self.Random_prmc_ptmc_cbtn.winfo_name())))
             self.master.TesterConfig.update_file(self.master.TesterConfigData)
             self.cpopup.withdraw()
             self.update_logs("UI","Tester Config Data updated Successfully")
@@ -994,7 +993,7 @@ class Run(MPPGUI):
 
     def LoadESDFFile(self):
         try:
-            VerifyESDF = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutVerifyEsdfData'])
+            VerifyESDF = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutVerifyEsdfData'])
             filename = askopenfilename()
             if '.json' in filename:
                 #convert the file data
@@ -1007,13 +1006,13 @@ class Run(MPPGUI):
                 # rawdata = self.Esdf_converter(ESDFData)
                 converter = EsdfConverter()
                 rawdata = converter.convert(ESDFData)
-                MainESDFData[self.master.Product][self.master.Mode]['Esdf_Elements'] = rawdata['Esdf_Elements']
+                MainESDFData[GeneralConfig.Product][GeneralConfig.Mode]['Esdf_Elements'] = rawdata['Esdf_Elements']
                 MainESDF.update_file(MainESDFData)
                 
                 self.update_logs("UI","ESDF Data updated Successfully")
                 
                 #Verify the ESDF data
-                VerifyESDF.json = MainESDFData[self.master.Product][self.master.Mode]
+                VerifyESDF.json = MainESDFData[GeneralConfig.Product][GeneralConfig.Mode]
                 APIres = VerifyESDF.PutRequest()
                 if APIres == 200:
                     self.update_logs("UI","ESDF Data Verified Successfully")
@@ -1047,11 +1046,11 @@ class Run(MPPGUI):
                 TesterConf = JsonOperations('json/TesterConfig.json')
                 TesterConfData = TesterConf.read_file()
                 #call the Project creation API
-                ProjectCreate = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutProjectFolder'])
-                ProjectCreate.json = {"EsdfConfigurationModel":{"Esdf_Elements":MainESDFData[self.master.Product][self.master.Mode]["Esdf_Elements"]},
-                                    "ProjectConfigurationModel":{"projectName":self.ProjectName.get(),"projectModePreCompliance":False,"projectAppMode":"MPP_TPR" if self.master.Mode == "TPR" else "MPP_TPT"},
-                                    "ReportConfigurationModel":TesterConfData[self.master.Product][self.master.Mode]['ReportConfigurationModel'],
-                                    "TesterConfigurationModel":TesterConfData[self.master.Product][self.master.Mode]['TesterConfigurationModel']}
+                ProjectCreate = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutProjectFolder'])
+                ProjectCreate.json = {"EsdfConfigurationModel":{"Esdf_Elements":MainESDFData[GeneralConfig.Product][GeneralConfig.Mode]["Esdf_Elements"]},
+                                    "ProjectConfigurationModel":{"projectName":self.ProjectName.get(),"projectModePreCompliance":False,"projectAppMode":"MPP_TPR" if GeneralConfig.Mode == Enums.Mode.TPR else "MPP_TPT"},
+                                    "ReportConfigurationModel":TesterConfData[GeneralConfig.Product][GeneralConfig.Mode]['ReportConfigurationModel'],
+                                    "TesterConfigurationModel":TesterConfData[GeneralConfig.Product][GeneralConfig.Mode]['TesterConfigurationModel']}
                                     
                 APIres = ProjectCreate.PutRequest()
                 # print("ProjectCreate:",APIres,ProjectCreate.json)
@@ -1062,7 +1061,7 @@ class Run(MPPGUI):
         except Exception as e:
             self.update_logs("UI",f"Exception:{e}")
     def LoadOptData(self):
-        PutcoilAPI = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutOptimumCoilValues'])
+        PutcoilAPI = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutOptimumCoilValues'])
         #Load Data
         filename = askopenfilename()
         if filename.endswith('.xml') or filename.endswith('.json'):
@@ -1090,7 +1089,7 @@ class Run(MPPGUI):
             res= PutcoilAPI.PutRequest()
             # print(res)
             if res == 200:
-                self.master.JQIData[self.master.Product][self.master.Mode]['ssCheckForTestcases']=True
+                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['ssCheckForTestcases']=True
                 self.master.JQI.update_file(self.master.JQIData)
                 self.update_logs("UI",f"Optimum Coil Values loaded: {", ".join(f"{c['coilType']} : {c['value']}" for c in json_data["Optimum"]["Coil_Values"])}")
                 messagebox.showinfo("Optimum values",f"Optimum Coil Values loaded:\n" +"\n".join(f"{c['coilType']} : {c['value']}" for c in json_data["Optimum"]["Coil_Values"]))
@@ -1104,7 +1103,7 @@ class Run(MPPGUI):
         yax = 30
         #Get Coils
         Coils = offset = Phase = []
-        Coils_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Coil' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        Coils_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Coil' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         if Coils_DF is not None:
             Coils = list(Coils_DF['Name'])
             # if not(len(Coils)==1 and 'NA' in Coils):
@@ -1118,9 +1117,9 @@ class Run(MPPGUI):
         self.selectedcoils = DropdownWithCheckboxes(self.RN_FR3,options=Coils,width=180,selected_options=[],font=self.master.FT8BW,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=100,y=yax+5)
         yax += 25
         print("Coils:",Coils)
-        if self.master.Product != 'C3':
+        if GeneralConfig.Product != Enums.Product.C3:
             #Get Position
-            POS_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='offset' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+            POS_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='offset' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
             if POS_DF is not None:
                 offset = list(POS_DF['Name'])
                 # if not(len(offset)==1 and 'NA' in offset):
@@ -1134,7 +1133,7 @@ class Run(MPPGUI):
             self.selectedpositions = DropdownWithCheckboxes(self.RN_FR3,options=offset,width=180,selected_options=[],font=self.master.FT8BW,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=100,y=yax+5)
             yax += 25
        #Get Phases
-        Phase_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Phase' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        Phase_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Phase' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         if Phase_DF is not None:
             Phase = list(Phase_DF['Name'])
             # if not(len(Phase)==1 and 'NA' in Phase):
@@ -1149,7 +1148,7 @@ class Run(MPPGUI):
         yax += 25
 
         # #Get Categories
-        # CAT_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Cat' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        # CAT_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Cat' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         # if CAT_DF is not None:
         #     cat = list(CAT_DF['Name'])
         #     # if not(len(cat)==1 and 'NA' in cat):
@@ -1168,28 +1167,28 @@ class Run(MPPGUI):
 
 
         # #Get Position
-        # POS_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='offset' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        # POS_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='offset' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         # if POS_DF is not None:
         #     offset = list(POS_DF['Name'])
         # else:
         #     offset = []
         #     self.update_logs("UI","Unable to fetch positions from DB.!")
         # #Get Categories
-        # CAT_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Cat' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        # CAT_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Cat' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         # if CAT_DF is not None:
         #     cat = list(CAT_DF['Name'])
         # else:
         #     cat = []
         #     self.update_logs("UI","Unable to fetch Categories from DB.!")
         # #Get Coils
-        # Coils_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Coil' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        # Coils_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Coil' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         # if Coils_DF is not None:
         #     Coils = list(Coils_DF['Name'])
         # else:
         #     Coils= []
         #     self.update_logs("UI","Unable to fetch Coils from DB.!")
         # #Get Phases
-        # Phase_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Phase' and Product='{self.master.Product}' and Mode='{self.master.Mode}'")
+        # Phase_DF =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name from TestFilters where FilterType='Phase' and Product='{GeneralConfig.Product}' and Mode='{GeneralConfig.Mode}'")
         # if Phase_DF is not None:
         #     Phase = list(Phase_DF['Name'])
         # else:
@@ -1321,7 +1320,7 @@ class Run(MPPGUI):
     def PutListTests(self):
         self.master.ClearFrame(self.RN_FR4)
         Labels(self.RN_FR4,text="View Test",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=50,font=self.master.FT10BW)
-        if self.master.JAllMOIData['Switch']=='online':
+        if GeneralConfig.Switch == Enums.Switch.ONLINE:
             pos = phase = Coil = []
             # posobj =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name FROM TestFilters WHERE Status =1 and FilterType='offset'")
             posobj =  self.master.SQLConn.FetchDataFromQRY(f"SELECT DISTINCT(Position) from AllTestcases where Status =1")
@@ -1333,7 +1332,7 @@ class Run(MPPGUI):
             # CoilObj =  self.master.SQLConn.FetchDataFromQRY(f"SELECT Name FROM TestFilters WHERE Status =1 and FilterType='Coil'")
             CoilObj =  self.master.SQLConn.FetchDataFromQRY(f"SELECT DISTINCT(Coil) from AllTestcases where Status =1")
             if CoilObj is not None: Coil = list(CoilObj['Coil'])
-            # pos = [i.replace(',','') for i in list(self.master.JMOIData['Offset'][self.master.Mode][self.master.PPCB.get()].values())]
+            # pos = [i.replace(',','') for i in list(self.master.JMOIData['Offset'][GeneralConfig.Mode][self.master.PPCB.get()].values())]
             # pos = list(self.master.JAllMOIData['Selected_Testcases'].keys())
             # phase = []
             # if len(pos)>0: phase = list(self.master.JAllMOIData['Selected_Testcases'][pos[0]].keys())
@@ -1359,7 +1358,7 @@ class Run(MPPGUI):
                 Labels(self.RN_FR4,text='Select Coil :',font=self.master.FT12BW,x=1,y=yax,width=14,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],anchor=tk.E)
                 self.CoilSelCombo = Combo(self.RN_FR4,width=25,state="readonly",font=self.master.FT10BW,val=Coil,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=120,y=yax+5)
                 yax += 25
-            if self.master.Product == "MPP":
+            if GeneralConfig.Product == Enums.Product.MPP:
                 if not(len(pos)==1 and 'NA' in pos):
                     Labels(self.RN_FR4,text='Select Position :',font=self.master.FT12BW,x=1,y=yax,width=14,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],anchor=tk.E)
                     self.PosSelCombo = Combo(self.RN_FR4,width=25,state="readonly",font=self.master.FT10BW,val=pos,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=120,y=yax+5)
@@ -1420,7 +1419,7 @@ class Run(MPPGUI):
          while not self.Conn_flag:
             time.sleep(1)
             popupdata = {"userTextBoxInput":"","responseButton":"Ok","shouldTextBoxBeAdded":False,"isValid":True,"popID":23,"displayPopUp":False,"isDisplayPopUpOpen":False,"title":"GRL-C3-MP-TPR Test Solution","message":"","button":"OK","image":"","icon":"Asterisk","isFrontEndPopUp":False,"callBackMethod":"","comboBoxEntries":"","selectedComboBoxValue":"","comboBoxEntriesFE":[],"selectedComboBoxValueFE":"","onlyDropdownAdded":False,"enableTimerOKButton":False,"enableCustomUserInputs":False,"customInputValues":{}}
-            self.APIHandlePopup=APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutMessageBoxResponse'])
+            self.APIHandlePopup=APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutMessageBoxResponse'])
             self.APIHandlePopup.json=popupdata
             self.APIHandlePopup.PutRequest()
             if self.Conn_flag == True: break
@@ -1456,19 +1455,19 @@ class Run(MPPGUI):
         
         threading.Thread(target=self.Connpopup,daemon=True).start()
         self.update_logs("UI",f"Procceding to connect the Tester with IP {self.TesterIP.get()}")
-        TesterCon = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['ConnectionSetup'],pathparam=self.TesterIP.get(),retype='json')
+        TesterCon = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['ConnectionSetup'],pathparam=self.TesterIP.get(),retype='json')
         testerinfo = TesterCon.GetRequest()
         #print(testerinfo)
         if testerinfo is not None:
-            self.master.JtesterData[self.master.Product][self.master.Mode]['TesterIP'] = testerinfo['testerIpAddress']
-            self.master.JtesterData[self.master.Product][self.master.Mode]['status'] = testerinfo['testerStatus']
-            self.master.JtesterData[self.master.Product][self.master.Mode]['BoardNo'] = testerinfo['serialNumber']
-            self.master.JtesterData[self.master.Product][self.master.Mode]['FWversion'] = testerinfo['firmwareVersion']
-            self.master.JtesterData[self.master.Product][self.master.Mode]['licenseInfo'] = testerinfo['licenseInfo']
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['TesterIP'] = testerinfo['testerIpAddress']
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['status'] = testerinfo['testerStatus']
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['BoardNo'] = testerinfo['serialNumber']
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['FWversion'] = testerinfo['firmwareVersion']
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['licenseInfo'] = testerinfo['licenseInfo']
             #get Sw
-            SWver = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetSoftwareVersion'],retype='text')
+            SWver = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetSoftwareVersion'],retype='text')
             SWverinfo = SWver.GetRequest()
-            self.master.JtesterData[self.master.Product][self.master.Mode]['SWVersion'] = SWverinfo if SWverinfo is not None else 'NA'
+            self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['SWVersion'] = SWverinfo if SWverinfo is not None else 'NA'
             self.master.Jtester.update_file(values=self.master.JtesterData)
             # print(testerinfo)
             if testerinfo['testerStatus'] == 'Connected':
@@ -1476,21 +1475,21 @@ class Run(MPPGUI):
                 self.master.TesterConnection = True
                 self.update_logs("UI",f"Tester connected Successfully with IP {self.TesterIP.get()}")
                 tk.messagebox.showinfo("Tester Connection:","Connected Successfully.")
-                # self.update_logs(f"Connecting to the C3 {self.master.Mode} Tester with IP:{self.master.TesterIP.get()}..")
+                # self.update_logs(f"Connecting to the C3 {GeneralConfig.Mode} Tester with IP:{self.master.TesterIP.get()}..")
                 # #put certification and power profile filters
-                # if self.master.Mode=='TPR':
-                #     self.CallAPI(self.master.JapiData[self.master.Product][self.master.Mode]['PutCertificationFilter']+f'/{self.master.VerCB.get()}')
-                #     self.CallAPI(self.master.JapiData[self.master.Product][self.master.Mode]['PutPowerProfile']+f'/{self.master.PPCB.get()}')
+                # if GeneralConfig.Mode == Enums.Mode.TPR:
+                #     self.CallAPI(self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutCertificationFilter']+f'/{self.master.VerCB.get()}')
+                #     self.CallAPI(self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutPowerProfile']+f'/{self.master.PPCB.get()}')
                 # else:
-                #     self.CallAPI(self.master.JapiData[self.master.Product][self.master.Mode]['PutCertificationFilterToggle']+f'/{self.master.VerCB.get()}')
-                #     self.CallAPI(self.master.JapiData[self.master.Product][self.master.Mode]['PutCertificationFilterToggle']+f'/{self.master.PPCB.get()}')
+                #     self.CallAPI(self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutCertificationFilterToggle']+f'/{self.master.VerCB.get()}')
+                #     self.CallAPI(self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutCertificationFilterToggle']+f'/{self.master.PPCB.get()}')
                 #Enable API mode
-                # apiobj = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['EnableAPIMode'])
+                # apiobj = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['EnableAPIMode'])
                 # apiobj.PutRequest()
                 #Load the
                 for product in self.master.JtesterData:
                         for mode in self.master.JtesterData[product]:
-                            if not (product == self.master.Product and mode == self.master.Mode):
+                            if not (product == GeneralConfig.Product and mode == GeneralConfig.Mode):
                                 self.master.JtesterData[product][mode]['status'] = "Disconnected"
                                 self.master.JtesterData[product][mode]['BoardNo'] = "NA"
                                 self.master.JtesterData[product][mode]['FWversion'] = "NA"
@@ -1507,8 +1506,8 @@ class Run(MPPGUI):
             #call server open
             #os.system('py ./Server.py')
             # subprocess.Popen(["python", ".\\Scripts\\Server.py"])
-            self.update_logs("UI",f"The MPP {self.master.Mode} software is not running,Please check the status manually.")
-            # server_instance = Server(self.master.Mode,self.master.Product)
+            self.update_logs("UI",f"The MPP {GeneralConfig.Mode} software is not running,Please check the status manually.")
+            # server_instance = Server(GeneralConfig.Mode,GeneralConfig.Product)
             # server_instance.open_C3_server_application()
             # time.sleep(15)
             # self.TesterConnect()
@@ -1536,7 +1535,7 @@ class Run(MPPGUI):
         self.TADCk = CheckBtn(self.RN_FR5,font=self.master.FT10BW,name="enableTAD",text="Enable Tester As DUT :",selectedVal=False,x=330,y=60,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],command=self.UpdateTAD)
         self.TADfilter = Combo(self.RN_FR5,width=16,state="readonly",font=self.master.FT10BW,val=["Automation Tests","Excerciser Tests"],selectedVal="Automation Tests",bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=480,y=65)
         # self.RerunCk = CheckBtn(self.RN_FR5,font=self.master.FT10BW,text="Rerun Fail and inconclusive",x=330,y=80,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
-        if self.master.Product == 'MPP':
+        if GeneralConfig.Product == Enums.Product.MPP:
             self.FindOptimumCk = CheckBtn(self.RN_FR5,font=self.master.FT10BW,text="Find Optimum :",x=105,y=25,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=False)
             self.optimumcoils = DropdownWithCheckboxes(self.RN_FR5,options=self.master.alloptimumcoils,width=100,selected_options=[],font=self.master.FT8BW,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=220,y=30)
             self.EnablePosCk = CheckBtn(self.RN_FR5,font=self.master.FT10BW,text="Enable Position Tool",x=330,y=25,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],selectedVal=self.master.JAllMOIData['Run']['PositionTool'],command=self.UpdatePosTool)
@@ -1560,13 +1559,13 @@ class Run(MPPGUI):
         # self.proSelCB.bind("<<ComboboxSelected>>",self.UpdateProject)
     def PutOfflineValUI(self):
         self.master.ClearFrame(self.RN_FR6)
-        #Phase = self.master.JMOIData['Chapters'][self.master.Mode][self.master.PPCB.get()]
-        # projval = self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode][1] if self.AllRun == 1 else self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode][0]
+        #Phase = self.master.JMOIData['Chapters'][GeneralConfig.Mode][self.master.PPCB.get()]
+        # projval = self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode][1] if self.AllRun == 1 else self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode][0]
         Labels(self.RN_FR6,text="Offline Validation",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=156,font=self.master.FT10BW)
         Buttons(self.RN_FR6,text='Browse & Add Projects',width=30,x=1,y=25,font=self.master.FT10BW,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],command=self.ProjAddOffValidation)
         Buttons(self.RN_FR6,text='Remove Selected',width=30,x=220,y=25,font=self.master.FT10BW,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],command=self.RemoveSelectedOffline)
         Buttons(self.RN_FR6,text='Clear All',width=30,x=440,y=25,font=self.master.FT10BW,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],command=self.ClearAllOffline)
-        self.OfflineListBox = ListBx(self.RN_FR6,width=155,height=6,font=self.master.FT10BW,x=1,y=50,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode])
+        self.OfflineListBox = ListBx(self.RN_FR6,width=155,height=6,font=self.master.FT10BW,x=1,y=50,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode])
         # self.AllRunCBT = CheckBtn(self.RN_FR6,font=self.master.FT12BW,text="Consider All Runs",x=1,y=154,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],selectedVal=True if self.master.AllRun==1 else False,command=self.ValidationModeSwitch)
         # self.ExValid = CheckBtn(self.RN_FR6,font=self.master.FT12BW,text="Consider Exerciser Runs",x=1,y=154,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"], selectedVal=True if self.master.ExRun==1 else False,command=self.ValidationModeSwitch)
         Buttons(self.RN_FR6,text='Prepare Validation',width=18,x=530,y=154,font=self.master.FT10BW,bg=self.master.Ccodes["blue"],command=self.PrepareOffValidation)
@@ -1616,14 +1615,14 @@ class Run(MPPGUI):
         # print(offsetlist)
         # if len(phaselist)>0 and len(offsetlist)>0:
         #     #clear Existing data
-        #     for pos in self.master.JTestConfData[self.master.Product][self.master.Mode]:
+        #     for pos in self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]:
         #         if pos != 'Offline':
-        #             self.master.JTestConfData[self.master.Product][self.master.Mode][pos].clear()
-        #     for test in self.master.JMOIData[self.master.Mode]:
-        #         # if str(self.master.Mode)+'_TD_' in test:
+        #             self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode][pos].clear()
+        #     for test in self.master.JMOIData[GeneralConfig.Mode]:
+        #         # if str(GeneralConfig.Mode)+'_TD_' in test:
         #         # print(test)
-        #         if self.master.JMOIData[self.master.Mode][test]['TC_Chapter'] in phaselist and self.master.JMOIData[self.master.Mode][test]['Pos_applicable'][0] in offsetlist and self.master.PPCB.get() in self.master.JMOIData[self.master.Mode][test]['PowerProfile']:
-        #             self.master.JTestConfData[self.master.Product][self.master.Mode][self.master.JMOIData[self.master.Mode][test]['Pos_applicable'][0].replace(',','')].append(test)
+        #         if self.master.JMOIData[GeneralConfig.Mode][test]['TC_Chapter'] in phaselist and self.master.JMOIData[GeneralConfig.Mode][test]['Pos_applicable'][0] in offsetlist and self.master.PPCB.get() in self.master.JMOIData[GeneralConfig.Mode][test]['PowerProfile']:
+        #             self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode][self.master.JMOIData[GeneralConfig.Mode][test]['Pos_applicable'][0].replace(',','')].append(test)
         # self.master.JTestConf.update_file(self.master.JTestConfData)
     def UpdateJSONValues(self,ts):
         widget = ts.widget
@@ -1646,78 +1645,78 @@ class Run(MPPGUI):
                         if wdgt.winfo_name() in ['maximumPower','guaranteedPower']:
                             val = int(wdgt.get())
                             if val > 0 and val<=15:
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                             else:
                                 remarks.append(f"{wdgt.winfo_name()} not in limit [0-15]")
                                 errors=True
                         elif wdgt.winfo_name() in ['supportATNCloaking']:
                             val = wdgt.get()
-                            self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = False if val =='No' else True
+                            self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = False if val =='No' else True
                         elif wdgt.winfo_name() in ['pRx_detectPing']:
                             val = wdgt.get()
-                            self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                            self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                         elif wdgt.winfo_name() in ['mplaOffset']:
                             val = int(wdgt.get())
                             if val >= 0 and val<=5000:
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                             else:
                                 remarks.append(f"{wdgt.winfo_name()} not in limit [<500]")
                                 errors=True
                         elif wdgt.winfo_name() in ['kest_P1_MPTPT','kest_P2_MPTPT']:
                             val = float(wdgt.get())
                             if val >= 0.40 and val <= 0.96 or val in [0,0.0]:
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                             else:
                                 remarks.append(f"{wdgt.winfo_name()} not in limit [0.40-0.96]")
                                 errors=True
                         elif wdgt.winfo_name() in ['prxCloakRetry']:
-                            if self.master.JQIData[self.master.Product][self.master.Mode]['pRx_detectPing']=='Yes':
+                            if self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['pRx_detectPing']=='Yes':
                                 val = int(wdgt.get())
                                 if val >= 0 and val <= 100:
-                                    self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                    self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                                 else:
                                     remarks.append(f"{wdgt.winfo_name()} not in limit [0-100] or pRx_detectPing not set Yes")
                                     errors=True
                             else:
                                 remarks.append(f"pRx_detectPing not set to yes,prxCloakRetry are ignored")
                         elif wdgt.winfo_name() in ['cloakingReason']:
-                            if self.master.Mode == 'TPT':
-                                if self.master.JQIData[self.master.Product][self.master.Mode]['isCloaking']=='Yes':
+                            if GeneralConfig.Mode == Enums.Mode.TPT:
+                                if self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['isCloaking']=='Yes':
                                     valindex = wdgt.curselection()
                                     if len(valindex)>0:
                                         val = [wdgt.get(i) for i in valindex]
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                                     else:
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
                                 else:
-                                    self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
+                                    self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
                                     remarks.append(f"isCloaking not set to yes,cloakingReason are ignored ")
                                     remarks.append(f"  But the fields are updated")
                             else:
-                                if self.master.JQIData[self.master.Product][self.master.Mode]['supportATNCloaking']==True:
+                                if self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['supportATNCloaking']==True:
                                     valindex = wdgt.curselection()
                                     if len(valindex)>0:
                                         val = [wdgt.get(i) for i in valindex]
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                                     else:
-                                        self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
+                                        self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
                                 else:
-                                    self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
+                                    self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
                                     remarks.append(f"supportATNCloaking not set to yes,cloakingReason are ignored")
                         elif wdgt.winfo_name() in ['prxPLAP_support_MPTPT','prxID_support_MPTPT','prxChargeStatus_support_MPTPT','prxEDS_support_MPTPT','ssCheckForTestcases']:
-                            self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] =False if wdgt.getvar(wdgt.winfo_name())=='0' else True
+                            self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] =False if wdgt.getvar(wdgt.winfo_name())=='0' else True
                         elif wdgt.winfo_name() in ['cloaking','supportProprietary']:
                             valindex = wdgt.curselection()
                             if len(valindex)>0:
                                 val = [wdgt.get(i) for i in valindex]
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = val
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = val
                             else:
-                                self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()].clear()
+                                self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()].clear()
                         else:
-                            self.master.JQIData[self.master.Product][self.master.Mode][wdgt.winfo_name()] = wdgt.get()
+                            self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode][wdgt.winfo_name()] = wdgt.get()
                     except Exception as e:
                         errors=True
                         remarks.append(f"{wdgt.winfo_name()} "+str(e))
@@ -1734,7 +1733,7 @@ class Run(MPPGUI):
         # if self.PosSelCombo.get() not in ['Offline']:
             # self.OffValProjCB['values']=[]
             # self.OffValProjCB.set('')
-        if self.master.JAllMOIData['Switch'] != 'Offline':
+        if GeneralConfig.Switch != Enums.Switch.OFFLINE:
             # res = self.master.SQLConn.FetchDataFromQRY(f"SELECT Testcase FROM AllTestcases WHERE Position='{self.PosSelCombo.get()}' and Coil='{self.CoilSelCombo.get()}' and Phase='{self.PhaseSelCombo.get()}' and Status=1")
             # query = f"SELECT Testcase FROM AllTestcases WHERE"
             # if 'PosSelCombo' in vars(self):#'PosSelCombo' in vars(self)
@@ -1772,8 +1771,8 @@ class Run(MPPGUI):
             # self.RnPOSListBox.UpdateValues(list(self.master.JAllMOIData['Selected_Testcases'].keys()))
         # else:
         # else:
-        #     if len(self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'])>0:
-        #         self.OffValProjCB['values']=list(self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'].keys())
+        #     if len(self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'])>0:
+        #         self.OffValProjCB['values']=list(self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'].keys())
     def LoadOffTest(self,ts):
         self.TestListBox.delete(0,tk.END)
         self.PhaseListBox.delete(0,tk.END)
@@ -1789,7 +1788,7 @@ class Run(MPPGUI):
                 self.PhaseListBox.UpdateValues(phases)
 
            
-        #self.TestListBox.UpdateValues(list(self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][self.OffValProjCB.get()].keys()))
+        #self.TestListBox.UpdateValues(list(self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][self.OffValProjCB.get()].keys()))
     def KeepSelected(self):
         index = self.TestListBox.curselection()
         if len(index)>0:
@@ -1797,7 +1796,7 @@ class Run(MPPGUI):
             availabletc = list(self.TestListBox.get(0,tk.END))
             ns_tests = list(set(availabletc) - set(testcases))
             if len(testcases)>0:
-                if self.master.switch != 'Offline':
+                if GeneralConfig.Switch != Enums.Switch.OFFLINE:
                     testlist=  f"('{ns_tests[0]}')" if len (ns_tests) == 1 else tuple(ns_tests)
                     self.master.SQLConn.ExecutebyQuery(f"UPDATE AllTestcases SET Status=0 where Testcase in {testlist}")
                     self.LoadPosTest(self.TestListBox) 
@@ -1815,9 +1814,9 @@ class Run(MPPGUI):
             #     else:
             #         proj = self.OffValProjCB.get()
             #         for tc in ns_tests:
-            #             del self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][proj][tc]
+            #             del self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][proj][tc]
             #         self.master.JTestConf.update_file(self.master.JTestConfData)
-            #         # self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][proj] = testcases
+            #         # self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][proj] = testcases
             #         # self.master.JTestConf.update_file(self.master.JTestConfData)
             #         self.LoadPosTest(self.TestListBox)  
             #         self.LoadOffTest(self.OffValProjCB)  
@@ -1841,7 +1840,7 @@ class Run(MPPGUI):
             availabletc = list(self.TestListBox.get(0,tk.END))
             ns_tests = list(set(availabletc) - set(testcases))
             if len(testcases)>0:
-                if self.master.switch != 'Offline':
+                if GeneralConfig.Switch != Enums.Switch.OFFLINE:
                     testlist=  f"('{testcases[0]}')" if len (testcases) == 1 else tuple(testcases)
                     self.master.SQLConn.ExecutebyQuery(f"UPDATE AllTestcases SET Status=0 where Testcase in {testlist}")
                     self.LoadPosTest(self.TestListBox) 
@@ -1852,7 +1851,7 @@ class Run(MPPGUI):
                     self.master.SQLConn.ExecutebyQuery(f"UPDATE OfflineTestcases SET Status=0 where Testcase in {testlist} AND Project = '{self.OffValProjCB.get()}'")
                     self.LoadOffTest(self.TestListBox)  
 
-                    # self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][proj] = ns_tests
+                    # self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][proj] = ns_tests
                     # self.master.JTestConf.update_file(self.master.JTestConfData)
                     # self.LoadPosTest(self.TestListBox)
                     # self.LoadOffTest(self.OffValProjCB)
@@ -1876,14 +1875,14 @@ class Run(MPPGUI):
         if len(proj)>0:
             for i in proj:
                 print("i:",i.split('/')[-1])
-                self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode].remove(i)
+                self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode].remove(i)
                 self.master.SQLConn.ExecutebyQuery(f"DELETE FROM OfflineTestcases WHERE Project = '{i.split('/')[-1]}'")
             self.master.Jsettings.update_file(self.master.JsettingsData)
-            self.OfflineListBox.UpdateValues(self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode])   
+            self.OfflineListBox.UpdateValues(self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode])   
         self.PutListTests()
     def GetProjectnameFromRepDir(self):
         prolist=[]
-        propath = self.master.JtesterData[self.master.Product][self.master.Mode]['ReportPath']
+        propath = self.master.JtesterData[GeneralConfig.Product][GeneralConfig.Mode]['ReportPath']
         for file in os.listdir(propath):
             if 'V_2_0_1' in file:
                 prolist.append(file.split('_')[0])
@@ -1892,27 +1891,27 @@ class Run(MPPGUI):
         # if ts != "NA":
         #     self.master.JAllMOIData['Run']['Project'] = self.proSelCB.get()
         #     self.master.JAllMOI.update_file(self.master.JAllMOIData)
-        # APIPutPowerProfile = APIOperations(url=f"{self.master.JapiData[self.master.Product][self.master.Mode]['PutPowerProfile']}/{self.master.JAllMOIData['PowerProfile']}")
-        # APIPutCertificationFilter = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutCertificationFilter'])
-        # APIcreateProj = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutProjectFolder'],json={"projectName":self.master.JsettingsData['Online_validation'][self.master.Mode]['ProjectName'],"moiName":self.master.VerCB.get()})
+        # APIPutPowerProfile = APIOperations(url=f"{self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutPowerProfile']}/{self.master.JAllMOIData['PowerProfile']}")
+        # APIPutCertificationFilter = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutCertificationFilter'])
+        # APIcreateProj = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutProjectFolder'],json={"projectName":self.master.JsettingsData['Online_validation'][GeneralConfig.Mode]['ProjectName'],"moiName":self.master.VerCB.get()})
         # APIPutPowerProfile.PutRequest()
         # APIPutCertificationFilter.PutRequest()
         # res = APIcreateProj.PutRequest()
 
-        # self.master.JsettingsData['Online_validation'][self.master.Mode]['ProjectName'] = self.proSelCB.get()
+        # self.master.JsettingsData['Online_validation'][GeneralConfig.Mode]['ProjectName'] = self.proSelCB.get()
         # self.master.Jsettings.update_file(self.master.JsettingsData)
         # Move the project creation while clicking the Run Tests api button.
 
-        # APIPutPowerProfile = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutPowerProfile'])
-        # APIPutCertificationFilter = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutCertificationFilter'])
-        # APIcreateProj = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutProjectFolder'],json={"projectName":self.master.JsettingsData['Online_validation'][self.master.Mode]['ProjectName'],"moiName":self.master.VerCB.get()})
+        # APIPutPowerProfile = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutPowerProfile'])
+        # APIPutCertificationFilter = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutCertificationFilter'])
+        # APIcreateProj = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutProjectFolder'],json={"projectName":self.master.JsettingsData['Online_validation'][GeneralConfig.Mode]['ProjectName'],"moiName":self.master.VerCB.get()})
         # APIPutPowerProfile.PutRequest()
         # APIPutCertificationFilter.PutRequest()
         # res = APIcreateProj.PutRequest()
         # print("Project",res)
     def UpdateRepeatCount(self,ts):
         try:
-            # self.master.JQIData[self.master.Product][self.master.Mode]['repCount'] = int(self.Repeatcount.get())
+            # self.master.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['repCount'] = int(self.Repeatcount.get())
             # self.master.JQI.update_file(self.master.JQIData)
             self.master.JAllMOIData['Run']['RepeatCount'] = int(self.Repeatcount.get())
             print("checking repeat count:",int(self.Repeatcount.get()))
@@ -1921,7 +1920,7 @@ class Run(MPPGUI):
             print(e)
     #Update 
     def UpdatePosTool(self):
-        if self.master.Product == "MPP":
+        if GeneralConfig.Product == Enums.Product.MPP:
             self.master.JAllMOIData['Run']['PositionTool'] = True if self.EnablePosCk.getvar(self.EnablePosCk.winfo_name()) == '1' else False
         else: self.master.JAllMOIData['Run']['PositionTool'] = False
         self.master.JAllMOI.update_file(self.master.JAllMOIData)
@@ -1949,12 +1948,12 @@ class Run(MPPGUI):
         ExTracelist = []
         test = {}
         
-        if self.master.switch == 'Offline':
-            # print(self.master.switch)
+        if GeneralConfig.Switch == Enums.Switch.OFFLINE:
+            # print(GeneralConfig.Switch)
             foldernames = filedialog.askdirectory(title="Select Folder")
         else: foldernames = folder
     
-        # print(foldernames,self.master.switch)
+        # print(foldernames,GeneralConfig.Switch)
         # foldernames = list(tkfilebrowser.askopendirnames(title="Select Project Folders"))
         if foldernames:
             # for path in foldernames:
@@ -1994,22 +1993,20 @@ class Run(MPPGUI):
                     #check for the project file loaded is for selected product & the mode
                     Fjson = JsonOperations(Finaljsonpath)
                     FjsonData = Fjson.read_file()
-                    self.master.JAllMOIData = self.master.JAllMOI.read_file()
                     #MPP TPR case
-                    # print(FjsonData['TestToolInfo']['ModelName'],self.master.JAllMOIData['Product'],self.master.JAllMOIData['Mode'])
                     if all(res in FjsonData['TestToolInfo']['ModelName'] for res in ["-MP-","TPR"]):
-                        if self.master.JAllMOIData['Product'] == "MPP" and self.master.JAllMOIData['Mode'] == "TPR":ValidProj=True
+                        if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR: ValidProj = True
                     elif all(res in FjsonData['TestToolInfo']['ModelName'] for res in ["-C3-","TPT"]):
-                        if self.master.JAllMOIData['Product'] == "MPP" or "C3" and self.master.JAllMOIData['Mode'] == "TPT":ValidProj=True
+                        if GeneralConfig.Product in (Enums.Product.MPP, Enums.Product.C3) and GeneralConfig.Mode == Enums.Mode.TPT: ValidProj = True
                     elif all(res in FjsonData['TestToolInfo']['ModelName'] for res in ["-WP-","TPR"]):
-                        if self.master.JAllMOIData['Product'] == "C3" and self.master.JAllMOIData['Mode'] == "TPR":ValidProj=True
+                        if GeneralConfig.Product == Enums.Product.C3 and GeneralConfig.Mode == Enums.Mode.TPR: ValidProj = True
                     if ValidProj == True:
                         #1. Consider All Runs
                         if self.master.AllRun == 1:
                             for root, dirs, files in os.walk(foldernames):
                                 for d in dirs:
                                     if d.startswith("Run"):
-                                        if os.path.join(root, d) not in self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode]:
+                                        if os.path.join(root, d) not in self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode]:
                                             # print(os.path.join(root, d))
                                             jsonlist.append(os.path.join(root, d))
                         #2. Consider Consolidated
@@ -2017,13 +2014,13 @@ class Run(MPPGUI):
                             for root, dirs, files in os.walk(foldernames):
                                 for file in files:
                                     if file.__contains__("FinalReport.json"):
-                                        if root not in self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode]:
+                                        if root not in self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode]:
                                             # jsonlist.append(os.path.join(root,file))
                                             jsonlist.append(root)
-                        self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode].extend(jsonlist)
+                        self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode].extend(jsonlist)
                         self.master.Jsettings.update_file(self.master.JsettingsData)
-                        # print("links:",self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode])
-                        if self.master.switch == 'Offline':self.OfflineListBox.UpdateValues(self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode])
+                        # print("links:",self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode])
+                        if GeneralConfig.Switch == Enums.Switch.OFFLINE:self.OfflineListBox.UpdateValues(self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode])
                     else: 
                         self.update_logs("UI","Please select a valid project, The selected project does not match the one configured in the tool.")
                         messagebox.showinfo("Wrong Project","Please select a valid project, The selected project does not match the one configured in the tool.")
@@ -2031,11 +2028,11 @@ class Run(MPPGUI):
  
     def ClearAllOffline(self):
         # self.master.SQLConn.DeleteTableData("OfflineTestcases")
-        self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode].clear()
+        self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode].clear()
         self.master.Jsettings.update_file(self.master.JsettingsData)
         self.OfflineListBox.delete(0,tk.END)
-        self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'].clear()
-        # self.master.JTestConfData[self.master.Product][self.master.Mode]['Test'].clear()
+        self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'].clear()
+        # self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Test'].clear()
         self.master.JTestConf.update_file(self.master.JTestConfData)
         self.master.SQLConn.DeleteTableData("OfflineTestcases")
         self.PutListTests()
@@ -2043,8 +2040,8 @@ class Run(MPPGUI):
         try:
             self.master.SQLConn.DeleteTableData("OfflineTestcases")
             # auto validation
-            if self.master.switch != 'Offline':
-                projects = self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode]
+            if GeneralConfig.Switch != Enums.Switch.OFFLINE:
+                projects = self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode]
                 # print(len(projects))
             # manually selecting projects to validate
             else:
@@ -2055,7 +2052,7 @@ class Run(MPPGUI):
                     # print("projects:",projects)
                 
             TClist={}
-            # projects = self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode]
+            # projects = self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode]
             # print(len(projects))
             if len(projects)>0:
                 if self.master.AllRun == 1:
@@ -2085,7 +2082,7 @@ class Run(MPPGUI):
                                 if 'testinformation' in tcl:
                                     if tcl['testinformation'] is not None:
                                         if tcl['testcaseDetails']['m_DisplayName'] is not None and tcl['testinformation']['TestResult'] not in [' ',None,'NotRun']:
-                                            # if any(self.master.JMOIData[self.master.Mode][i].get('Testcase_Name') == tcl['testcaseDetails']['m_DisplayName'] for i in self.master.JMOIData[self.master.Mode] if str(self.master.Mode)+"_TD_" in i):
+                                            # if any(self.master.JMOIData[GeneralConfig.Mode][i].get('Testcase_Name') == tcl['testcaseDetails']['m_DisplayName'] for i in self.master.JMOIData[GeneralConfig.Mode] if str(GeneralConfig.Mode)+"_TD_" in i):
                                                 testpath = tcl['actualTracePath'].split('\\')
                                                 TClist[proname][tcl['testcaseDetails']['m_DisplayName']]=[tcl['testcaseDetails']['m_TestId'],pro+'\\'+testpath[len(testpath)-2]+'\\'+testpath[len(testpath)-1],jsonpath]
                 else:
@@ -2114,8 +2111,8 @@ class Run(MPPGUI):
                             if proname not in TClist:TClist[proname] ={} 
                             TClist[proname][TCdata["testcaseDetails"]['m_DisplayName']]=[TCdata["testcaseDetails"]['m_TestId'],str(tracepath),str(jsonpath),str(Backuppath),TCdata["testcaseDetails"]['m_TestDetailsfromSpecVersion']['_chapter']]
                 # # print(self.master.JTestConfData)   
-                # self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'].clear()
-                # self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline']=TClist
+                # self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'].clear()
+                # self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline']=TClist
                 # print("TClist:",TClist)
                 # self.master.JTestConf.update_file(self.master.JTestConfData)
                 self.create_offlinetestcases_table()  # Ensure table is created before inserting
@@ -2126,8 +2123,8 @@ class Run(MPPGUI):
                 for project_name, test_cases in TClist.items():
                     for test_case_name, test_case_details in test_cases.items():
                         AllTestData.append({
-                            "Product": self.master.JAllMOIData['Product'],
-                            "Mode": self.master.JAllMOIData['Mode'],
+                            "Product": GeneralConfig.Product,
+                            "Mode": GeneralConfig.Mode,
                             'Project': project_name,
                             "TestCase": test_case_name,
                             "TestID": test_case_details[0],
@@ -2178,8 +2175,8 @@ class Run(MPPGUI):
     def Create_validation_logs(self,proj):
         # Logs folder
         timestamp1 = datetime.now().strftime("%Y%m%d_%H%M%S")
-        os.makedirs(f"Offline_validation_Logs/{self.master.Product}/{self.master.Mode}", exist_ok=True)
-        log_path = f"Offline_validation_Logs/{self.master.Product}/{self.master.Mode}/{proj}_{timestamp1}.log"
+        os.makedirs(f"Offline_validation_Logs/{GeneralConfig.Product}/{GeneralConfig.Mode}", exist_ok=True)
+        log_path = f"Offline_validation_Logs/{GeneralConfig.Product}/{GeneralConfig.Mode}/{proj}_{timestamp1}.log"
         open(log_path, "w").close()
         self.master.JsettingsData['Validation_logs_path'] = log_path
         self.master.Jsettings.update_file(self.master.JsettingsData)
@@ -2195,7 +2192,7 @@ class Run(MPPGUI):
             self.master.TestData['FileList_Data']={}
             self.master.TestResultsjson.update_file(self.master.TestData)
             self.master.JsettingsData = self.master.Jsettings.read_file()
-            CTS = JsonOperations(f'json/CTSvalidation/{self.master.Product}{self.master.Mode}.json')
+            CTS = JsonOperations(f'json/CTSvalidation/{GeneralConfig.Product}{GeneralConfig.Mode}.json')
             self.JCTSData =CTS.read_file()
             if self.master.JsettingsData['_stop_flag']==True:
                 #Start the Status threat
@@ -2213,11 +2210,11 @@ class Run(MPPGUI):
                 time.sleep(1)
                 # print("St 1",self.master.sts,len(self.master.OfflineProjs))
                 # self.update_logs("UI","Offline validation started.")
-                self.TraceUPL = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutWaveformFile'])        
-                self.TCstatus = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['TCstatus'],retype='json')
+                self.TraceUPL = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutWaveformFile'])        
+                self.TCstatus = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['TCstatus'],retype='json')
                 #Exerciser traces validation
                 if self.master.sts == True:
-                    for tests in self.master.JTestConfData[self.master.Product][self.master.Mode]['Test']:
+                    for tests in self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Test']:
                         self.update_logs("UI",f"Validating:{tests}")
                         self.TraceUPL.files = {"WaveformFile":open(tests.replace('/','\\'),"rb")}
                         # print(tests.replace('/','\\'),"rb")
@@ -2252,13 +2249,13 @@ class Run(MPPGUI):
                            
                             if len(AllTests)>0:
                                 self.Disable_Frames(self.RN_FR4)
-                                if self.master.JAllMOIData['Switch']=='Offline':self.Disable_Frames(self.RN_FR4_2)
+                                if GeneralConfig.Switch == Enums.Switch.OFFLINE:self.Disable_Frames(self.RN_FR4_2)
                                 for tests in AllTests:
                                     try:
                                         # print("tests:",tests)
                                         if os.path.exists(tests[2]):
-                                            APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutClearCapture']).PutRequest()
-                                            if self.master.Product=='MPP' and self.master.Mode=='TPT':
+                                            APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutClearCapture']).PutRequest()
+                                            if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPT:
                                                 BKjson = JsonOperations(tests[4])
                                                 self.BKjsonData = BKjson.read_file()
                                                 self.master.TestData = self.master.TestResultsjson.read_file()
@@ -2267,8 +2264,8 @@ class Run(MPPGUI):
                                                     TCcnt+=1
                                                     try:
                                                         TestKey=f'{self.Certification}_Link'
-                                                        if self.JCTSData[self.master.Product][self.master.Mode][tests[1]].get(TestKey,False):
-                                                            for Tc in self.JCTSData[self.master.Product][self.master.Mode][tests[1]][TestKey]["TestLink"]:
+                                                        if self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][tests[1]].get(TestKey,False):
+                                                            for Tc in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][tests[1]][TestKey]["TestLink"]:
                                                                 for TempTests in AllTests:
                                                                     if Tc in TempTests[1] and Tc not in self.master.TestData['TestResults'].keys():
                                                                         self.update_logs("UI",f"Validating:{TempTests[0]}-{TCcnt}/{len(AllTests)}")
@@ -2277,7 +2274,8 @@ class Run(MPPGUI):
                                                                         status = self.TraceUPL.PutRequest()
                                                                         if status == 200 and self.CheckTraceLoadStatus():
                                                                             TCcnt+=1
-                                                                            TestValidation(TestID=TempTests[1],TestCaseName=TempTests[0],ProjectJson=TempTests[3],BackupJson = TempTests[4],TracePath=TempTests[2])                                                                          
+                                                                            self.UpdateTestCaseInfo(TempTests)
+                                                                            TestValidation()                                                                          
                                                                             break                                                               
                                                     except Exception as e: print(e)
                                                     # If the Test Contains TWO Trace files then add the TC in List and Load the TRace file and store it in Json and Update Json file
@@ -2286,7 +2284,7 @@ class Run(MPPGUI):
                                                             self.TraceUPL.files = {"WaveformFile":open(tests[2].replace('/','\\'),"rb")}
                                                             status = self.TraceUPL.PutRequest()
                                                             if status == 200 and self.CheckTraceLoadStatus():
-                                                                PktAPI = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetCCLinePackets'],retype='json')
+                                                                PktAPI = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCCLinePackets'],retype='json')
                                                                 if tests[1] not in self.master.TestData['FileList_Data']:
                                                                     self.master.TestData['FileList_Data'][tests[1]] = {}
                                                                 self.master.TestData['FileList_Data'][tests[1]]['Json']= PktAPI.GetRequest()
@@ -2297,7 +2295,8 @@ class Run(MPPGUI):
                                                     self.TraceUPL.files = {"WaveformFile":open(tests[2].replace('/','\\'),"rb")}
                                                     status = self.TraceUPL.PutRequest()
                                                     if status == 200 and self.CheckTraceLoadStatus():
-                                                        TestValidation(TestID=tests[1],TestCaseName=tests[0],ProjectJson=tests[3],BackupJson = tests[4],TracePath=tests[2])        
+                                                        self.UpdateTestCaseInfo(tests)
+                                                        TestValidation()        
 
                                             else:
                                                 TCcnt+=1
@@ -2310,7 +2309,8 @@ class Run(MPPGUI):
                                                 if status == 200 and self.CheckTraceLoadStatus():       
                                                     end1 = time.perf_counter()
                                                     start2 = time.perf_counter()
-                                                    TestValidation(TestID=tests[1],TestCaseName=tests[0],ProjectJson=tests[3],BackupJson = tests[4],TracePath=tests[2])
+                                                    self.UpdateTestCaseInfo(tests)
+                                                    TestValidation()
                                                     end2 = time.perf_counter()
                                                     test_time.append([tests[0], f"Trace loading: {round(end1-start1,3)} sec", f"Validation time: {round(end2-start2,3)} sec"])
                                                     print([tests[0], f"Trace loading: {round(end1-start1,3)} sec", f"Validation time: {round(end2-start2,3)} sec"])
@@ -2322,7 +2322,7 @@ class Run(MPPGUI):
                                     self.master.JsettingsData = self.master.Jsettings.read_file()
                                     if self.master.JsettingsData['_stop_flag'] == True :break
                                 self.Enable_frame(self.RN_FR4)
-                                if self.master.JAllMOIData['Switch']=='Offline':self.Enable_frame(self.RN_FR4_2)
+                                if GeneralConfig.Switch == Enums.Switch.OFFLINE:self.Enable_frame(self.RN_FR4_2)
                             # print(test_time)
                     else: self.update_logs("UI","No project loaded")
                     #Sync With DB
@@ -2343,13 +2343,20 @@ class Run(MPPGUI):
     def CheckTraceLoadStatus(self):
         time.sleep(1)
         Status=False
-        TraceStatus = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetFileReadStatus'],retype='text')
+        TraceStatus = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetFileReadStatus'],retype='text')
         while not Status:
             out=TraceStatus.GetRequest()
             print(out)
             if out =='"READY"':
                 Status=True
         return Status
+
+    def UpdateTestCaseInfo(self,tests):
+        TestCaseConfig.TestcaseID = tests[1]
+        TestCaseConfig.TestcaseName = tests[0]
+        TestCaseConfig.ProjectJson = tests[3]
+        TestCaseConfig.TracePath = tests[2]
+        TestCaseConfig.BackupJson = tests[4]
 
     def Validation(self,tests,ProjRun):
         status = self.TraceUPL.PutRequest()
@@ -2362,13 +2369,13 @@ class Run(MPPGUI):
                         # print(len(data['2']['displayDataChunk']))
                         if len(data['2']['displayDataChunk'])>0:
                         #call Validation
-                            if self.master.sts == True and self.master.Mode == 'TPT':
+                            if self.master.sts == True and GeneralConfig.Mode == Enums.Mode.TPT:
                                 ExcerciseValidation()  #Exerciser traces validation
-                            elif self.master.JMOIData[self.master.Mode][tests]['Status'] == True:
-                                # if self.master.Mode == 'TPR':
-                                OfflineValidation(TestID=tests,ProjectJson=self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][ProjRun][tests][2],TracePath=self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][ProjRun][tests][1],mode=self.master.Mode,product=self.master.Product)
-                                # elif self.master.Mode == 'TPT':
-                                #     OfflineValidationMPPTPT(TestID=tests,ProjectJson=self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][ProjRun][tests][2],TracePath=self.master.JTestConfData[self.master.Product][self.master.Mode]['Offline'][ProjRun][tests][1])
+                            elif self.master.JMOIData[GeneralConfig.Mode][tests]['Status'] == True:
+                                # if GeneralConfig.Mode == Enums.Mode.TPR:
+                                OfflineValidation(TestID=tests,ProjectJson=self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][ProjRun][tests][2],TracePath=self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][ProjRun][tests][1],mode=GeneralConfig.Mode,product=GeneralConfig.Product)
+                                # elif GeneralConfig.Mode == Enums.Mode.TPT:
+                                #     OfflineValidationMPPTPT(TestID=tests,ProjectJson=self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][ProjRun][tests][2],TracePath=self.master.JTestConfData[GeneralConfig.Product][GeneralConfig.Mode]['Offline'][ProjRun][tests][1])
                             else: self.update_logs("UI",f'No Validation config for Test {tests}')
                             break
                 except Exception as e:
@@ -2380,7 +2387,7 @@ class Run(MPPGUI):
 
     def RunTest(self):
         # Optimum finding
-        if self.master.Product == "MPP":
+        if GeneralConfig.Product == Enums.Product.MPP:
             if bool(int(self.FindOptimumCk.getvar(self.FindOptimumCk.winfo_name()))) and bool(int(self.EnablePosCk.getvar(self.EnablePosCk.winfo_name()))):
                 self.update_logs("UI","Optimum position finding started.")
                 self.StartOptimumRun()
@@ -2414,7 +2421,7 @@ class Run(MPPGUI):
                 threading.Thread(target=self.safe_refresh_logs,daemon=True).start()
 
                 # if self.EnablePosCk.getvar(self.EnablePosCk.winfo_name()) == '1':
-                #     if self.master.Product == "MPP":
+                #     if GeneralConfig.Product == Enums.Product.MPP:
                 #         self.master.postool.Disconnection()
                 #         self.ArduinoCon = self.master.postool.Connection(port=self.master.JsettingsData['PositionTool']['Port'])
                 #         print("ArduinoCon:",self.ArduinoCon)
@@ -2433,7 +2440,7 @@ class Run(MPPGUI):
                 # if bool(int(self.RerunCk.getvar(self.RerunCk.winfo_name()))):
                 #     time.sleep(20)
                 #     self.Rerun()
-                #     APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutClearCapture']).PutRequest()
+                #     APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutClearCapture']).PutRequest()
                 #     self.JAllMOI = JsonOperations('json/AllMOIRun.json')
                 #     self.Disable_Frames(self.master.SM1_frame)
 
@@ -2461,7 +2468,7 @@ class Run(MPPGUI):
     def AutoValidate(self):
         try:
             #Get Project Name from API
-            GetProject =  APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetProjectConfiguration'],retype="json")
+            GetProject =  APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetProjectConfiguration'],retype="json")
             data = GetProject.GetRequest()
             reports = {'MPP':{'TPR':'GRL-C3-MP-TPR','TPT':'GRL-C3-MP-TPT'},'C3':{'TPR':'GRL-WP-TPR-C3','TPT':'GRL-C3-MP-TPT'}}
             ProjectName = None
@@ -2469,13 +2476,13 @@ class Run(MPPGUI):
                 ProjectName = data['projectConfigurationModel']['projectName']
             if ProjectName is not None:
                 folderpath = ''
-                for root, dirs, files in os.walk(rf"C:\GRL\{reports[self.master.Product][self.master.Mode]}\Report"): #for root, dirs, files in os.walk(rf"C:\GRL\GRL-C3-MP-{self.master.Mode}\Report"):
+                for root, dirs, files in os.walk(rf"C:\GRL\{reports[GeneralConfig.Product][GeneralConfig.Mode]}\Report"): #for root, dirs, files in os.walk(rf"C:\GRL\GRL-C3-MP-{GeneralConfig.Mode}\Report"):
                     for dir_name in dirs:
                         if dir_name.startswith(self.ProjectName.get()):
                             folderpath = str(Path(os.path.join(root, dir_name)))
                 self.update_logs("UI","Wait for the auto validation to start.")
                 folderpath = folderpath.replace("\\", "/")
-                self.master.JsettingsData['Offline_validation']['json_path'][self.master.Product][self.master.Mode].clear()
+                self.master.JsettingsData['Offline_validation']['json_path'][GeneralConfig.Product][GeneralConfig.Mode].clear()
                 self.master.Jsettings.update_file(self.master.JsettingsData)
                 self.ProjAddOffValidation(folderpath)
                 time.sleep(1)
@@ -2524,7 +2531,7 @@ class Run(MPPGUI):
         #create json file for report
         now = datetime.now()
         timestamp = now.strftime("%d%m%Y_%H%M%S")
-        reponame = f'{self.master.Mode}_{project}_{timestamp}_Offline'
+        reponame = f'{GeneralConfig.Mode}_{project}_{timestamp}_Offline'
         path ="Results\\JsonReports\\"+reponame+'.json'
         li = []        
         resjson = JsonOperations(path)
@@ -2607,8 +2614,8 @@ class Run(MPPGUI):
     #Load Offset,Phase and Testcases for the selected MOI
     def UpdateMOI(self):
         try: 
-            testerStatus = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['ConnectionSetup'],retype='json').GetRequest()['testerStatus']
-            # self.update_logs("UI",f"Automation tool set for {self.master.Product} {self.master.Mode}")
+            testerStatus = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['ConnectionSetup'],retype='json').GetRequest()['testerStatus']
+            # self.update_logs("UI",f"Automation tool set for {GeneralConfig.Product} {GeneralConfig.Mode}")
             # if self.master.TesterConnection == True:
             if testerStatus == "Connected":
                 self.master.AllMOIModule.GetAllTestcases()
@@ -2636,9 +2643,9 @@ class Run(MPPGUI):
         self.master.JAllMOI.update_file(self.master.JAllMOIData)
     #Create Project 
     # def CreateProject(self):
-    #     APIcreateProj = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutProjectFolder'],json={"projectName":self.master.JAllMOIData['Run']['Project'],"moiName":self.master.JAllMOIData['Certificate']})
+    #     APIcreateProj = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutProjectFolder'],json={"projectName":self.master.JAllMOIData['Run']['Project'],"moiName":self.master.JAllMOIData['Certificate']})
     #     res = APIcreateProj.PutRequest()
-    #     self.update_logs("UI",f"Project {self.master.JAllMOIData['Run']['Project']} created for {self.master.Product}:{self.master.Mode}:{self.master.JAllMOIData['Certificate']}")
+    #     self.update_logs("UI",f"Project {self.master.JAllMOIData['Run']['Project']} created for {GeneralConfig.Product}:{GeneralConfig.Mode}:{self.master.JAllMOIData['Certificate']}")
     #Start Optimim
     def StartOptimumRun(self):
         # self.ToolConsistencyTest()
@@ -2671,7 +2678,7 @@ class Run(MPPGUI):
                 else: self.update_logs("UI","Tool is busy with running other progress..! wait/kill the existing thread.")
                 time.sleep(3)
 
-            coilvalues = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['GetOptimumCoilValues'],retype='json').GetRequest()
+            coilvalues = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetOptimumCoilValues'],retype='json').GetRequest()
             print("coilvalues API response:",coilvalues)
 
             # optijson = {"Optimum": {"SSCheck": True,"Coil_Type": coil,"Coil_Position": "(0.0,0.0)","Coil_Values": coilvalues['coilOptData']}}
@@ -2687,7 +2694,7 @@ class Run(MPPGUI):
             with open(f"Results/OptimumResults/{self.ProjectName.get()}_optimumdata_{timestamp}.json", "wb") as f:
                 f.write(orjson.dumps(coilvalues,option=orjson.OPT_INDENT_2))
 
-            PutcoilAPI = APIOperations(url=self.master.JapiData[self.master.Product][self.master.Mode]['PutOptimumCoilValues'])
+            PutcoilAPI = APIOperations(url=self.master.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['PutOptimumCoilValues'])
             # PutcoilAPI.json = {"coilOptData":coilvalues['coilOptData']}
             PutcoilAPI.json = coilvalues
             res= PutcoilAPI.PutRequest()
@@ -3098,7 +3105,7 @@ class Reports(MPPGUI):
             messagebox.showerror("Not Updated","Software Json file is not selected")
         else:
             print(self.JsonPathList)
-            JsonObj=C3_MPP_JsonSchema(self.Backuppath,self.jsonpath,self.master.Product,self.master.Mode,self.JsonPathList['Automation'])
+            JsonObj=C3_MPP_JsonSchema(self.Backuppath,self.jsonpath,GeneralConfig.Product,GeneralConfig.Mode,self.JsonPathList['Automation'])
             # JsonObj=C3_MPP_JsonSchema(self.JsonPathList['Automation'],self.JsonPathList['Software'])
             out=JsonObj.validate_with_exceptions()
             if len(out)>0:self.SchemaListBox.UpdateValues(out)
@@ -3106,7 +3113,7 @@ class Reports(MPPGUI):
         
     def ValidatePdfSchema(self):
         if self.Backuppath and self.jsonpath and self.PdfPath is not None:
-            PdfObj=C3_MPP_PdfSchema( self.Backuppath,self.jsonpath,self.PdfPath,self.master.Product,self.master.Mode)
+            PdfObj=C3_MPP_PdfSchema( self.Backuppath,self.jsonpath,self.PdfPath,GeneralConfig.Product,GeneralConfig.Mode)
             PdfObj.FormatPDFReport()
             res=PdfObj.PdfDB()
             if res is not None:messagebox.showinfo("Updated",f"Generated PDF_Schema Report in the Path :{res}")
@@ -3116,10 +3123,10 @@ class Reports(MPPGUI):
     def PutInput(self):
         #Get Cerifications
         # print('Product',self.Product)
-        if self.master.Product == "C3":
-            self.BoardMDL = "C3_TPR" if self.master.Mode =="TPR" else "C3_TPT"
-        elif self.master.Product == "MPP":
-            self.BoardMDL = "MPP_TPR" if self.master.Mode =="TPR" else "MPP_TPT"
+        if GeneralConfig.Product == Enums.Product.C3:
+            self.BoardMDL = "C3_TPR" if GeneralConfig.Mode == Enums.Mode.TPR else "C3_TPT"
+        elif GeneralConfig.Product == Enums.Product.MPP:
+            self.BoardMDL = "MPP_TPR" if GeneralConfig.Mode == Enums.Mode.TPR else "MPP_TPT"
         Certificates = self.master.SQLConn.GetSingleValuesFromDB(Header_Qry=f'''SELECT DISTINCT(Certification) FROM Header WHERE BoardModel="{self.BoardMDL}"''')
         self.master.ClearFrame(self.RP_FR2_1)
         Labels(self.RP_FR2_1,text="Report Inputs",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=120,font=self.master.FT10BW)
@@ -3197,7 +3204,7 @@ class Reports(MPPGUI):
         # Buttons(self.RP_FR2_3, text="Export CTS Checks", x=5, y=70,bg=self.master.Ccodes["blue"],fg="#FFFFFF",font=self.master.FT12BW, width=19,command=self.export_cts)
         # Labels(self.RP_FR2_3,text=": Export CTS Checks to Excel based on the selection from Input section",x=170,y=70,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],font=self.master.FT10BW)
     # def export_cts(self):
-    #     xl_report = XLreport(mode=self.master.Mode, name="CTS Checks")  
+    #     xl_report = XLreport(mode=GeneralConfig.Mode, name="CTS Checks")  
     #     xl_report.ExportCTSChecks()
     def GetReportData(self):
         ch_index = self.ChapLB.curselection()
@@ -3211,11 +3218,11 @@ class Reports(MPPGUI):
             "Chap":[self.ChapLB.get(i) for i in ch_index],"Coil":[self.PosLB.get(i) for i in pos_index],"Tests":[self.TestLB.get(i) for i in ts_index],
             "Timings":timechk,"Measures":meschk,"Others":othchk,"Product":self.BoardMDL,"Certification":self.CRCB.get()}
         # print(fltr)
-        self.master.ExcelRep.CTSDetailedReport(fltr,self.master.Product)
-        self.master.ExcelRep.CTSCompleteReport(self.master.Product,self.master.Mode,fltr)
-        self.master.ExcelRep.PacketPayLoadDetailedReport(fltr,self.master.Product)
-        self.master.ExcelRep.summarize_Report(fltr,self.master.Product)
-        # self.CTSrep = CSVreport(filters=fltr,mode=self.master.Mode)
+        self.master.ExcelRep.CTSDetailedReport(fltr,GeneralConfig.Product)
+        self.master.ExcelRep.CTSCompleteReport(GeneralConfig.Product,GeneralConfig.Mode,fltr)
+        self.master.ExcelRep.PacketPayLoadDetailedReport(fltr,GeneralConfig.Product)
+        self.master.ExcelRep.summarize_Report(fltr,GeneralConfig.Product)
+        # self.CTSrep = CSVreport(filters=fltr,mode=GeneralConfig.Mode)
         # for Tcdata in 
         #Add summary frame --TBD
     #Backend Functions

@@ -6,8 +6,8 @@ import traceback
 import uuid
 # import zipfile
 from MainModule import JsonOperations,APIOperations,GeneralMethods
-
-
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
 from datetime import datetime,date
 from SQLite import SQLiteConnection
@@ -36,14 +36,14 @@ class TestValidation():
         self.JQIData = self.JQI.read_file()
         self.JMOI = JsonOperations('json/MOIJson.json')
         self.JMOIData = self.JMOI.read_file()
-        self.JAllMOI = JsonOperations('json/AllMOIRun.json')
-        self.JAllMOIData = self.JAllMOI.read_file()
+        # self.JAllMOI = JsonOperations('json/AllMOIRun.json')
+        # self.JAllMOIData = self.JAllMOI.read_file()
         self.JPayLoadCheck = JsonOperations('json/PayLoadChecks.json')
         self.JPayLoadCheckData = self.JPayLoadCheck.read_file()
-        BKjson = JsonOperations(BackupJson)
+        BKjson = JsonOperations(TestCaseConfig.BackupJson)
         self.BKjsonData = BKjson.read_file()
-        self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
-        if self.Certification in ["2.0.1","2.1.0","2.2.1","2.3.0"]:
+        GeneralConfig.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
+        if GeneralConfig.Certification in ["2.0.1","2.1.0","2.2.1","2.3.0"]:
             self.EPRC_pkt = "Extended_Power_Receiver_Capabilities"
         else:
             self.EPRC_pkt = "Extended Power Receiver Capabilities"
@@ -51,16 +51,9 @@ class TestValidation():
         
         
  
-        # self.Json_TC = self.JMOIData[self.mode][self.TestID]
+        # self.Json_TC = self.JMOIData[self.mode][TestCaseConfig.TestcaseID]
         #Global Vars
-        self.TestCaseName = TestCaseName
-        self.TestID=TestID
-        self.mode = self.JAllMOIData['Mode']
-        self.ProjectJson = ProjectJson
-        self.TracePath = TracePath
-        self.BackupJson = BackupJson
-        self.Product = self.JAllMOIData['Product']
-        CTS = JsonOperations(f'json/CTSvalidation/{self.Product}{self.mode}.json')
+        CTS = JsonOperations(f'json/CTSvalidation/{GeneralConfig.Product}{GeneralConfig.Mode}.json')
         self.JCTSData =CTS.read_file()
         self.Header = {}
         #Timing checks setup_________________________________________________________________
@@ -85,31 +78,31 @@ class TestValidation():
         self.conRepData = self.conRep.read_file()
         #_start validation___________________________________________________________________
         self.TCRemarks = []
-        self.update_TClogs("General",f"Validation started for : {self.TestID}")
+        self.update_TClogs("General",f"Validation started for : {TestCaseConfig.TestcaseID}")
         self.UpdateHeaderInfo()
         #Get Packets___________________________________________________________________________
-        self.PktAPI = APIOperations(url=self.JapiData[self.Product][self.mode]['GetCCLinePackets'],retype='json')
+        self.PktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetCCLinePackets'],retype='json')
         self.file_list = self.PktAPI.GetRequest()
         self.PlotMethod = PlotMethods(Header=self.Header)
        
         #Define the offline validation module 
         self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
         # print(self.Header)
-        self.flows = self.SegricatePackets()
+        TestCaseConfig.Flows = self.SegricatePackets()
         # If the Test Contains TWO Trace files then add the TC in List and store the final Limts in Json
-        if self.TestID in ["CMAG001_01_Magnetic_Cover_Presence_Check"]:  
+        if TestCaseConfig.TestcaseID in ["CMAG001_01_Magnetic_Cover_Presence_Check"]:  
             self.TestResultsjson = JsonOperations("json/TestResults.json")
             self.TestData = self.TestResultsjson.read_file()
-            if self.TestID in self.TestData['FileList_Data'].keys():
+            if TestCaseConfig.TestcaseID in self.TestData['FileList_Data'].keys():
                 temp=self.file_list
-                self.file_list = self.TestData['FileList_Data'][self.TestID]['Json']
+                self.file_list = self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['Json']
                 self.PktMethod.file_list=self.file_list
-                self.TestData['FileList_Data'][self.TestID]['flows']=self.SegricatePackets()
+                self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['flows']=self.SegricatePackets()
                 self.TestResultsjson.update_file(self.TestData)
                 self.file_list =self.PktMethod.file_list= temp
                
-        self.stability = self.flows
-        # print(self.flows)
+        self.stability = TestCaseConfig.Flows
+        # print(TestCaseConfig.Flows)
         self.GetAllPackets()    
         self.UpdateToJsonReport()
 
@@ -121,61 +114,53 @@ class TestValidation():
     #To Fetch headers of Testcase from various sources.
     def UpdateHeaderInfo(self):
         try:
-            # print("ProjectJson:",self.ProjectJson)
-            
             now = datetime.now()
             timestamp = now.strftime("%d%m%Y_%H%M%S")
-            jsondata = JsonOperations(self.ProjectJson)
+            jsondata = JsonOperations(TestCaseConfig.ProjectJson)
             self.jsonValues = jsondata.read_file()
-            # self.Header['DBStatus']= 'NotUpdated'
-            self.Header['UID'] = str(uuid.uuid1())
-            self.Header['TestcaseID'] = self.TestID
-            self.Header['TestcaseName']= self.TestCaseName
-            # print("TestcaseName:",self.Header['TestcaseName'])
-            # self.Header['ChapterID']=self.GetTCValuesfromBackUpJSON("_chapter")
-            self.Header['ChapterName']=self.GetTCValuesfromBackUpJSON("_chapter")
-            self.Header['Transmitter']= self.JQIData[self.Product][self.mode]['transmitterType']
-            self.Header['potentialPower']=self.JQIData[self.Product][self.mode]['potentialPower']
-            self.Header['Coil'] = self.GetJSONTCData(self.TestID,self.BackupJson,"TCcoil") #self.GetJSONTCData(self.TestID,self.jsonValues,"TCcoil")
-            # print("potentialPower:",self.Header['potentialPower'])
-            # print("Coil:",self.Header['Coil'])
-            if 'TestToolInfo' in self.jsonValues:
-                self.Header['SWVersion'] = self.jsonValues['TestToolInfo']['SoftwareVersion']
-                self.Header['FWVersion'] = self.jsonValues['TestToolInfo']['FirmwareVersion']
-                self.Header['HWVersion'] = self.jsonValues['TestToolInfo']['HardwareVersion']
-                self.Header['BoardNo'] = self.jsonValues['TestToolInfo']['SerialNumber']
-                # self.Header['BoardModel'] = jsonValues['TestToolInfo']['ModelName']
-            elif 'TestPlatformInfo' in self.jsonValues:
-                self.Header['SWVersion'] = self.jsonValues['TestPlatformInfo']['SoftwareVersion']
-                self.Header['FWVersion'] = self.jsonValues['TestPlatformInfo']['FirmwareVersion']
-                self.Header['HWVersion'] = self.jsonValues['TestPlatformInfo']['HardwareVersion']
-                self.Header['BoardNo'] = self.jsonValues['TestPlatformInfo']['SerialNumber']
-            self.Header['QiID'] = self.jsonValues['DutInfo']['QiId']
-            self.Header['BoardModel'] = f"{self.JAllMOIData['Product']}_{self.JAllMOIData['Mode']}"
-            self.Header['Certification'] = self.jsonValues['TestExecutionDetails']['SpecVersion']
-            self.Header['CapturePath'] = self.TracePath
-            pathlist = self.TracePath.split("\\")
-            # print(pathlist)
-            self.Header['ProjectName'] = pathlist[len(pathlist)-4]
-            self.Header['Run'] = pathlist[len(pathlist)-3]
-            #TBD 
-            self.Header['TestedTime_start']="NA"
-            self.Header['TestedTime_end']="NA"
-            self.Header['TestedTime'] = "NA"
-            self.UpdateTestRunTimings(self.TestID,self.jsonValues)
-            self.Header['ValidatedTime']=timestamp
-            self.Header['DUTName']= self.jsonValues['DutInfo']['BrandName']
-            self.Header['DUTID']= self.jsonValues['DutInfo']['ProductName']
-            self.Header['DUTSL']= self.jsonValues['TestToolInfo']['SerialNumber']
             
-            self.Header['TestLab']=self.JQIData[self.Product][self.mode]['testLab'] = self.jsonValues['TestLab']['LabName'] 
-            self.Header['Engineer']=self.JQIData[self.Product][self.mode]['testEngineer'] = self.jsonValues['TestLab']['TestEngineer']
-            self.Header['TCresult']='NA'
-            self.Header['SWresult'] = self.GetJSONTCData(self.TestID,self.BackupJson,"TCresult")
-            self.Header['Product'] = self.Product
-            self.Header['Mode'] = self.mode
-            # self.Header['CTSVersion'] = self.JCTSData['Version']
-            # self.Header['Remarks']=[]
+            TestCaseConfig.UID = str(uuid.uuid1())
+            TestCaseConfig.ChapterName = self.GetTCValuesfromBackUpJSON("_chapter")
+            TestCaseConfig.Coil = self.GetJSONTCData(TestCaseConfig.TestcaseID, TestCaseConfig.BackupJson, "TCcoil")
+            GeneralConfig.Transmitter = self.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['transmitterType']
+            GeneralConfig.potentialPower = self.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['potentialPower']
+
+            if 'TestToolInfo' in self.jsonValues:
+                BoardConfig.SWVersion = self.jsonValues['TestToolInfo']['SoftwareVersion']
+                BoardConfig.FWVersion = self.jsonValues['TestToolInfo']['FirmwareVersion']
+                BoardConfig.HWVersion = self.jsonValues['TestToolInfo']['HardwareVersion']
+                BoardConfig.BoardNo = self.jsonValues['TestToolInfo']['SerialNumber']
+            elif 'TestPlatformInfo' in self.jsonValues:
+                BoardConfig.SWVersion = self.jsonValues['TestPlatformInfo']['SoftwareVersion']
+                BoardConfig.FWVersion = self.jsonValues['TestPlatformInfo']['FirmwareVersion']
+                BoardConfig.HWVersion = self.jsonValues['TestPlatformInfo']['HardwareVersion']
+                BoardConfig.BoardNo = self.jsonValues['TestPlatformInfo']['SerialNumber']
+
+            BoardConfig.BoardModel = f"{GeneralConfig.Product}_{GeneralConfig.Mode}"
+            GeneralConfig.QiID = self.jsonValues['DutInfo']['QiId']
+            GeneralConfig.Certification = self.jsonValues['TestExecutionDetails']['SpecVersion']
+            
+            pathlist = TestCaseConfig.TracePath.split("\\")
+            GeneralConfig.ProjectName = pathlist[len(pathlist)-4]
+            GeneralConfig.Run = pathlist[len(pathlist)-3]
+
+            TestCaseConfig.TestStartTime = "NA"
+            TestCaseConfig.TestEndTime = "NA"
+            self.UpdateTestRunTimings(TestCaseConfig.TestcaseID, self.jsonValues)
+            TestCaseConfig.ValidatedTime = timestamp
+
+            GeneralConfig.DUTName = self.jsonValues['DutInfo']['BrandName']
+            GeneralConfig.DUTID = self.jsonValues['DutInfo']['ProductName']
+            GeneralConfig.DUTSL = self.jsonValues.get('TestToolInfo', {}).get('SerialNumber', '') or self.jsonValues.get('TestPlatformInfo', {}).get('SerialNumber', '')
+            
+            TesterConfigurationModel.testLab = self.jsonValues['TestLab']['LabName']
+            TesterConfigurationModel.testEngineer = self.jsonValues['TestLab']['TestEngineer']
+            self.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testLab'] = TesterConfigurationModel.testLab
+            self.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testEngineer'] = TesterConfigurationModel.testEngineer
+            
+            TestCaseConfig.SoftwareResult = self.GetJSONTCData(TestCaseConfig.TestcaseID, TestCaseConfig.BackupJson, "TCresult")
+
+           
         except Exception as e:
             traceback.print_exc()
             self.update_TClogs("Exception",f"UpdateHeaderInfo : {str(e)}")
@@ -195,9 +180,9 @@ class TestValidation():
                     self.SubTClist.append(tmpid)
                 tmpid+=1
             TCLimit = [0,len(self.file_list)]
-            if self.TestID in ['TEST_PTX_CPX_PNG_S01_TIM_002']:
+            if TestCaseConfig.TestcaseID in ['TEST_PTX_CPX_PNG_S01_TIM_002']:
                 return  {1:{"Limit":[0,len(self.file_list)-1],"Flow":1},2:None}
-            # if self.TestID in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
+            # if TestCaseConfig.TestcaseID in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
             #     return {1:{'Limit': TCLimit, 'Flow': 1}, 2: None}
             # print(self.SubTClist)
             if len(self.SubTClist)>1:
@@ -209,11 +194,11 @@ class TestValidation():
             sid = TCLimit[0]
             while sid < TCLimit[1]:
                 # print(self.file_list[sid]['pktType'])
-                if all(rs in self.file_list[sid].get('value') for rs in ['Test_Started']) if self.mode=="TPR" else  all(rs in self.file_list[sid].get('pktType') for rs in ['Test_Started']):
+                if all(rs in self.file_list[sid].get('value') for rs in ['Test_Started']) if GeneralConfig.Mode == Enums.Mode.TPR else  all(rs in self.file_list[sid].get('pktType') for rs in ['Test_Started']):
                     eid = sid+1
                     # print(eid)
                     while eid < TCLimit[1]-1:
-                        if all(rs in self.file_list[eid].get('value') for rs in ['Test_Stop']) if self.mode=="TPR" else all(rs in self.file_list[eid].get('pktType') for rs in ['Test_Stop']): 
+                        if all(rs in self.file_list[eid].get('value') for rs in ['Test_Stop']) if GeneralConfig.Mode == Enums.Mode.TPR else all(rs in self.file_list[eid].get('pktType') for rs in ['Test_Stop']): 
                             limit=[sid,eid]
                             break
                         elif all(rs in self.file_list[eid].get('pktType') for rs in ['Shutdown','next_subtest']): 
@@ -239,7 +224,7 @@ class TestValidation():
                         if len(sd)>2:
                             # print('sd',sd)
                             #ensure no PD recevied btw PD-SD
-                            if self.mode == "TPR":
+                            if GeneralConfig.Mode == Enums.Mode.TPR:
                                 ilPD = self.PktMethod.GetPacketDetails(packet='Ping Detected',limit=[id+1,sd[2]],Type = "TesterMsg")
                             else:
                                 ilPD = self.PktMethod.GetPacketDetails(packet='Ping Initiated',limit=[id+1,sd[2]],Type = "TesterMsg")
@@ -255,7 +240,7 @@ class TestValidation():
                             if len(sd)>2:
                                 # print('ts',sd)
                                 #ensure no PD recevied btw PD-SD
-                                if self.mode == "TPR":
+                                if GeneralConfig.Mode == Enums.Mode.TPR:
                                     ilPD = self.PktMethod.GetPacketDetails(packet='Ping Detected',limit=[id+1,sd[2]],Type = "TesterMsg")
                                 else:ilPD = self.PktMethod.GetPacketDetails(packet='Ping Initiated',limit=[id+1,sd[2]],Type = "TesterMsg")
                                 if len(ilPD)>1: id = ilPD[2]
@@ -273,10 +258,10 @@ class TestValidation():
                             if (end -start) > 4 and len(SS)>1: # Refer Segregation Function in Notes               
                                 cnt +=1
                                 # print(start,end)
-                                index = self.Findflow([start,end]) if self.Product=='MPP' else 1
+                                index = self.Findflow([start,end]) if GeneralConfig.Product == Enums.Product.MPP else 1
                                 packets[cnt]={"Limit":[start,end],"Flow":index}
                             else: # Eswar 
-                                if self.mode=='TPR' and self.Product=='C3' and (self.Header['ChapterName'] in ['In_Power_Transfer_Tests'] or self.TestID in ['TEST_PTX_CPX_PNG_S01_TIM_001','TEST_PTX_CPX_PNG_S01_SIG_001']):
+                                if GeneralConfig.Mode == Enums.Mode.TPR and GeneralConfig.Product == Enums.Product.C3 and (self.Header['ChapterName'] in ['In_Power_Transfer_Tests'] or TestCaseConfig.TestcaseID in ['TEST_PTX_CPX_PNG_S01_TIM_001','TEST_PTX_CPX_PNG_S01_SIG_001']):
                                     if end-start >1:
                                         cnt +=1
                                         packets[cnt]={"Limit":[start,end],"Flow":1}
@@ -286,14 +271,14 @@ class TestValidation():
                             # print(EP)
                             if len(EP)>2:
                                 cnt +=1
-                                index = self.Findflow([start,end]) if self.Product=='MPP' else 1
+                                index = self.Findflow([start,end]) if GeneralConfig.Product == Enums.Product.MPP else 1
                                 packets[cnt]={"Limit":[start,end],"Flow":index}
                             else: # Eswar - to handle C3-TPR ping phase
-                                if self.mode=='TPR' and self.Product=='C3'  and self.Header['ChapterName'] in ['Ping_Phase_Tests','Disconnected_Load_Tests']:
+                                if GeneralConfig.Mode == Enums.Mode.TPR and GeneralConfig.Product == Enums.Product.C3  and self.Header['ChapterName'] in ['Ping_Phase_Tests','Disconnected_Load_Tests']:
                                     if end-start >1:
                                         cnt +=1
                                         packets[cnt]={"Limit":[start,end],"Flow":1}
-                                    # if self.TestID in ['TEST_PTX_CPX_PNG_S01_TIM_002']:packets[cnt]={"Limit":[start,end],"Flow":1}
+                                    # if TestCaseConfig.TestcaseID in ['TEST_PTX_CPX_PNG_S01_TIM_002']:packets[cnt]={"Limit":[start,end],"Flow":1}
                     else: id+=1
                 # print('Packetflow',packets)
                 #consider last 2 seq.
@@ -312,7 +297,7 @@ class TestValidation():
                             else:
                                 #Ensure the current flow has the execution count else consider the previous flow
                                 # print(tmpflow1['Limit'][0],flow2['Limit'][1])
-                                if self.mode == "TPR":
+                                if GeneralConfig.Mode == Enums.Mode.TPR:
                                     # print("limits:")
                                     # print(tmpflow1)
                                     # print(flow2)
@@ -331,17 +316,17 @@ class TestValidation():
                             tmpflow1=packets[seq]
                 
                 print({1:flow1,2:flow2})
-                if self.Product=='MPP' and self.mode=='TPT' and self.Header['ChapterName'] in ['Pre_power_transfer_test']: return {1:None, 2:{'Limit':[0,len(self.file_list)-1],'Flow':2}}
-                if self.Product=="MPP" and self.mode=='TPR':
+                if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPT and self.Header['ChapterName'] in ['Pre_power_transfer_test']: return {1:None, 2:{'Limit':[0,len(self.file_list)-1],'Flow':2}}
+                if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR:
                     # print("multiflow1:",multiflow1)
                     if multiflow1:
                         flow1 = max(multiflow1, key=lambda x: x['Limit'][1] - x['Limit'][0])
                         # print({1:max(multiflow1, key=lambda x: x['Limit'][1] - x['Limit'][0]),2:flow2})
-                        if self.TestID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
-                            if flow1 is None : self.TCRemarks.append(["128Khz Flow not found for the testcase","Fail"])
-                            # print(self.TestCaseName, self.TestID)
-                            if self.TestID not in ["MPP_PTX_CPX_NEG_ENTRY_INIT","MPP_PTX_CPX_NEG_ERROR_STATUS_RESET","MPP_PTX_CPX_PNG_DP_LEVEL_ERROR","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC1","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC2","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC3","MPP_PTX_CPX_NEG_ERROR_STATUS_TC2","MPP_PTX_CPX_NEG_ERROR_STATUS_TC1","TSDF002_01_Unique_PTx_Identifier","MPP_PTX_NEG_POW_KEST_SLIDING","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC1","MPP_PTX_CPX_PNG_T_NOPOWER_RESET","MPP_PTX_POW_MAX_GAIN_SWEEP_PROCEDURE","MPP_PTX_POW_Digital_Ping_128kHz_P1","MPP_PTX_POW_Digital_Ping_128kHz_P2","MPP_PTX_POW_Digital_Ping_128kHz_P3","MPP_PTX_POW_Digital_Ping_128kHz_P4","MPP_PTX_CPX_GENCOM_MPP_PRIORITY","MPP_PTX_CPX_NEG_ILL_001","MPP_PTX_CPX_NEG_ILL_002","MPP_PTX_CPX_NEG_ILL_003","MPP_PTX_CPX_NEG_ILL_004","MPP_PTX_CPX_NEG_ILL_005","MPP_PTX_CPX_NEG_ILL_006","MPP_PTX_CPX_NEG_ILL_007","MPP_PTX_CPX_NEG_ILL_008","MPP_PTX_CPX_NEG_ILL_009","MPP_PTX_CPX_NEG_ILL_010","MPP_PTX_CPX_NEG_ILL_011","MPP_PTX_CPX_NEG_ILL_012","MPP_PTX_CPX_NEG_ILL_013","MPP_PTX_CPX_NEG_ILL_014","MPP_PTX_POW_Digital_Ping_360_OV_LPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_NPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_HPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_CPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_CPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_LPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_NPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_HPM_TC2","MPP_PTX_POW_KEst_P1","MPP_PTX_POW_KEst_P2","MPP_PTX_CPX_PNG_RX_IDENTIFICATION_TC3"]:
-                                if flow2 is None : self.TCRemarks.append(["360Khz Flow not found for the testcase","Inconclusive"])
+                        if TestCaseConfig.TestcaseID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
+                            if flow1 is None : self.TCRemarks.append(["128Khz Flow not found for the testcase",Enums.TestResult.FAIL])
+                            # print(self.TestCaseName, TestCaseConfig.TestcaseID)
+                            if TestCaseConfig.TestcaseID not in ["MPP_PTX_CPX_NEG_ENTRY_INIT","MPP_PTX_CPX_NEG_ERROR_STATUS_RESET","MPP_PTX_CPX_PNG_DP_LEVEL_ERROR","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC1","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC2","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC3","MPP_PTX_CPX_NEG_ERROR_STATUS_TC2","MPP_PTX_CPX_NEG_ERROR_STATUS_TC1","TSDF002_01_Unique_PTx_Identifier","MPP_PTX_NEG_POW_KEST_SLIDING","MPP_PTX_CPX_NEG_MODECAP_MODEXCAP_TC1","MPP_PTX_CPX_PNG_T_NOPOWER_RESET","MPP_PTX_POW_MAX_GAIN_SWEEP_PROCEDURE","MPP_PTX_POW_Digital_Ping_128kHz_P1","MPP_PTX_POW_Digital_Ping_128kHz_P2","MPP_PTX_POW_Digital_Ping_128kHz_P3","MPP_PTX_POW_Digital_Ping_128kHz_P4","MPP_PTX_CPX_GENCOM_MPP_PRIORITY","MPP_PTX_CPX_NEG_ILL_001","MPP_PTX_CPX_NEG_ILL_002","MPP_PTX_CPX_NEG_ILL_003","MPP_PTX_CPX_NEG_ILL_004","MPP_PTX_CPX_NEG_ILL_005","MPP_PTX_CPX_NEG_ILL_006","MPP_PTX_CPX_NEG_ILL_007","MPP_PTX_CPX_NEG_ILL_008","MPP_PTX_CPX_NEG_ILL_009","MPP_PTX_CPX_NEG_ILL_010","MPP_PTX_CPX_NEG_ILL_011","MPP_PTX_CPX_NEG_ILL_012","MPP_PTX_CPX_NEG_ILL_013","MPP_PTX_CPX_NEG_ILL_014","MPP_PTX_POW_Digital_Ping_360_OV_LPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_NPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_HPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_CPM_TC1","MPP_PTX_POW_Digital_Ping_360_OV_CPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_LPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_NPM_TC2","MPP_PTX_POW_Digital_Ping_360_OV_HPM_TC2","MPP_PTX_POW_KEst_P1","MPP_PTX_POW_KEst_P2","MPP_PTX_CPX_PNG_RX_IDENTIFICATION_TC3"]:
+                                if flow2 is None : self.TCRemarks.append(["360Khz Flow not found for the testcase",Enums.TestResult.INCONCLUSIVE])
                 
                 return {1:flow1,2:flow2}
         except Exception as e:
@@ -349,20 +334,20 @@ class TestValidation():
             self.update_TClogs("Exception",f"SegricatePackets {str(e)}")
     #-categorise packets into phase wise , with its responses
     def GetAllPackets(self):
-        if self.TestID in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
-            self.flows = {1: {'Limit': [0, len(self.file_list)-1], 'Flow': 1}, 2: None}
-        # print("flows:",self.flows)
-        if self.flows is not None:
-            for flwID in self.flows:
+        if TestCaseConfig.TestcaseID in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
+            TestCaseConfig.Flows = {1: {'Limit': [0, len(self.file_list)-1], 'Flow': 1}, 2: None}
+        # print("flows:",TestCaseConfig.Flows)
+        if TestCaseConfig.Flows is not None:
+            for flwID in TestCaseConfig.Flows:
                
-                if self.flows[flwID] is not None:
+                if TestCaseConfig.Flows[flwID] is not None:
                    
                     if flwID not in self.timing_map:self.timing_map[flwID]={}
-                    FlowLimit = self.flows[flwID]['Limit']
-                    # print("FlowLimit:",FlowLimit)
-                    id = FlowLimit[0]
-                    if self.TestID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
-                        while id < FlowLimit[1]:
+                    TestCaseConfig.FlowLimit = TestCaseConfig.Flows[flwID]['Limit']
+                    # print("TestCaseConfig.FlowLimit:",TestCaseConfig.FlowLimit)
+                    id = TestCaseConfig.FlowLimit[0]
+                    if TestCaseConfig.TestcaseID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
+                        while id < TestCaseConfig.FlowLimit[1]:
                             if self.PktMethod.GetPacketType(id)=='Packet':
                                 phase = 'General' if self.file_list[id]['description']=='' else self.file_list[id]['description']
                                 if phase not in self.timing_map[flwID]:self.timing_map[flwID][phase]={}
@@ -370,7 +355,7 @@ class TestValidation():
                                 if packet not in self.timing_map[flwID][phase]:self.timing_map[flwID][phase][packet]=[]
                                 #check for the response
                                 rid = id+1
-                                while rid <= FlowLimit[1]:
+                                while rid <= TestCaseConfig.FlowLimit[1]:
                                     if self.PktMethod.GetPacketType(rid)=='Response':
                                         self.timing_map[flwID][phase][packet].append([[id,self.file_list[id]['value'],self.file_list[id]['startTime'],self.file_list[id]['stopTime']],[rid,self.file_list[rid]['pktType'],self.file_list[rid]['startTime'],self.file_list[rid]['stopTime']]])
                                         id=rid+1
@@ -379,7 +364,7 @@ class TestValidation():
                                         self.timing_map[flwID][phase][packet].append([[id,self.file_list[id]['value'],self.file_list[id]['startTime'],self.file_list[id]['stopTime']]])
                                         id=rid
                                         break
-                                    if rid==FlowLimit[1]:
+                                    if rid==TestCaseConfig.FlowLimit[1]:
                                         self.timing_map[flwID][phase][packet].append([[id,self.file_list[id]['value'],self.file_list[id]['startTime'],self.file_list[id]['stopTime']]])
                                         id=rid
                                         break
@@ -388,10 +373,10 @@ class TestValidation():
                     #Add General Packets
                     # print("timing_map1:",self.timing_map)
                     self.timing_map[flwID]['General']={}
-                    self.timing_map[flwID]['General']['PD']=[[[FlowLimit[0],self.file_list[FlowLimit[0]]['value'],self.file_list[FlowLimit[0]]['startTime'],self.file_list[FlowLimit[0]]['stopTime']]]]
-                    self.timing_map[flwID]['General']['SD']=[[[FlowLimit[1],self.file_list[FlowLimit[1]]['value'],self.file_list[FlowLimit[1]]['startTime'],self.file_list[FlowLimit[1]]['stopTime']]]]
+                    self.timing_map[flwID]['General']['PD']=[[[TestCaseConfig.FlowLimit[0],self.file_list[TestCaseConfig.FlowLimit[0]]['value'],self.file_list[TestCaseConfig.FlowLimit[0]]['startTime'],self.file_list[TestCaseConfig.FlowLimit[0]]['stopTime']]]]
+                    self.timing_map[flwID]['General']['SD']=[[[TestCaseConfig.FlowLimit[1],self.file_list[TestCaseConfig.FlowLimit[1]]['value'],self.file_list[TestCaseConfig.FlowLimit[1]]['startTime'],self.file_list[TestCaseConfig.FlowLimit[1]]['stopTime']]]]
                     #Get Freq data
-                    res = self.PktMethod.GetPacketDetails(value='FOP:',limit=FlowLimit,Type = "TesterMsg")
+                    res = self.PktMethod.GetPacketDetails(value='FOP:',limit=TestCaseConfig.FlowLimit,Type = "TesterMsg")
                     if len(res)>2:
                         self.timing_map[flwID]['General']['FOP'] =[res[2],self.file_list[res[2]]['value'],res[0],res[1]]
                     #Add Loads
@@ -404,72 +389,72 @@ class TestValidation():
                             self.timing_map[flwID]['Loads'].append([Lid,self.file_list[Lid]['pktType'],self.file_list[Lid]['startTime'],self.file_list[Lid]['stopTime']])
                         Lid+=1
                     #Add timing checks
-                    self.timing_map[flwID]['Timings']=self.TimingChecksGeneral(flwID,FlowLimit)
+                    self.timing_map[flwID]['Timings']=self.TimingChecksGeneral(flwID,TestCaseConfig.FlowLimit)
 
-                    if self.Product == "C3" or self.mode=='TPT' :
-                        module_path = f"OfflineValidationModules.{self.Product}{self.mode}.V_{self.Certification.replace('.', '_')}.CTSChecks{self.Product}{self.mode}"
+                    if GeneralConfig.Product == Enums.Product.C3 or GeneralConfig.Mode == Enums.Mode.TPT:
+                        module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.V_{GeneralConfig.Certification.replace('.', '_')}.CTSChecks{GeneralConfig.Product}{GeneralConfig.Mode}"
                         try:spec = importlib.util.find_spec(module_path)
                         except ModuleNotFoundError : spec= None
                         if spec is not None:
                             module = importlib.import_module(module_path)
-                            CTSChecks= getattr(module, f"CTSChecks_{self.Product}{self.mode}")
+                            CTSChecks= getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")
                         else:
-                            module_path = f"OfflineValidationModules.{self.Product}{self.mode}.Backward.CTSChecks{self.Product}{self.mode}"
+                            module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.Backward.CTSChecks{GeneralConfig.Product}{GeneralConfig.Mode}"
                             module = importlib.import_module(module_path)
-                            CTSChecks = getattr(module, f"CTSChecks_{self.Product}{self.mode}")
-                        self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=self.BackupJson,ProjectJson=self.ProjectJson)
-                        self.timing_map[flwID]['Measures']= self.MeasuresCheck(flwID,self.flows)
+                            CTSChecks = getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")
+                        self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=TestCaseConfig.BackupJson,ProjectJson=TestCaseConfig.ProjectJson)
+                        self.timing_map[flwID]['Measures']= self.MeasuresCheck(flwID,TestCaseConfig.Flows)
 
                     else:
-                        if self.mode=="TPR":
+                        if GeneralConfig.Mode == Enums.Mode.TPR:
                             Coil = ""
-                            if self.Header['Coil'] == "TPR#MPP1":
+                            if  TestCaseConfig.Coil == "TPR#MPP1":
                                 Coil = "MPPTPR1"
-                                module_path = f"OfflineValidationModules.{self.Product}{self.mode}.V_{self.Certification.replace('.', '_')}.MPPTPR1"
+                                module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.V_{GeneralConfig.Certification.replace('.', '_')}.MPPTPR1"
                                 try:spec = importlib.util.find_spec(module_path)
                                 except ModuleNotFoundError : spec= None
                                 if spec is not None:
                                     module = importlib.import_module(module_path)
                                     CTSChecks= getattr(module, f"CTSChecks_MPP_TPR1")
                                 else:
-                                    module_path = f"OfflineValidationModules.{self.Product}{self.mode}.Backward.MPPTPR1"
+                                    module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.Backward.MPPTPR1"
                                     module = importlib.import_module(module_path)
                                     CTSChecks = getattr(module, f"CTSChecks_MPP_TPR1")
                                 
-                                # self.CTSChecks_obj1 = CTSChecks_MPP_TPR1(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=self.BackupJson,ProjectJson=self.ProjectJson)
-                                # self.timing_map[flwID]['Measures']= self.CTSChecks_MPPTPR1.MeasuresCheck(flwID,self.flows,self.timing_map)
-                            elif self.Header['Coil'] == "TPR#MPP4" or self.Header['Coil'] == "TPR_MPP4":
+                                # self.CTSChecks_obj1 = CTSChecks_MPP_TPR1(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=TestCaseConfig.BackupJson,ProjectJson=TestCaseConfig.ProjectJson)
+                                # self.timing_map[flwID]['Measures']= self.CTSChecks_MPPTPR1.MeasuresCheck(flwID,TestCaseConfig.Flows,self.timing_map)
+                            elif  TestCaseConfig.Coil == "TPR#MPP4" or  TestCaseConfig.Coil == "TPR_MPP4":
                                 Coil = "MPPTPR4"
-                                module_path = f"OfflineValidationModules.{self.Product}{self.mode}.V_{self.Certification.replace('.', '_')}.MPPTPR4"
+                                module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.V_{GeneralConfig.Certification.replace('.', '_')}.MPPTPR4"
                                 try:spec = importlib.util.find_spec(module_path)
                                 except ModuleNotFoundError : spec= None
                                 if spec is not None:
                                     module = importlib.import_module(module_path)
                                     CTSChecks= getattr(module, f"CTSChecks_MPP_TPR4")
                                 else:
-                                    module_path = f"OfflineValidationModules.{self.Product}{self.mode}.Backward.MPPTPR4"
+                                    module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.Backward.MPPTPR4"
                                     module = importlib.import_module(module_path)
                                     CTSChecks = getattr(module, f"CTSChecks_MPP_TPR4")
                                 
-                            self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=self.BackupJson,ProjectJson=self.ProjectJson)
-                            self.timing_map[flwID]['Measures']= self.MeasuresCheck2(flwID,self.flows,Coil)
+                            self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=self.JapiData,BackupJson=TestCaseConfig.BackupJson,ProjectJson=TestCaseConfig.ProjectJson)
+                            self.timing_map[flwID]['Measures']= self.MeasuresCheck2(flwID,TestCaseConfig.Flows,Coil)
                             # print("Measures:",self.timing_map[flwID]['Measures'])
                        
                         
-                    # if self.TestID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
+                    # if TestCaseConfig.TestcaseID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
                     self.timing_map[flwID]['Others']= self.GeneralCheck(flwID)
-                    # print("Header TC result:",self.Header['TCresult'])
+                    # print("Header TC result:",TestCaseConfig.AutomationResult)
                     # print("Others",self.timing_map[flwID]['Others']["TestIssues_Details"])
-                    if self.Product=='MPP' and self.mode=='TPR':
+                    if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR:
                         for chks in self.timing_map[flwID]['Others']["TestIssues_Details"]:
-                            if "Fail" in chks[1]:
-                                if "Inconclusive" in self.Header['TCresult']:
-                                    self.Header['TCresult']='Inconclusive'
+                            if Enums.TestResult.FAIL in chks[1]:
+                                if Enums.TestResult.INCONCLUSIVE in TestCaseConfig.AutomationResult:
+                                    TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
                                     break
-                                else: self.Header['TCresult']='Fail'
+                                else: TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
                                 
-                            elif "Inconclusive" in chks[1]:
-                                self.Header['TCresult']='Inconclusive'
+                            elif Enums.TestResult.INCONCLUSIVE in chks[1]:
+                                TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
                                 break
                                 
                         
@@ -479,22 +464,22 @@ class TestValidation():
     def MeasuresCheck(self,flwID,flows):
         try:
             AllMeasures={}
-            print(self.Header['TestcaseID'])
-            if self.Header['TestcaseID'] in self.JCTSData[self.Product][self.mode]:
-                if self.Certification in self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']]['Certifications']:
-                    CTSJson=self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']]['CTSChecks']
+            print(TestCaseConfig.TestcaseID)
+            if TestCaseConfig.TestcaseID in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode]:
+                if GeneralConfig.Certification in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID]['Certifications']:
+                    CTSJson=self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID]['CTSChecks']
                     AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)   
                 else:
                     NotalEnabled=False
-                    if self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']][self.Certification].get("Notal",False):
-                        for  Notal in self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']][self.Certification]['Notal']:
+                    if self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][GeneralConfig.Certification].get("Notal",False):
+                        for  Notal in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][GeneralConfig.Certification]['Notal']:
                             if Notal in self.GetNotals():
                                 NotalEnabled=True
-                                CTSJson= self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']][self.Certification]['Notal'][Notal]
+                                CTSJson= self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][GeneralConfig.Certification]['Notal'][Notal]
                                 AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
 
                     if not NotalEnabled:
-                        CTSJson=self.JCTSData[self.Product][self.mode][self.Header['TestcaseID']][self.Certification]['CTS']
+                        CTSJson=self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][GeneralConfig.Certification]['CTS']
                         AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
 
             print('Measures',AllMeasures)
@@ -504,33 +489,33 @@ class TestValidation():
     
 
     def MeasuresCheck2(self,flwID,flows,Coil):
-        # print("Certification:",self.Certification)
-        self.flows = flows
+        # print("Certification:",GeneralConfig.Certification)
+        TestCaseConfig.Flows = flows
         self.AllChannelData = self.PlotMethod.GetAllChannelData('2',self.JapiData)
         try:
             AllMeasures={}
-            print("TestcaseID:",self.Header['TestcaseID'])
-            if self.Header['TestcaseID'] in self.JCTSData[Coil]:
+            print("TestcaseID:",TestCaseConfig.TestcaseID)
+            if TestCaseConfig.TestcaseID in self.JCTSData[Coil]:
                 notal_executed = False
                 # Notal testcases
-                if self.JCTSData[Coil][self.Header['TestcaseID']].get("Notal"):
-                    if self.JCTSData[Coil][self.Header['TestcaseID']]["Notal"].get(self.Certification):
-                        if len(self.JCTSData[Coil][self.Header['TestcaseID']]["Notal"][self.Certification].keys()) >0:
-                            for notal in self.JCTSData[Coil][self.Header['TestcaseID']]["Notal"][self.Certification]:
+                if self.JCTSData[Coil][TestCaseConfig.TestcaseID].get("Notal"):
+                    if self.JCTSData[Coil][TestCaseConfig.TestcaseID]["Notal"].get(GeneralConfig.Certification):
+                        if len(self.JCTSData[Coil][TestCaseConfig.TestcaseID]["Notal"][GeneralConfig.Certification].keys()) >0:
+                            for notal in self.JCTSData[Coil][TestCaseConfig.TestcaseID]["Notal"][GeneralConfig.Certification]:
                                 if notal in self.GetNotals():
-                                    CTSJson= self.JCTSData[Coil][self.Header['TestcaseID']]["Notal"][self.Certification][notal]
+                                    CTSJson= self.JCTSData[Coil][TestCaseConfig.TestcaseID]["Notal"][GeneralConfig.Certification][notal]
                                     AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
                                     notal_executed = True
 
                 # Normal testcases
                 if not notal_executed:
                     
-                    # if self.Certification in self.JCTSData[Coil][self.Header['TestcaseID']]['common']['Certifications']:
-                    #     CTSJson=self.JCTSData[Coil][self.Header['TestcaseID']]['common']['CTSChecks']
+                    # if GeneralConfig.Certification in self.JCTSData[Coil][TestCaseConfig.TestcaseID]['common']['Certifications']:
+                    #     CTSJson=self.JCTSData[Coil][TestCaseConfig.TestcaseID]['common']['CTSChecks']
                     #     AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
                     
-                    # if self.JCTSData[Coil][self.Header['TestcaseID']].get(self.Certification):
-                    #     CTSJson=self.JCTSData[Coil][self.Header['TestcaseID']][self.Certification]
+                    # if self.JCTSData[Coil][TestCaseConfig.TestcaseID].get(GeneralConfig.Certification):
+                    #     CTSJson=self.JCTSData[Coil][TestCaseConfig.TestcaseID][GeneralConfig.Certification]
                     #     common_keys = list(CTSJson.keys())
                     #     CertMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
                     #     AllMeasures.update(CertMeasures)
@@ -539,13 +524,13 @@ class TestValidation():
 
                     
                     common_keys = []
-                    if self.JCTSData[Coil][self.Header['TestcaseID']].get(self.Certification):
-                        CTSJson=self.JCTSData[Coil][self.Header['TestcaseID']][self.Certification]['CTSChecks']
+                    if self.JCTSData[Coil][TestCaseConfig.TestcaseID].get(GeneralConfig.Certification):
+                        CTSJson=self.JCTSData[Coil][TestCaseConfig.TestcaseID][GeneralConfig.Certification]['CTSChecks']
                         common_keys = list(CTSJson.keys())
                         AllMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
 
-                    if self.Certification in self.JCTSData[Coil][self.Header['TestcaseID']]['common']['Certifications']:
-                        CTSJson=self.JCTSData[Coil][self.Header['TestcaseID']]['common']['CTSChecks']
+                    if GeneralConfig.Certification in self.JCTSData[Coil][TestCaseConfig.TestcaseID]['common']['Certifications']:
+                        CTSJson=self.JCTSData[Coil][TestCaseConfig.TestcaseID]['common']['CTSChecks']
                         for key in common_keys:
                             CTSJson.pop(key, None)
                         CertMeasures=self.CTSChecksOBJ.CTSChecks(flwID,flows,CTSJson)
@@ -559,7 +544,7 @@ class TestValidation():
 
     def GetNotals(self):
         Notals=[]
-        Certification= self.Certification if self.Product=='MPP' and self.mode== 'TPR' else str('V_'+self.Certification) 
+        Certification= GeneralConfig.Certification if GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPR else str('V_'+GeneralConfig.Certification) 
         for Notal,value in self.BKjsonData["testBkpProjectConfiguration"]["TesterConfigurationModel"]["notal"].items():
             if value['isActive']:
                 if Certification in value['appModeDescription']:
@@ -569,25 +554,25 @@ class TestValidation():
 
 
     #-apply all timing checks for the received pacekts with all details
-    def TimingChecksGeneral(self,flwID,FlowLimit):
+    def TimingChecksGeneral(self,flwID,TestCaseConfig.FlowLimit):
         # print(self.timing_map[flwID])
         try:
             AllTimings={}
             cnt = 1
             EPP=False
-            for timeChk in self.JTimeData[self.Product][self.mode]:
+            for timeChk in self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode]:
 
-                if self.TestID in self.JTimeData[self.Product][self.mode][timeChk]['skip']:continue
+                if TestCaseConfig.TestcaseID in self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk]['skip']:continue
                 # print(timeChk)
-                timeChkSetup = self.JTimeData[self.Product][self.mode][timeChk]
+                timeChkSetup = self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk]
                 timeChkList = []
-                # print(self.JTimeData[self.Product][self.mode][timeChk][self.TestID])
-                tol = self.JTimeData[self.Product][self.mode][timeChk]['default'] if self.TestID not in self.JTimeData[self.Product][self.mode][timeChk] else self.JTimeData[self.Product][self.mode][timeChk][self.TestID] 
+                # print(self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk][TestCaseConfig.TestcaseID])
+                tol = self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk]['default'] if TestCaseConfig.TestcaseID not in self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk] else self.JTimeData[GeneralConfig.Product][GeneralConfig.Mode][timeChk][TestCaseConfig.TestcaseID] 
                 #Update Tolerence specif to Prodct / mode
-                if timeChk in ['tintervalCE-CE_PT','tintervalCE-CE_CL'] and EPP and not self.Product=="C3" and not self.mode=="TPR": tol=[0,700]
-                if timeChk in ['treceviedRP8-RP8'] and self.Product=="C3" and self.mode=="TPR":
-                    if self.Header['Coil']=="TPR#5":tol=[3900,5]
-                    elif  self.Header['Coil']=="TPR#6":tol=[2000,5]
+                if timeChk in ['tintervalCE-CE_PT','tintervalCE-CE_CL'] and EPP and GeneralConfig.Product != Enums.Product.C3 and GeneralConfig.Mode != Enums.Mode.TPR: tol=[0,700]
+                if timeChk in ['treceviedRP8-RP8'] and GeneralConfig.Product == Enums.Product.C3 and GeneralConfig.Mode == Enums.Mode.TPR:
+                    if  TestCaseConfig.Coil=="TPR#5":tol=[3900,5]
+                    elif   TestCaseConfig.Coil=="TPR#6":tol=[2000,5]
                 # print(tol)
                 AllTimings[f'{timeChk}_exp'] = str(tol[0]-tol[1])+'-'+str(tol[0]+tol[1]) if tol[0]!=0 else str(tol[0])+'-'+str(tol[1])
                 AllTimings[f'{timeChk}_res']='NA'
@@ -599,7 +584,7 @@ class TestValidation():
                 #Checks timing btw any two packets______________________________________________________________________________________________________________________________
                 # if timeChk in ['twake',"tintervalCNF-XCE",'tintervalCFG-CE',"tintervalSRQ/EN-CE"]:
                 # if timeChk in ['twake',"tintervalSRQ/EN-CE"]:
-                valid_list = (['twake', 'tintervalSRQ/EN-CE']if self.Product == 'MPP' else ['twake', 'tintervalCNF-XCE', 'tintervalCFG-CE', 'tintervalSRQ/EN-CE'])
+                valid_list = (['twake', 'tintervalSRQ/EN-CE'] if GeneralConfig.Product == Enums.Product.MPP else ['twake', 'tintervalCNF-XCE', 'tintervalCFG-CE', 'tintervalSRQ/EN-CE'])
                 if timeChk in valid_list:
                     StartPhase=timeChkSetup['PhasePkts']['Start']['Phase']
                     EndPhase=timeChkSetup['PhasePkts']['End']['Phase']
@@ -614,19 +599,19 @@ class TestValidation():
                                 AllTimings[timeChk] = str(round((self.timing_map[flwID][EndPhase][EndPacket][0][0][2] - self.timing_map[flwID][StartPhase][StartPacket][0 if timeChk=="tintervalCFG-CE" else len(self.timing_map[flwID][StartPhase][StartPacket])-1][0][2])*1000,2)+timeChkSetup['Preamble'])
                                 AllTimings[f'{timeChk}_remark']=f'Measured {timeChk} is {AllTimings[timeChk]} ms, between {StartPacket} @{self.timing_map[flwID][StartPhase][StartPacket][len(self.timing_map[flwID][StartPhase][StartPacket])-1][0][0]} to {EndPacket} @{self.timing_map[flwID][EndPhase][EndPacket][0][0][0]} + {timeChkSetup['Preamble']}.'
                                 res= float(AllTimings[timeChk]) >= tol[0]-tol[1]-0.1 and float(AllTimings[timeChk]) <= tol[0]+tol[1]+0.1 if tol[0]!=0 else float(AllTimings[timeChk]) >= tol[0] and float(AllTimings[timeChk]) <= tol[1]+0.1 #0.1 is tolerance
-                                AllTimings[f'{timeChk}_Details'].append([f"{AllTimings[f'{timeChk}_remark']} The measured value is {'' if res else 'not'} in limit:{AllTimings[f'{timeChk}_exp']} ms.","Pass" if res else 'Fail'])
-                        else:AllTimings[f'{timeChk}_Details'].append([f'All required packets not found to perform the {timeChk}',"Fail"])
-                    else:AllTimings[f'{timeChk}_Details'].append([f'All required packets not found to perform the {timeChk}',"Fail"])
+                                AllTimings[f'{timeChk}_Details'].append([f"{AllTimings[f'{timeChk}_remark']} The measured value is {'' if res else 'not'} in limit:{AllTimings[f'{timeChk}_exp']} ms.",Enums.TestResult.PASS if res else Enums.TestResult.FAIL])
+                        else:AllTimings[f'{timeChk}_Details'].append([f'All required packets not found to perform the {timeChk}',Enums.TestResult.FAIL])
+                    else:AllTimings[f'{timeChk}_Details'].append([f'All required packets not found to perform the {timeChk}',Enums.TestResult.FAIL])
                 #check for timings btw all packets for mentioned phases_____________________________________________________________________________________________________
                
                 elif timeChk in ["tstart","tsilent"]:
 
                     Limits=str(tol[0]-tol[1])+'-'+str(tol[0]+tol[1])
-                    if timeChk=='tsilent' and self.mode=='TPT': Limits= f'GTE {tol[1]}'
+                    if timeChk=='tsilent' and GeneralConfig.Mode == Enums.Mode.TPT: Limits= f'GTE {tol[1]}'
                    
-                    id=FlowLimit[0]
+                    id=TestCaseConfig.FlowLimit[0]
                     Pktslist =[]
-                    while id < FlowLimit[1]:
+                    while id < TestCaseConfig.FlowLimit[1]:
                         if not self.file_list[id]['isFWTestermessage']:
                             if self.file_list[id]['description'] not in ['Ping','ID&CFG'] or self.PktMethod.GetPacketType(id)=="Response":break
                             if self.file_list[id]['description'] in ['Ping','ID&CFG']:
@@ -638,17 +623,17 @@ class TestValidation():
                         while id < len(Pktslist)-1:
                             res = round((Pktslist[id+1][2]-Pktslist[id][3])*1000,1)+float(timeChkSetup['Preamble'])
                             timeChkList.append(res)
-                            if (res < tol[0]-tol[1] or res >tol[0]+tol[1]) if tol[0]!=0 else res < tol[1] if self.mode=='TPT'and timeChk=='tsilent'else res > tol[1]:
-                                AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is not in limit: {Limits}ms.","Fail"])
+                            if (res < tol[0]-tol[1] or res >tol[0]+tol[1]) if tol[0]!=0 else res < tol[1] if GeneralConfig.Mode == Enums.Mode.TPT and timeChk=='tsilent' else res > tol[1]:
+                                AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is not in limit: {Limits}ms.",Enums.TestResult.FAIL])
                             else:
-                                AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is in limit: {Limits}ms.","Pass"])
+                                AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is in limit: {Limits}ms.",Enums.TestResult.PASS])
                             id+=1
                         AllTimings[timeChk]=';'.join(map(str,timeChkList))
 
                 #check timings btw packet and which has response_____________________________________________________________________________________________________
                 elif timeChk in ["tresponse","tresponseAuth","tresponseCNF"]:
                     # print(timeChk)
-                    if self.TestID not in ["MPP_PTX_POW_LEGACY_PRX_P1","MPP_PTX_POW_LEGACY_PRX_P2"]:
+                    if TestCaseConfig.TestcaseID not in ["MPP_PTX_POW_LEGACY_PRX_P1","MPP_PTX_POW_LEGACY_PRX_P2"]:
                         for phase in self.timing_map[flwID]:
                             if phase not in ['General','Loads']:
                                 for pkts in self.timing_map[flwID][phase]:
@@ -668,9 +653,9 @@ class TestValidation():
                                                         res = round((pks[1][2] - pks[0][3])*1000,1)
                                                         timeChkList.append(res)
                                                         if (res < tol[0]-tol[1] or res >tol[0]+tol[1]) if tol[0]!=0 else res > tol[1]:
-                                                            AllTimings[f'{timeChk}_Details'].append([f"Measured tresponse {res} Not in Limit({(tol[0]-tol[1])}-{(tol[0]+tol[1])}) @index:{pks[1][0]}","Fail"])
+                                                            AllTimings[f'{timeChk}_Details'].append([f"Measured tresponse {res} Not in Limit({(tol[0]-tol[1])}-{(tol[0]+tol[1])}) @index:{pks[1][0]}",Enums.TestResult.FAIL])
                                                         else:
-                                                            AllTimings[f'{timeChk}_Details'].append([f"Measured tresponse {res} in Limit({(tol[0]-tol[1])}-{(tol[0]+tol[1])}) @index:{pks[1][0]}","Pass"])
+                                                            AllTimings[f'{timeChk}_Details'].append([f"Measured tresponse {res} in Limit({(tol[0]-tol[1])}-{(tol[0]+tol[1])}) @index:{pks[1][0]}",Enums.TestResult.PASS])
                     AllTimings[timeChk]=';'.join(map(str,timeChkList)) if len(timeChkList)>0  else 'NA'
                     AllTimings[f'{timeChk}_exp'] = str(round(tol[0]-tol[1],2))+'-'+str(round(tol[0]+tol[1],2)) if tol[0]!=0 else str(tol[0])+'-'+str(tol[1])
                     #Keep only failures in sunchecks to save space
@@ -694,7 +679,7 @@ class TestValidation():
                     if len(Pktslist)>0:
                         id = 0
                         # end = len(Pktslist)-1
-                        if self.TestID in ["MPP_PTX_POW_OVP_FAST_RECOVERY_TC_1","MPP_PTX_POW_OVP_FAST_RECOVERY_TC_2"]:
+                        if TestCaseConfig.TestcaseID in ["MPP_PTX_POW_OVP_FAST_RECOVERY_TC_1","MPP_PTX_POW_OVP_FAST_RECOVERY_TC_2"]:
                             end = self.PktMethod.GetPacketDetails(packet=f"Set_Load 400mA",limit=[0,len(self.file_list)-1],Type="TesterMsg")[2]
                         else: end = Pktslist[-1][0] #len(Pktslist)-1
 
@@ -717,10 +702,10 @@ class TestValidation():
                                     timeChkList.append(res)
                                     if (res < tol[0]-tol[1] or res >tol[0]+tol[1]) if tol[0]!=0 else res > tol[1]:
                                         # FalsetimeChk.append('Fail')
-                                        AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is not in limit: {AllTimings[f'{timeChk}_exp']} ms.","Fail"])
+                                        AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is not in limit: {AllTimings[f'{timeChk}_exp']} ms.",Enums.TestResult.FAIL])
                                     else:
                                         # FalsetimeChk.append('Pass')
-                                        AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is in limit: {AllTimings[f'{timeChk}_exp']} ms.","Pass"])
+                                        AllTimings[f'{timeChk}_Details'].append([f"Measured {timeChk}={res} between {self.file_list[Pktslist[id][0]]['pktType']}_{self.file_list[Pktslist[id][0]]['value']} at index {Pktslist[id][0]} and {self.file_list[Pktslist[id+1][0]]['pktType']}_{self.file_list[Pktslist[id+1][0]]['value']} at index {Pktslist[id+1][0]} is in limit: {AllTimings[f'{timeChk}_exp']} ms.",Enums.TestResult.PASS])
                                 id+=1
                             else: break
 
@@ -733,13 +718,13 @@ class TestValidation():
                         # AllTimings[f'{timeChk}_allres'] = ';'.join(FalsetimeChk)
                 # #Add the final results
                 if len(AllTimings[f'{timeChk}_Details'])>0:
-                    AllTimings[f'{timeChk}_res']='Fail' if 'Fail' in [item[1] for item in AllTimings[f'{timeChk}_Details']] else 'Pass'
+                    AllTimings[f'{timeChk}_res']=Enums.TestResult.FAIL if Enums.TestResult.FAIL in [item[1] for item in AllTimings[f'{timeChk}_Details']] else Enums.TestResult.PASS
                     #compress subchecks to keep only pass
                     if timeChk in ['tresponse',"tresponseAuth","treceviedPLA-PLA",'tintervalXCE-XCE','tintervalCE-CE',"tintervalCE-CE_CL","tintervalCE-CE_PT","treceviedRPM1-RPM1","treceviedRPM2-RPM2","treceviedRPM0-RPM0","treceviedRP8-RP8"]:
                         subck = []
                         for chk in AllTimings[f'{timeChk}_Details']:
-                            if chk[1] == "Fail":subck.append(chk)
-                        AllTimings[f'{timeChk}_Details']=subck if len(subck)>0 else [[f"All the measured {timeChk} are within the Limit: {AllTimings[f'{timeChk}_exp']} mS","Pass"]]
+                            if chk[1] == Enums.TestResult.FAIL:subck.append(chk)
+                        AllTimings[f'{timeChk}_Details']=subck if len(subck)>0 else [[f"All the measured {timeChk} are within the Limit: {AllTimings[f'{timeChk}_exp']} mS",Enums.TestResult.PASS]]
                     cnt+=1
         except Exception as e:
             traceback.print_exc()
@@ -751,11 +736,11 @@ class TestValidation():
         try:
             GeneralCheck={}
             seqcnt = 1
-            for GenCheck in self.JGenCheckData[self.Product][self.mode]:
-                if self.Header['TestcaseName'] not in self.JGenCheckData[self.Product][self.mode][GenCheck]['ExemeptedTC']:
-                    if flwID in self.JGenCheckData[self.Product][self.mode][GenCheck]['Default']['flow']:
-                        exp = self.JGenCheckData[self.Product][self.mode][GenCheck]['Default']['expected']
-                        Flow_limit = self.flows[flwID]['Limit']
+            for GenCheck in self.JGenCheckData[GeneralConfig.Product][GeneralConfig.Mode]:
+                if TestCaseConfig.TestcaseName not in self.JGenCheckData[GeneralConfig.Product][GeneralConfig.Mode][GenCheck]['ExemeptedTC']:
+                    if flwID in self.JGenCheckData[GeneralConfig.Product][GeneralConfig.Mode][GenCheck]['Default']['flow']:
+                        exp = self.JGenCheckData[GeneralConfig.Product][GeneralConfig.Mode][GenCheck]['Default']['expected']
+                        Flow_limit = TestCaseConfig.Flows[flwID]['Limit']
                         if GenCheck in ['F1-Fq','F2-Fq']:
                             GeneralCheck[f'{GenCheck}_exp'] = str(exp[0])+'-'+str(exp[1])+' kHz'
                             GeneralCheck[f'{GenCheck}_res'] ='NA'
@@ -766,9 +751,9 @@ class TestValidation():
                                 res = GeneralMethods.GetFloatFromStr(self.timing_map[flwID]['General']['FOP'][1])
                                 GeneralCheck[GenCheck] = res[0]
                                 if GeneralCheck[GenCheck] >= exp[0] and GeneralCheck[GenCheck] <= exp[1]:
-                                    GeneralCheck[f'{GenCheck}_Details'].append([f"The measured FOP is {GeneralCheck[GenCheck]} kHz at {round(self.timing_map[flwID]['General']['FOP'][2],3)}sec, Limit: [{exp[0]} - {exp[1]}] kHz","Pass"])
-                                else:GeneralCheck[f'{GenCheck}_Details'].append([f"The measured FOP is {GeneralCheck[GenCheck]} kHz at {round(self.timing_map[flwID]['General']['FOP'][2],3)}sec, Limit: [{exp[0]} - {exp[1]}] kHz","Fail"])
-                            else:GeneralCheck[f'{GenCheck}_Details'].append([f"FOP packet not found","Fail"])
+                                    GeneralCheck[f'{GenCheck}_Details'].append([f"The measured FOP is {GeneralCheck[GenCheck]} kHz at {round(self.timing_map[flwID]['General']['FOP'][2],3)}sec, Limit: [{exp[0]} - {exp[1]}] kHz",Enums.TestResult.PASS])
+                                else:GeneralCheck[f'{GenCheck}_Details'].append([f"The measured FOP is {GeneralCheck[GenCheck]} kHz at {round(self.timing_map[flwID]['General']['FOP'][2],3)}sec, Limit: [{exp[0]} - {exp[1]}] kHz",Enums.TestResult.FAIL])
+                            else:GeneralCheck[f'{GenCheck}_Details'].append([f"FOP packet not found",Enums.TestResult.FAIL])
                         elif GenCheck in ['ReserveBitChek']:
                             res =[]
                             val = []
@@ -781,8 +766,8 @@ class TestValidation():
                                             if 'Reserved' in d2['sDecodedValue']:
                                                 val.append(d2['sRawData'])
                                                 if d2['sRawData'] != exp:
-                                                    res.append([str(self.file_list[id]['pktType'])+'@index='+str(id)+':'+str(d2['sDecodedValue'])+str(d2['sRawData']),"Fail"])
-                                                else:res.append([str(self.file_list[id]['pktType'])+'@index='+str(id)+':'+str(d2['sDecodedValue'])+str(d2['sRawData']),"Pass"])
+                                                    res.append([str(self.file_list[id]['pktType'])+'@index='+str(id)+':'+str(d2['sDecodedValue'])+str(d2['sRawData']),Enums.TestResult.FAIL])
+                                                else:res.append([str(self.file_list[id]['pktType'])+'@index='+str(id)+':'+str(d2['sDecodedValue'])+str(d2['sRawData']),Enums.TestResult.PASS])
                                 id+=1
                             GeneralCheck[f'{GenCheck}_SEQ'] =seqcnt
                             GeneralCheck['ReserveBitChek']=','.join(val) #if len(val)>0 else 'No Mismatch'
@@ -796,16 +781,16 @@ class TestValidation():
                             GeneralCheck[f'{GenCheck}_SEQ'] = seqcnt
                             if len(self.TCRemarks)>0:
                                 GeneralCheck[f'{GenCheck}_Details'] = self.TCRemarks
-                            else:GeneralCheck[f'{GenCheck}_Details']=[["The received packet sequence was proper","Pass"]]
+                            else:GeneralCheck[f'{GenCheck}_Details']=[["The received packet sequence was proper",Enums.TestResult.PASS]]
                         #Add the final results
                         if len(GeneralCheck[f'{GenCheck}_Details'])>0:
-                            GeneralCheck[f'{GenCheck}_res']='Fail' if 'Fail' in [item[1] for item in GeneralCheck[f'{GenCheck}_Details']] else 'Pass'
+                            GeneralCheck[f'{GenCheck}_res']=Enums.TestResult.FAIL if Enums.TestResult.FAIL in [item[1] for item in GeneralCheck[f'{GenCheck}_Details']] else Enums.TestResult.PASS
                             #compress subchecks to keep only pass
                             if GenCheck in ['ReserveBitChek']:
                                 subck = []
                                 for chk in GeneralCheck[f'{GenCheck}_Details']:
-                                    if chk[1] == "Fail":subck.append(chk)
-                                GeneralCheck[f'{GenCheck}_Details']=subck if len(subck)>0 else [["All the received Reserved bit values are proper","Pass"]]
+                                    if chk[1] == Enums.TestResult.FAIL:subck.append(chk)
+                                GeneralCheck[f'{GenCheck}_Details']=subck if len(subck)>0 else [["All the received Reserved bit values are proper",Enums.TestResult.PASS]]
                             seqcnt+=1
             # print(GeneralCheck)
             return GeneralCheck
@@ -816,16 +801,16 @@ class TestValidation():
     def PayLoadCheck(self,flwID):
         try:
             
-            if self.Header['UID'] not in self.GeneralChecks:self.GeneralChecks[self.Header['UID']]={}
-            if self.Header['TestcaseName'] not in self.GeneralChecks[self.Header['UID']]:self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']]={}
-            if flwID not in self.GeneralChecks:self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID]={}
-            FlowLimit = self.flows[flwID]['Limit']
-            id = FlowLimit[0]
-            while id < FlowLimit[1]:
+            if TestCaseConfig.UID not in self.GeneralChecks:self.GeneralChecks[TestCaseConfig.UID]={}
+            if TestCaseConfig.TestcaseName not in self.GeneralChecks[TestCaseConfig.UID]:self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName]={}
+            if flwID not in self.GeneralChecks:self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID]={}
+            TestCaseConfig.FlowLimit = TestCaseConfig.Flows[flwID]['Limit']
+            id = TestCaseConfig.FlowLimit[0]
+            while id < TestCaseConfig.FlowLimit[1]:
                 Type=self.PktMethod.GetPacketType(id)
                 if Type in ['Packet', 'Response']:
                     phase = 'General' if self.file_list[id]['description']=='' else self.file_list[id]['description']
-                    if phase not in self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID]:self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase]={}
+                    if phase not in self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID]:self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase]={}
                     # print(phase)
                     packet =  self.file_list[id]['pktType']
                     if packet in["Get Request","General Request","DSR"]:packet+=" "+self.file_list[id]['value'].replace('{','').replace('}','')
@@ -836,20 +821,20 @@ class TestValidation():
                     try:
                         
                         #     print("packet:",packet)
-                        if f'{packet} @{Type}' not in self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase]:
-                            self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']={}
-                            if 'PayLoadCheck' not  in self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']:
-                                self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['PayLoadCheck']=[]
+                        if f'{packet} @{Type}' not in self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase]:
+                            self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']={}
+                            if 'PayLoadCheck' not  in self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']:
+                                self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']['PayLoadCheck']=[]
                                 try:
-                                    if len(self.JPayLoadCheckData[self.Product][self.mode][str(flwID)][phase][f'{packet} @{Type}']['PayLoadCheck']) > 0:
-                                        for PacketDetails in self.JPayLoadCheckData[self.Product][self.mode][str(flwID)][phase][f'{packet} @{Type}']['PayLoadCheck']:
+                                    if len(self.JPayLoadCheckData[GeneralConfig.Product][GeneralConfig.Mode][str(flwID)][phase][f'{packet} @{Type}']['PayLoadCheck']) > 0:
+                                        for PacketDetails in self.JPayLoadCheckData[GeneralConfig.Product][GeneralConfig.Mode][str(flwID)][phase][f'{packet} @{Type}']['PayLoadCheck']:
                                             # print("Name:",PacketDetails['Name'])
                                             expected = PacketDetails.get("Exp", []) 
                                             comp=PacketDetails.get("comp", "EQL")
                                             CompType=PacketDetails.get("Type", "DEC")
                                             count=0
                                             while count < len(PacketDetails['ExemeptedTC']):
-                                                if self.Header['TestcaseID'] in PacketDetails['ExemeptedTC'][count]['TestCase']:
+                                                if TestCaseConfig.TestcaseID in PacketDetails['ExemeptedTC'][count]['TestCase']:
                                                     expected=PacketDetails['ExemeptedTC'][count].get('Exp',[])
                                                     comp=PacketDetails['ExemeptedTC'][count].get("comp", "EQL")
                                                     CompType=PacketDetails['ExemeptedTC'][count].get("Type", "DEC")
@@ -876,29 +861,29 @@ class TestValidation():
                                                     elif comp in ['ANY']: Expected =f'Should be any value'
                                                     else:Expected=actual_val
                                                     # Expected=f'Should be in {expected}' if status=='FAIL' or PacketDetails.get("comp", "EQL") in ["BTW","IN","ANY"] else actual_val
-                                                    self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['PayLoadCheck'].append({'CheckName': PacketDetails.get("Name"), 'Byte': PacketDetails.get("Byte"),'Bit': PacketDetails.get("Bit"),'Expected': {Expected},'Received': actual_val,'Result': status })
-                                                    self.SQLConn.ExecutebyQuery("INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.Header['UID'], flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, PacketDetails.get('Name'), PacketDetails.get('Byte'), PacketDetails.get('Bit'), str(Expected), actual_val, status, None))
-                                    else: self.SQLConn.ExecutebyQuery( "INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (self.Header['UID'], flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, '--', '--', '--', '--', '--', '--', None))
+                                                    self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']['PayLoadCheck'].append({'CheckName': PacketDetails.get("Name"), 'Byte': PacketDetails.get("Byte"),'Bit': PacketDetails.get("Bit"),'Expected': {Expected},'Received': actual_val,'Result': status })
+                                                    self.SQLConn.ExecutebyQuery("INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (TestCaseConfig.UID, flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, PacketDetails.get('Name'), PacketDetails.get('Byte'), PacketDetails.get('Bit'), str(Expected), actual_val, status, None))
+                                    else: self.SQLConn.ExecutebyQuery( "INSERT INTO PayLoadDetails (UID, SEQID, Type, Phase, PacketID, Packet, HeaderName, CheckName, Byte, Bit, ExpValue, RecValue, ChecksResult, HeaderResult) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (TestCaseConfig.UID, flwID, 'PayLoad', phase, id, f"{packet} @{Type}", None, '--', '--', '--', '--', '--', '--', None))
                                 except Exception as e: e
                                     # print("PayLoadCheck",e)
                                 
-                            if 'HeaderCheck' not in self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']:
-                                self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['HeaderCheck']=[]
+                            if 'HeaderCheck' not in self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']:
+                                self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']['HeaderCheck']=[]
                                 try:
                                     headers = self.file_list[id].get('header_Payload', {})
                                     ReceivedHeader=headers.get('sFieldType', None)
                                     if ReceivedHeader is not None:
-                                        HeaderName=self.JPayLoadCheckData[self.Product][self.mode][str(flwID)][phase][f'{packet} @{Type}']['HeaderCheck'][0]['HeaderName']
+                                        HeaderName=self.JPayLoadCheckData[GeneralConfig.Product][GeneralConfig.Mode][str(flwID)][phase][f'{packet} @{Type}']['HeaderCheck'][0]['HeaderName']
                                         
-                                        if f'{packet} @{Type}' in ["ACK @Response" ,"ATN @Response","NAK @Response","ND @Response", "MPP ACK @Response","MPP:ACK @Response"] and self.Product=='MPP' and self.mode =='TPT':
+                                        if f'{packet} @{Type}' in ["ACK @Response" ,"ATN @Response","NAK @Response","ND @Response", "MPP ACK @Response","MPP:ACK @Response"] and GeneralConfig.Product == Enums.Product.MPP and GeneralConfig.Mode == Enums.Mode.TPT:
                                             ReceivedHeader=ReceivedHeader.split(':')[1].split()[-1]
                                         else:ReceivedHeader=ReceivedHeader.split(':')[1].split()[0]
                                         if HeaderName==ReceivedHeader: status = "PASS" 
                                         else: status="FAIL"
-                                        self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['HeaderCheck'].append({'HeaderName': HeaderName,'Result': status })
-                                    if  self.GeneralChecks[self.Header['UID']][self.Header['TestcaseName']][flwID][phase][f'{packet} @{Type}']['HeaderCheck'][0]['Result']=='PASS':
-                                        self.SQLConn.ExecutebyQuery("UPDATE PayLoadDetails SET HeaderResult = ?, HeaderName = ? ""WHERE UID = ? AND SEQID = ? AND Type = 'PayLoad' AND Phase = ? " "AND PacketID = ? AND Packet = ?", ('PASS', HeaderName, self.Header['UID'], flwID, phase, id, f"{packet} @{Type}"))
-                                    else: self.SQLConn.ExecutebyQuery( "UPDATE PayLoadDetails SET HeaderResult = ?, HeaderName = ? " " WHERE UID = ? AND SEQID = ? AND Type = 'PayLoad' AND Phase = ? " "AND PacketID = ? AND Packet = ?",('FAIL', HeaderName, self.Header['UID'], flwID, phase, id, f"{packet} @{Type}"))
+                                        self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']['HeaderCheck'].append({'HeaderName': HeaderName,'Result': status })
+                                    if  self.GeneralChecks[TestCaseConfig.UID][TestCaseConfig.TestcaseName][flwID][phase][f'{packet} @{Type}']['HeaderCheck'][0]['Result']=='PASS':
+                                        self.SQLConn.ExecutebyQuery("UPDATE PayLoadDetails SET HeaderResult = ?, HeaderName = ? ""WHERE UID = ? AND SEQID = ? AND Type = 'PayLoad' AND Phase = ? " "AND PacketID = ? AND Packet = ?", ('PASS', HeaderName, TestCaseConfig.UID, flwID, phase, id, f"{packet} @{Type}"))
+                                    else: self.SQLConn.ExecutebyQuery( "UPDATE PayLoadDetails SET HeaderResult = ?, HeaderName = ? " " WHERE UID = ? AND SEQID = ? AND Type = 'PayLoad' AND Phase = ? " "AND PacketID = ? AND Packet = ?",('FAIL', HeaderName, TestCaseConfig.UID, flwID, phase, id, f"{packet} @{Type}"))
                                 except Exception as e:e
                                     # print("PayLoadCheck",e)         
                     except Exception as e:e
@@ -918,9 +903,9 @@ class TestValidation():
 ###Support Functions ####################################################################################################################
     #-Get Run time of the testcase, returns start time and end in nanoseconds,
     def GetRunTime(self):
-        TcStartAPI = APIOperations(url=self.JapiData[self.Product][self.mode]['GetWaveformStartTime'],retype='json')
+        TcStartAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStartTime'],retype='json')
         TCstartTime = TcStartAPI.GetRequest()
-        TcStopAPI = APIOperations(url=self.JapiData[self.Product][self.mode]['GetWaveformStopTime'],retype='json')
+        TcStopAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStopTime'],retype='json')
         TCstopTime = TcStopAPI.GetRequest()
         return[TCstartTime,TCstopTime/100000000]
     #-Create log releated to a testcase validation steps. update same into debug logfile
@@ -930,8 +915,10 @@ class TestValidation():
         self.TClogs.append([str(dt_object),logtype,log])
  
     #- Get software side high level results
-    def GetJSONTCData(self,TestID,BackupJson,retunData):
+    def GetJSONTCData(self,TestID=None,BackupJson=None,retunData=""):
         try:
+            if BackupJson is None: BackupJson = TestCaseConfig.BackupJson
+            if TestID is None: TestID = TestCaseConfig.TestcaseID
             BKjson = JsonOperations(BackupJson)
             BKjsonData = BKjson.read_file()
             for TCdata in BKjsonData['testBkpTestResultsandPath']:
@@ -962,10 +949,10 @@ class TestValidation():
             traceback.print_exc()
     #- General method to retun values from backupjson file for a testcase.
     def GetTCValuesfromBackUpJSON(self,KeyToFind="_testID"):
-        BKjson = JsonOperations(self.BackupJson)
+        BKjson = JsonOperations(TestCaseConfig.BackupJson)
         self.BKjsonData = BKjson.read_file()
         for TCdata in self.BKjsonData['testBkpTestResultsandPath']:
-            if TCdata['testcaseDetails']['m_DisplayName'] == self.TestCaseName:
+            if TCdata['testcaseDetails']['m_DisplayName'] ==  TestCaseConfig.TestcaseName:
                 res = self.GetValuefromKey(TCdata,KeyToFind)
                 return res
     #Get value from matching key of dict
@@ -1016,10 +1003,10 @@ class TestValidation():
     #- Find the Testcase index in group TC mode
     def GetTCindexfromGroupRun(self):
         
-        JBkup = JsonOperations(self.BackupJson)
+        JBkup = JsonOperations(TestCaseConfig.BackupJson)
         JBkupData =JBkup.read_file()
         # For the Loaded Trace File, get the TcId's  through API 
-        SWResult = APIOperations(url=self.JapiData[self.Product][self.mode]['GetWaveFormTestResult'],retype='json')
+        SWResult = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveFormTestResult'],retype='json')
         SwResultJson = SWResult.GetRequest()
         mTestId=[]
         for data in SwResultJson[0].get("children",[]):
@@ -1028,7 +1015,7 @@ class TestValidation():
                     if "Couldn't capture test start assertion message" not in sub['displayString']:
                         mTestId.append(sub['testParentId'])  
                     break       
-        if len(self.SubTClist)==len(mTestId): return mTestId.index(self.TestID)   
+        if len(self.SubTClist)==len(mTestId): return mTestId.index(TestCaseConfig.TestcaseID)   
         return 0
 
     

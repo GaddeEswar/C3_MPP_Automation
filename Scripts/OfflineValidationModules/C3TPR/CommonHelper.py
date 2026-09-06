@@ -7,14 +7,15 @@ import csv
 import json
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Enums import Enums
+from Scripts.Enums import Enums
+from Scripts.TestConfigs import *
 
 
 class CommonCTSChecks:
-    def __init__(self,file_list,Header,JapiData,BackupJson,Product,Mode):
+    def __init__(self,file_list,Header,JapiData,BackupJson,Product=None,Mode=None):
         self.file_list=file_list
-        self.Product=Product
-        self.Mode=Mode
+        self.Product = GeneralConfig.Product
+        self.Mode = GeneralConfig.Mode
         self.JapiData = JapiData
         self.Header=Header
         BKjson = JsonOperations(BackupJson)
@@ -23,7 +24,7 @@ class CommonCTSChecks:
         self.PlotMethod = PlotMethods(Header)
         self.TestResultsjson = JsonOperations("json/TestResults.json")
         self.TestData = self.TestResultsjson.read_file()
-        self.AuthPktAPI = APIOperations(url=self.JapiData[self.Product][self.Mode]['Authmeassges'],retype='json')
+        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
 
@@ -101,7 +102,7 @@ class CommonCTSChecks:
             DefaultCheck=False
             while id < self.Flow_limit[1]:
                 if self.PktMethod.GetPacketType(id)=='Packet':
-                    if 'TEST_PTX_CPX_NEG_S07_ABT_002' in self.Header['TestcaseID'] and not DefaultCheck:
+                    if 'TEST_PTX_CPX_NEG_S07_ABT_002' in TestCaseConfig.TestcaseID and not DefaultCheck:
                         if "8 bit Received Power" in self.file_list[id]['pktType']:
                             res.append([f'TPR sent RP8 data packet at index@ {id} by replacing the First CE packet',Enums.TestResult.PASS])
                             count.append(id)
@@ -162,7 +163,7 @@ class CommonCTSChecks:
                     if Check.get('0.5',False):
                         res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is { '' if GPower==NPower+0.5 else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W + 0.5 W',Enums.TestResult.PASS if GPower==NPower+0.5 else Enums.TestResult.INCONCLUSIVE])
                     else:
-                        if 'GPX_002' in self.Header['TestcaseID'] :
+                        if 'GPX_002' in TestCaseConfig.TestcaseID :
                             res.append([f'TPR set Guranteed_Power value to {GPower}_W  in SRQ/GP packet, Expected 3W',Enums.TestResult.PASS if GPower==3 else Enums.TestResult.INCONCLUSIVE])
                         else:
                             res.append([f'TPR set Guranteed_Power value to {GPower}_W , which is {'' if GPower==NPower else 'not'} equal to PT-CAP Negotaible load power ({NPower})_W',Enums.TestResult.PASS if GPower==NPower else Enums.TestResult.INCONCLUSIVE])
@@ -1362,7 +1363,7 @@ class CommonCTSChecks:
                             res.append([f'TPR sent SRQ/rep packet at index@ {{{id}}}',Enums.TestResult.PASS])
                             reping_time=float(self.file_list[id]['value'].split(":")[1].split('Re-Ping value')[1].replace('}',''))/5
 
-                            if 'REP_002' in self.Header['TestcaseID']:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs',Enums.TestResult.PASS if reping_time== 12.4 else Enums.TestResult.INCONCLUSIVE])
+                            if 'REP_002' in TestCaseConfig.TestcaseID:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs',Enums.TestResult.PASS if reping_time== 12.4 else Enums.TestResult.INCONCLUSIVE])
                             else:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs',Enums.TestResult.PASS if reping_time >=0.2 and reping_time <=12.6 else Enums.TestResult.INCONCLUSIVE])
                             break
                         else:
@@ -1392,7 +1393,7 @@ class CommonCTSChecks:
                     else:id+=1
                 
                 # Check Nexping
-                res.extend(self.EPT_Helper(Check,[id,self.Flow_limit[1]],reping_time if 'REP_003' in self.Header['TestcaseID'] else None ))
+                res.extend(self.EPT_Helper(Check,[id,self.Flow_limit[1]],reping_time if 'REP_003' in TestCaseConfig.TestcaseID else None ))
 
             else:res.append([f'TPR did not sent SRQ/en packet', Enums.TestResult.INCONCLUSIVE])
         else:res.append([f'TPR did not sent SRQ/rpr Packet',Enums.TestResult.INCONCLUSIVE])
@@ -1643,7 +1644,7 @@ class CommonCTSChecks:
                 if len(CE60)>2:
                     res.append([f'TPR sent CE {Check['Pkt'][1]} at index@ {CE60[2]}',Enums.TestResult.PASS])
 
-                    if 'Power_Control_21' not in self.Header['TestcaseID']:
+                    if 'Power_Control_21' not in TestCaseConfig.TestcaseID:
                         Voltages=[]
                         for Voltage in Check['Voltages'][0].values():
                             Calvrect = self.CalculateVoltTwindow(CE60[2],self.AllChannelData_Volatge,at=Voltage[1],measure=Voltage[2],winsize=Voltage[0])
@@ -1729,7 +1730,7 @@ class CommonCTSChecks:
                 Prect=round(vrect[0]*(self.CalculateVoltTwindow(CE[2],self.AllChannelData3,at="start",measure="before"))[0],2)
                 res.append([f"Measured regualated Load power is {Prect}W at index@ {CE[2]}", Enums.TestResult.FAIL if Prect < Check['PowerLimit'][1][0] or Prect > Check['PowerLimit'][1][1] else Enums.TestResult.PASS])
                 #Check CE packets and voltage regulation if there is no Load  assertion for Test_ID= "Guaranteed_Load_Power_23d_2"
-            elif self.Header['TestcaseID'] in ['Guaranteed_Load_Power_23d_2']:
+            elif TestCaseConfig.TestcaseID in ['Guaranteed_Load_Power_23d_2']:
                 pkt = self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[Regulated[2]+1,self.Flow_limit[1]])
                 if len(pkt)>2:
                     PktsCountBefore=self.CECount(Limit=[Regulated[2],pkt[2]],value=["+1","0","-1"])
@@ -2099,7 +2100,7 @@ class CommonCTSChecks:
         # if self.Certification not in ["2.2.1","2.2.0","1.3.3","2.1.0"]:
         results=[]
         for TCdata in self.BKjsonData['testBkpTestResultsandPath']:
-            if self.Header['TestcaseID'] in TCdata['testcaseDetails']['m_TestId']:
+            if TestCaseConfig.TestcaseID in TCdata['testcaseDetails']['m_TestId']:
                 if len(TCdata['testinformation']['Measurements'])>1:
                     for measures in TCdata['testinformation']['Measurements']:
                         results.append([measures['MeasurementName'],measures['Value']])
@@ -2343,7 +2344,7 @@ class CommonCTSChecks:
     def T_terminate(self,CTSCheck,Check,flows,flwID):
         res=[]
         self.Flow_limit = flows[flwID]['Limit']
-        Trestart= True if self.Header['TestcaseID'] in ['TEST_PTX_CPX_CFG_S02_ILL_003','TEST_PTX_CPX_CFG_S03_ILL_003','TEST_PTX_CPX_CFG_S04_ILL_003'] and self.Certification not in ["2.2.1","2.1.0","1.3.3","2.0.0"] else self.TrestartBool(Check['pkt'])
+        Trestart= True if TestCaseConfig.TestcaseID in ['TEST_PTX_CPX_CFG_S02_ILL_003','TEST_PTX_CPX_CFG_S03_ILL_003','TEST_PTX_CPX_CFG_S04_ILL_003'] and self.Certification not in ["2.2.1","2.1.0","1.3.3","2.0.0"] else self.TrestartBool(Check['pkt'])
         Packet= f'{Check['pkt'][0] if Check['pkt'][1] is None else Check['pkt'][0]+" "+Check['pkt'][1]}'
         OP= f'{Check['sp'][0] if Check['sp'][1] is None else Check['sp'][0]+" "+Check['sp'][1]}'
         ST= self.PktMethod.GetPacketDetails(packet="Test_Status",value="Execution_Started" ,Type="TesterMsg" ,limit=[0,len(self.file_list)-1])
@@ -2473,18 +2474,18 @@ class CommonCTSChecks:
                 desp=CommonMethods.GetCompDes(Payload['Exp'],Payload['comp'])
                 res.append([f'Obtained {Payload['Name']} is {HexVal if Payload['Name']=='Manufacturer_Code' else int(Val) }, Exp : {desp}',result])
             # Check for Power Transfer Timing
-            PhaseLimit=self.FindPhase(ID[2]+1,"Calib" if 'EPP' in self.Header['TestcaseID']  else 'PT')
+            PhaseLimit=self.FindPhase(ID[2]+1,"Calib" if 'EPP' in TestCaseConfig.TestcaseID  else 'PT')
             if PhaseLimit is not None:
                 Duration= round((self.file_list[self.Flow_limit[1]]['stopTime']-self.file_list[PhaseLimit[0]]['startTime']),3)
-                res.append([f'TPR stayed in Power Transfer phase for {Duration} Secs , Exp :>= 5 secs',Enums.TestResult.INCONCLUSIVE if Duration <5 else Enums.TestResult.PASS if 'EPP' in self.Header['TestcaseID'] else Enums.TestResult.FAIL if Duration  <5 else Enums.TestResult.PASS])
+                res.append([f'TPR stayed in Power Transfer phase for {Duration} Secs , Exp :>= 5 secs',Enums.TestResult.INCONCLUSIVE if Duration <5 else Enums.TestResult.PASS if 'EPP' in TestCaseConfig.TestcaseID else Enums.TestResult.FAIL if Duration  <5 else Enums.TestResult.PASS])
                 # Rp check
-                if 'EPP' in self.Header['TestcaseID'] :
+                if 'EPP' in TestCaseConfig.TestcaseID :
                     RP=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",limit=PhaseLimit)
                     if len(RP)>2:
                         Duration= round((RP[0]-self.file_list[self.Flow_limit[0]]['startTime']),3)
                         res.append([f'TPR sent 16-Bit RP packet at index@ {{{RP[2]}}} within {Duration} Secs from digital ping',Enums.TestResult.FAIL if Duration > 3 else Enums.TestResult.PASS])                      
                     else:res.append([f'TPR did not sent 16-Bit RP packet in PT phase',Enums.TestResult.FAIL])
-            else:res.append(['TPR did not entered Power Transfer phase',Enums.TestResult.INCONCLUSIVE if 'EPP' in self.Header['TestcaseID'] else Enums.TestResult.FAIL])
+            else:res.append(['TPR did not entered Power Transfer phase',Enums.TestResult.INCONCLUSIVE if 'EPP' in TestCaseConfig.TestcaseID else Enums.TestResult.FAIL])
         else:res.append(['Test did not found ID Packet',Enums.TestResult.INCONCLUSIVE])
         return res
 
@@ -2520,7 +2521,7 @@ class CommonCTSChecks:
                         slot_populated=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Populated_Mask')[0]['sRawData']
                         slot_returned=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Returned_Mask')[0]['sRawData']
                         if Check.get('Compare_slots',False):
-                            self.TestData['TestResults'][self.Header['TestcaseID']]=int(slot_populated,16) 
+                            self.TestData['TestResults'][TestCaseConfig.TestcaseID]=int(slot_populated,16) 
                             self.TestResultsjson.update_file(self.TestData)
                             if slot_populated == slot_returned:res.append([f'PTx sent populated mask {slot_populated} matches the returned mask {slot_returned} in the DIGESTS authentication response at {{{Digests[2]}}}', Enums.TestResult.PASS])
                             else:res.append([f' PTx sent both populated mask: {slot_populated} & returned mask: {slot_returned} are not equal in the DIGESTS authentication response at {{{Digests[2]}}}',Enums.TestResult.FAIL])
@@ -2535,7 +2536,7 @@ class CommonCTSChecks:
                         # CTS Pass/ Fail Criteria
                         if Check.get('BytesCheck',False):
                             Bytes=self.BytesCount([Digests[2],Cache_Msg[2]])
-                            if self.Header['TestcaseID'] in ['TEST_PTX_APX_DIG_DRX_001']:
+                            if TestCaseConfig.TestcaseID in ['TEST_PTX_APX_DIG_DRX_001']:
                                 slot_returned=self.PktMethod.GetPayloadDetails(Digests[2],'Slots_Returned_Mask')[0]['sRawData']
                                 res.append([f'Slot returned mask was set to {int(slot_returned,16)}, Exp N=1', Enums.TestResult.PASS if int(slot_returned,16)==1 else Enums.TestResult.FAIL])
                                 res.append([f'Digest Authentication response consists of {Bytes} bytes, Exp: N x 32 +2 Where N={int(slot_returned,16)} ',Enums.TestResult.PASS if Bytes == (int(slot_returned,16)*32 +2) else Enums.TestResult.FAIL])
@@ -2629,7 +2630,7 @@ class CommonCTSChecks:
                 id=0
                 while id < len(self.Auth_file_list):
                     if self.Auth_file_list[id]['pktType']=="CERTIFICATE":
-                        if  self.Header['TestcaseID'] in ['PTX_APX_CONTENT_SUB_REG']:
+                        if  TestCaseConfig.TestcaseID in ['PTX_APX_CONTENT_SUB_REG']:
 
                             Subject_attribute=self.PayloadDetails_Auth(id,'subject_attribute1')
                             if Subject_attribute is not None:
@@ -2649,7 +2650,7 @@ class CommonCTSChecks:
                                     serialnum.append(payloadvalue[0]['sRawData'] if payload['Name'] == 'Extensions_1_extnValue' else payloadvalue[1]['sRawData'])
 
                     id+=1
-                if  self.Header['TestcaseID'] in ['PTX_APX_CONTENT_SUB_REG']:
+                if  TestCaseConfig.TestcaseID in ['PTX_APX_CONTENT_SUB_REG']:
                     for val in AuthDetails:
                         if len(AuthDetails[val])>1:
                             if AuthDetails[val][0]==AuthDetails[val][1]:
@@ -2837,14 +2838,14 @@ class CommonCTSChecks:
                         res.append([f'PTx sent Authentication protocol version in the Certificate authentication response at index@ {{{Certificate[2]}}} is {ProtocolVersion}, Exp :0x01',Enums.TestResult.PASS if ProtocolVersion =='0x01' else Enums.TestResult.FAIL])
                     Challenge_Seq=True
                     
-                    if self.Header['TestcaseID']  in ['PTX_APX_CRT_LEN_001','PTX_APX_CRT_LEN_002','PTX_APX_CRT_LEN_003','PTX_APX_CRT_OFS_001']:
+                    if TestCaseConfig.TestcaseID  in ['PTX_APX_CRT_LEN_001','PTX_APX_CRT_LEN_002','PTX_APX_CRT_LEN_003','PTX_APX_CRT_OFS_001']:
                         Challenge_Seq=False
                         # Validate Certificate Chain Segment Length in certificate response
                         id=0
                         while id < len(self.Auth_file_list):
                             if self.Auth_file_list[id]['pktType']=="CERTIFICATE":break
                             id+=1
-                        if self.Header['TestcaseID']  in ['PTX_APX_CRT_OFS_001']:
+                        if TestCaseConfig.TestcaseID  in ['PTX_APX_CRT_OFS_001']:
                             productCertificate=self.PayloadDetails_Auth(id,"Product_Unit_CA_Certificate")
                             if productCertificate is not None:
                                 res.append([f'Product_Unit_Certificate found in CERTIFICATE response',Enums.TestResult.PASS])
@@ -3044,7 +3045,7 @@ class CommonCTSChecks:
                     Certificate=self.PktMethod.GetPacketDetails(packet="ADT",value='Certificate', Type="Response",limit=[Get_Certificate[2]+1,self.Flow_limit[1]])
                     if len(Certificate)>2:
                         # CTS Pass/ Fail Criteria
-                        if self.Header['TestcaseID']  in ['PTX_APX_TIM_002']:
+                        if TestCaseConfig.TestcaseID  in ['PTX_APX_TIM_002']:
                             res.append([f'PTx sent CERTIFICATE Response  at {{{Certificate[2]}}}',Enums.TestResult.PASS])
                             ATN=self.PktMethod.GetPacketDetails(packet="ATN",Type="Response",limit=[Certificate[2],ADC_End[2]])
                             Timing=round((ATN[0]-ADC_End[1])*1000,2)
@@ -3064,7 +3065,7 @@ class CommonCTSChecks:
                                     Challenge_Auth=self.PktMethod.GetPacketDetails(packet="ADT",value='Challenge_Auth', Type="Response",limit=[ADC_End[2]+1,self.Flow_limit[1]])
                                     if len(Challenge_Auth)>2:
                                         # CTS Pass/ Fail Criteria
-                                        if self.Header['TestcaseID']  in ['PTX_APX_TIM_003']:
+                                        if TestCaseConfig.TestcaseID  in ['PTX_APX_TIM_003']:
                                             res.append([f'PTx sent CHALLENGE_AUTH response at {{{Challenge_Auth[2]}}}',Enums.TestResult.PASS])
                                             ATN=self.PktMethod.GetPacketDetails(packet="ATN",Type="Response",limit=[Challenge_Auth[2],ADC_End[2]])
                                             Timing=round((ATN[0]-ADC_End[1])*1000,2)
@@ -3073,12 +3074,12 @@ class CommonCTSChecks:
                                         if len(Challenge_Msg)>2:
                                             res.append([f'Challenge_Auth message found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
                                         else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.INCONCLUSIVE])
-                                    else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.FAIL if self.Header['TestcaseID']  in ['PTX_APX_TIM_003'] else Enums.TestResult.INCONCLUSIVE ])
+                                    else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.FAIL if TestCaseConfig.TestcaseID  in ['PTX_APX_TIM_003'] else Enums.TestResult.INCONCLUSIVE ])
                                 else:res.append([f'PRx did not sent ADC_End packet after Challenge packet at {{{Challenge[2]}}}',Enums.TestResult.INCONCLUSIVE])
                                
                             else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
                         else:res.append([f'Test did not found Certificate chain valid message', Enums.TestResult.INCONCLUSIVE])
-                    else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.FAIL if self.Header['TestcaseID']  in ['PTX_APX_TIM_002'] else Enums.TestResult.INCONCLUSIVE ])
+                    else:res.append([f'PTx did not sent Certificate_Response', Enums.TestResult.FAIL if TestCaseConfig.TestcaseID  in ['PTX_APX_TIM_002'] else Enums.TestResult.INCONCLUSIVE ])
                 else:res.append([f'PRx did not sent ADC_End packet',Enums.TestResult.INCONCLUSIVE])
             else:res.append([f'TPR did not sent Get_Certificate request',Enums.TestResult.INCONCLUSIVE])
         else:res.append([f'Prx did not entered PT phase', Enums.TestResult.INCONCLUSIVE])
@@ -3394,7 +3395,7 @@ class CommonCTSChecks:
                                 id=Threshold[2]+1
                                 continue
                         Timing=round((NextPing[0]-self.file_list[EPTid]['stopTime'])*1000,3)
-                        unit = f'{round(Timing,3)} mS' if 'RST' in self.Header['TestcaseID'] else f'{round(Timing/1000,3)} Secs'
+                        unit = f'{round(Timing,3)} mS' if 'RST' in TestCaseConfig.TestcaseID else f'{round(Timing/1000,3)} Secs'
                         res.append([f'PTx initiated next ping at {{{NextPing[2]}}}, Measured t_nextping from end of End Power Transfer packet is :{unit}, Limit :{Check['Desc']}', Enums.TestResult.PASS if Timing >= Check['TnextPing'][0] and Timing <=Check['TnextPing'][1] else Enums.TestResult.FAIL])
                         break
                     else:break
@@ -3489,7 +3490,7 @@ class CommonCTSChecks:
                                     Challenge_Msg=self.PktMethod.GetPacketDetails(packet="Challenge_Auth",value="-Valid",Type='TesterMsg',limit=[Challenge_Auth[2]+1,Limit[1]])
                                     if len(Challenge_Msg)>2:
                                         res.append([f'Challenge_Auth found at {{{Challenge_Msg[2]}}}',Enums.TestResult.PASS])
-                                    else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.FAIL if self.Header['TestcaseID'] in ['TEST_PTX_APX_CHA_NDS_001'] else Enums.TestResult.INCONCLUSIVE])
+                                    else:res.append([f'Test did not found Challenge valid message', Enums.TestResult.FAIL if TestCaseConfig.TestcaseID in ['TEST_PTX_APX_CHA_NDS_001'] else Enums.TestResult.INCONCLUSIVE])
                                 else:res.append([f'PTx did not sent Challenge_Auth response', Enums.TestResult.INCONCLUSIVE])
                             else:res.append([f'TPR did not sent Challenge_Request',Enums.TestResult.INCONCLUSIVE])
                         else:res.append([f'Test did not found CERT_chain valid message', Enums.TestResult.INCONCLUSIVE])
@@ -3514,10 +3515,10 @@ class CommonCTSChecks:
                     ErrorCode=self.GetAuthPayloadDetails(id,"Error_Code","B1","[7:0]")[0]['sRawData']
                     ErrorData=self.GetAuthPayloadDetails(id,"Error_Data","B1","[7:0]")[0]['sRawData']
                     if ErrorCode and ErrorData is not None: 
-                        if 'UPE' in self.Header['TestcaseID']:
+                        if 'UPE' in TestCaseConfig.TestcaseID:
                             res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 2 , Error data as {int(ErrorData,16)} -- Exp : 1 in the Error_response' , Enums.TestResult.PASS if int(ErrorCode,16) ==2 and int(ErrorData,16)==1 else Enums.TestResult.FAIL])
                         else:
-                            if 'IRE_001' in self.Header['TestcaseID']:
+                            if 'IRE_001' in TestCaseConfig.TestcaseID:
                                 res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 , Error data as {int(ErrorData,16)} -- Exp : 0 in the Error_response' , Enums.TestResult.PASS if int(ErrorCode,16) ==1 and int(ErrorData,16)==0 else Enums.TestResult.FAIL])
                             else:res.append([f'PTx sent Error_Code as {int(ErrorCode,16)} -- Exp : 1 (INVALID_REQUEST) in the Error_response', Enums.TestResult.PASS if int(ErrorCode,16) ==1 else Enums.TestResult.FAIL])
                     

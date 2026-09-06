@@ -27,6 +27,12 @@ class Mode(StrEnum):
     TPR = "TPR"  # Test Power Receiver
 
 @unique
+class Switch(StrEnum):
+    """Switch states."""
+    OFFLINE = "Offline"
+    ONLINE = "Online"
+
+@unique
 class ConnectionStatus(StrEnum):
     """Hardware and tester connection status."""
     CONNECTED = "Connected"
@@ -70,6 +76,7 @@ class Enums:
     """
     Product = Product
     Mode = Mode
+    Switch = Switch
     ConnectionStatus = ConnectionStatus
     TestResult = TestResult
     Phase = Phase
