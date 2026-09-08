@@ -1272,20 +1272,25 @@ class CommonCTSChecks:
                             else:  res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time >=0.2 and reping_time <=12.6 else 'Inconclusive'])
                             # Add check to validate the SRQ/rep response.
                             id+=1
+                            RSP_Check = False
                             while id < self.Flow_limit[1]:
                                 if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
                                     if 'ACK' in self.file_list[id]['pktType']: res.append([f'PTx sent ACK response for SRQ/rep data packet at index@ {id}','Pass'])
                                     else: res.append([f'PTx sent {self.file_list[id]['pktType']} response for SRQ/rep data packet at index@ {id}','Fail'])
+                                    RSP_Check = True
                                     break
                                 elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
                                     if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
                                         id+=1
                                         continue
-                                    else:
-                                        res.append(f"TPR sent {self.file_list[id]['pktType']} data packet, Exp: SRQ/rep", 'Inconclusive')
+                                    elif "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' not in self.file_list[id]['value']:
+                                        res.append([f'TPR sent SRQ/{self.file_list[id]['value']} packet, Expected is SRQ/rep packet','Inconclusive'])
                                         break
+                                elif self.file_list[id]['isFWTestermessage']:
+                                    id+=1
+                                    continue
                                 else:
-                                    res.append(f"PTx did not sent response for SRQ/rep data packet")
+                                    res.append([f"PTx did not sent response for SRQ/rep data packet at index@ {id}", 'Inconclusive'])
                                     break
                             break
                         else:
