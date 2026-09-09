@@ -1255,59 +1255,44 @@ class CommonCTSChecks:
         # find SRQ/rpr
         SRQ_RPR=self.PktMethod.GetPacketDetails(packet="SRQ [0x20]", value="Received Power reporting", limit=self.Flow_limit)
         if len(SRQ_RPR)>2:
-            reping_time=12.4
+            res.append([f'TPR sent SRQ/rpr data packet at index@ {id}', 'Pass'])
             # find srq/rep
-            id=SRQ_RPR[2]
+            id=SRQ_RPR[2]+1
+            pktcheck=False
             while id < self.Flow_limit[1]:
                 if self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
-                    if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Received Power reporting' in self.file_list[id]['value']:
-                        res.append([f'TPR sent SRQ/rpr data packet at index@ {id}', 'pass'])
+                    pktcheck=True
+                    if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
+                        res.append([f'TPR sent SRQ/re-ping packet at index@ {id}', 'Pass'])
+                        reping_time = float(self.file_list[id]['value'].split(":")[1].split('Re-Ping value')[1].replace('}', '')) / 5
+ 
+                        if 'REP_002' in self.Header['TestcaseID']: res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time == 12.4 else 'Inconclusive'])
+                        else: res.append([f'TPR set Re-Ping delay value to {reping_time} Secs', 'Pass' if 0.2 <= reping_time <= 12.6 else 'Inconclusive'])
                         id += 1
-                        #Validate SRQ/rep data packet.
-                        while id < self.Flow_limit[1]:
-                            if self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
+                        # Validate the SRQ/rep response — If not received retry up to 3 times
+                        RSP_Check = False
+                        retry_count = 1
+                        while id < self.Flow_limit[1] and retry_count < 4:
+                            if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
+                                if 'ACK' in self.file_list[id]['pktType']: res.append([f'PTx sent ACK response for SRQ/re-ping data packet at index@ {id}', 'Pass'])
+                                else: res.append([f"PTx sent {self.file_list[id]['pktType']} response for SRQ/re-ping data packet at index@ {id}", 'Fail'])
+                                RSP_Check = True
+                                break
+                            elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
                                 if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
-                                    res.append([f'TPR sent SRQ/rep packet at index@ {id}', 'Pass'])
-                                    reping_time = float(self.file_list[id]['value'].split(":")[1].split('Re-Ping value')[1].replace('}', '')) / 5
-
-                                    if 'REP_002' in self.Header['TestcaseID']: res.append([f'TPR set Re-Ping delay value to {reping_time} Secs','Pass' if reping_time == 12.4 else 'Inconclusive'])
-                                    else: res.append([f'TPR set Re-Ping delay value to {reping_time} Secs', 'Pass' if 0.2 <= reping_time <= 12.6 else 'Inconclusive'])
                                     id += 1
-
-                                    # Validate the SRQ/rep response — If not received retry up to 3 times
-                                    RSP_Check = False
-                                    retry_count = 1
-                                    while id < self.Flow_limit[1] and retry_count < 4:
-                                        if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
-                                            if 'ACK' in self.file_list[id]['pktType']: res.append([f'PTx sent ACK response for SRQ/rep data packet at index@ {id}', 'Pass'])
-                                            else: res.append([f"PTx sent {self.file_list[id]['pktType']} response for SRQ/rep data packet at index@ {id}", 'Fail'])
-                                            RSP_Check = True
-                                            break
-                                        elif self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
-                                            if "SRQ [0x20]" in self.file_list[id]['pktType'] and 'Re ping delay' in self.file_list[id]['value']:
-                                                id += 1
-                                                retry_count += 1
-                                            else:
-                                                res.append([f"TPR sent SRQ/{self.file_list[id]['value']} packet, Expected is SRQ/rep packet", 'Inconclusive'])
-                                                break
-                                        elif self.file_list[id]['isFWTestermessage']:
-                                            id += 1
-
-                                    if not RSP_Check:
-                                        res.append([f"PTx did not send a response for SRQ/rep data packet at index@ {id} after {retry_count} retries", 'Fail'])
-                                    break
+                                    retry_count += 1
                                 else:
-                                    res.append([f'TPR did not sent SRQ/rep packet at index@ {id} after SRQ/rpr', 'Inconclusive'])
+                                    res.append([f"TPR sent SRQ/{self.file_list[id]['value']} packet, Expected is SRQ/re-ping packet", 'Inconclusive'])
                                     break
-                            else: id += 1
-                        else: res.append([f'TPR did not sent SRQ/rep packet at index@ {id})', 'Inconclusive'])
+                            else :id+=1
+ 
+                        if not RSP_Check:res.append([f"PTx did not send a response for SRQ/rep data packet at index@ {id} after {retry_count} retries", 'Inconclusive'])
                         break
-                    else: res.append([f'TRP did not sent SRQ/rpr data packet at index@ {id}]', 'Inconclusive'])
+                    else:res.append([f'TPR did not sent SRQ/rep packet at index@ {id} after SRQ/rpr', 'Inconclusive'])
                     break
-                else: res.append([f'TRP did not sent SRQ/rpr data packet at index@ {id}]', 'Inconclusive'])
-                break
-
-                         
+                id+=1
+            if not pktcheck:res.append([f'TPR did not sent any packets after SRQ/rpr ','Inconclusive'])            
             # find SRQ/ en packet
             SRQ_En=self.PktMethod.GetPacketDetails(packet="SRQ [0x20]", value="End Negotiation", limit=[id,self.Flow_limit[1]])
             if len(SRQ_En)>2:
@@ -1332,11 +1317,10 @@ class CommonCTSChecks:
                 
                 # Check Nexping
                 res.extend(self.EPT_Helper(Check,[id,self.Flow_limit[1]],reping_time if 'REP_003' in self.Header['TestcaseID'] else None ))
-
+ 
             else:res.append([f'TPR did not sent SRQ/en packet', 'Inconclusive'])
         else:res.append([f'TPR did not sent SRQ/rpr Packet','Inconclusive'])
-        
-
+ 
         return res
 
     def EPT_NextPing(self,CTSCheck,Check,flows,flwID):
