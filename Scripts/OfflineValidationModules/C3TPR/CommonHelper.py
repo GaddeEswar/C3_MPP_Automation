@@ -1463,7 +1463,7 @@ class CommonCTSChecks:
 
                 
         else: res.append([f'Test_stop did not found','Inconclusive'])
-        return res
+        return resf
 
 
     def TimingChecks(self,CTSCheck,Check,flows,flwID):
@@ -1473,9 +1473,9 @@ class CommonCTSChecks:
         if len(CE)>2:
             CE2=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],value=Check['Pkt'][1], limit=[CE[2]+1,self.Flow_limit[1]])
             if len(CE2)>2:
-                Tinterval=round((CE2[0]-CE[0])*1000,2)
+                Tinterval=round((CE2[0]-CE[0])*1000,1)
                 res.append([f'TPR sent second {Check['Pkt'][0]} data packet at index@ {CE2[2]}', 'Pass'])
-                res.append([f'Measured timing from {round(CE[0],3)}_sec  to {round(CE2[0],3)}_sec  is {Tinterval}_mS , Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0]-Check['Tolerance'] or Tinterval > Check['Limit'][1]+Check['Tolerance'] else'Pass'])
+                res.append([f'Measured timing from {round(CE[0],3)}_sec to {round(CE2[0],3)}_sec is {Tinterval}_mS, Limit: {Check['Limit']}', 'Inconclusive' if Tinterval < Check['Limit'][0] or Tinterval > Check['Limit'][1] else'Pass'])
             else:res.append([f'TPR sent only one {Check['Pkt'][0]} data packet','Fail'])
         else:res.append([f'Test did not entered PT phase','Inconclusive'])
 
@@ -1794,7 +1794,7 @@ class CommonCTSChecks:
             # Check target operating voltage reached or not
             LD=self.PktMethod.GetPacketDetails(packet=f"Set_Load {Check['Load']}",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(LD)>2:
-                res.append([f'Prx Applied its final Load : {Check['Load']} Ohms','Pass'])
+                res.append([f'PRx applied its final Load: {Check['Load']}_ohms','Pass'])
                 VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[LD[2]+1,self.Flow_limit[1]])
                 if len(VR)>2:
                     self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)  #  Voltage Plot
@@ -1807,7 +1807,7 @@ class CommonCTSChecks:
                                     'Pass' if LoadResistance >= RLimit[0] and LoadResistance <= RLimit[1] else 'Inconclusive'])
                     VLimit= [round((Check['Voltage'] - ((Check['Voltage']*Check['VoltageTolerance'])/100)),3), round((Check['Voltage'] +((Check['Voltage']*Check['VoltageTolerance'])/100)),3)]
 
-                    res.append([f'while TPR Regulating to its Operating Target Load Voltage -> Measured Voltage is : {Loadvrect[0]} V ,Limits : {VLimit[0]} V ~ {VLimit[1]} V', 
+                    res.append([f'while TPR regulating to its operating target load voltage -> Measured voltage is {Loadvrect[0]} V ,Limit: {VLimit[0]}V ~ {VLimit[1]}V', 
                                 'Pass' if Loadvrect[0] >=VLimit[0]  and Loadvrect[0] <= VLimit[1] else 'Inconclusive'])
                     Power=round(Loadvrect[0]*LoadCurrent[0],3)
                     PLimit= [round((Check['Power'] - ((Check['Power']*Check['PowerTolerance'])/100)),3), round((Check['Power'] +((Check['Power']*Check['PowerTolerance'])/100)),3)]
@@ -1846,13 +1846,16 @@ class CommonCTSChecks:
         id=limit[0]
         CE3=True
         StopTime=None
-        while id < limit[1]:
+        while id <= limit[1]:
             if self.file_list[id]['pktType']=="Control Error" :
                 if self.file_list[id]['value'] not in ["0","+2","+3","+1"]:
                     CE3=False
-                    res.append([f'TPR sent CE packet with value { self.file_list[id]['value']} which is not in range of (0-3)','Inconclusive'])  
-                StopTime=self.file_list[id]['stopTime']
+                    res.append([f'TPR sent CE packet with value { self.file_list[id]['value']} which is not in range of (0-3)','Inconclusive'])
+            if self.file_list[id]['pktType']=="Test_Status" and "Test_Stop" in self.file_list[id]['value']:
+                StopTime=self.file_list[id]['startTime']
+                break
             id+=1
+            
 
         # Test Duration
         if StopTime is not None:
@@ -1865,7 +1868,7 @@ class CommonCTSChecks:
 
             Timing= round(StopTime-self.file_list[limit[0]]['startTime'],3)
             res.append([f'Stayed {round(Timing/60,3)} mins during load voltage regulation ramp, Exp: Atleast 2 mins','Pass' if Timing/60 >=2  else 'Inconclusive'])
-        else: res.append([f'Did not found CE packets which are in range of (0-3)','Inconclusive'])
+        else: res.append([f'Test did not find CE packets which are in range of (0-3)','Inconclusive'])
 
         return res
 
@@ -3763,10 +3766,13 @@ class CommonCTSChecks:
             for payload in self.PktMethod.GetGeneralPayloadDetails(name=PayLoads[Pd_id].get("Name"),index=Index,Byte=PayLoads[Pd_id].get("Byte"),Bit=PayLoads[Pd_id].get("Bit")):
                 raw_data = payload.get('sRawData')
                 if raw_data:
-                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_hex=raw_data, expected_values=PayLoads[Pd_id].get("Exp"),comparator= PayLoads[Pd_id].get("comp", "EQL"),Type=PayLoads[Pd_id].get("Type","DEC"))
+                    expected_values = PayLoads[Pd_id].get("Exp")
+                    if self.Header.get("TestcaseID") == "TEST_PTX_CPX_NEG_S09_IDX_001" and isinstance(expected_values, dict):
+                        expected_values = [expected_values.get(self.Certification)]
+                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_hex=raw_data, expected_values=expected_values,comparator= PayLoads[Pd_id].get("comp", "EQL"),Type=PayLoads[Pd_id].get("Type","DEC"))
                     status = ( "Pass" if result else (  "Inconclusive" if PayLoads[Pd_id].get("Inconclusive_Check", False) else "Fail" ) )
                     if (not PayLoads[Pd_id].get("Result_check",True) and not result) or PayLoads[Pd_id].get("Result_check",True):
-                        desp=CommonMethods.GetCompDes(PayLoads[Pd_id].get("Exp"),PayLoads[Pd_id].get("comp"))
+                        desp=CommonMethods.GetCompDes(expected_values,PayLoads[Pd_id].get("comp"))
                         res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} field with value {actual_val} for the {PacketName} data packet , Exp:{desp}', status])
                         # res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} Field with Val {actual_val}  for the  {PacketName} datapacket at Id @{Index}, Exp:{PayLoads[Pd_id].get("Exp")},Comp :{PayLoads[Pd_id].get("comp")}.', status])
                     Check=True
