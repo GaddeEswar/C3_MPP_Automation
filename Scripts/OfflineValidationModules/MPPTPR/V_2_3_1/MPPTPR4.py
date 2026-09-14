@@ -7,8 +7,9 @@ import re
 # import csv
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
+from Models.Enums import Enums
+from Models.TestConfigs import *
+from Models.JsonConfig import JsonConfig
 from OfflineValidationModules.MPPTPR.MPPTPR4_CommonHelper import CommonCTSChecks
 
 
@@ -55,8 +56,8 @@ class CTSChecks_MPP_TPR4():
         self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         #Define modules
-        self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
-        self.PlotMethod = PlotMethods(Header=self.Header)
+        self.PktMethod = PacketMethods()
+        self.PlotMethod = PlotMethods()
         # self.Certification=self.BKjsonData['testBkpAppModeString']
         self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
         if self.Certification in ["2.0.1","2.1.0","2.2.1","2.3.0"]:
@@ -175,17 +176,18 @@ class CTSChecks_MPP_TPR4():
                     #Update Final Result
                     if Check['Result_check'] == True:
                         # print("Header:",self.Header)
-                        if TestCaseConfig.AutomationResult == Enums.TestResult.NOT_RUN:
-                            TestCaseConfig.AutomationResult = AllMeasures[str(CTSCheck)+'_res']
-                        elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                            TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
-                        elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                            TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
-                        elif (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
-                            TestCaseConfig.AutomationResult=Enums.TestResult.FAIL #Add remarks for the test fail
+                        if TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.NOT_RUN:
+                            TestObjects.TestCaseConfig.AutomationResult = AllMeasures[str(CTSCheck)+'_res']
+                        elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
+                        elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                            TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
+                        elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                            TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.FAIL #Add remarks for the test fail
+                        
                   
                     # Update TestResult to Not-Run if SW result is NotRun
-                    if TestCaseConfig.SoftwareResult==Enums.TestResult.NOT_RUN:TestCaseConfig.AutomationResult=Enums.TestResult.NOT_RUN
+                    if TestObjects.TestCaseConfig.SoftwareResult==Enums.TestResult.NOT_RUN:TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.NOT_RUN
                 
         # # print("AllMeasures:",AllMeasures)
         return AllMeasures

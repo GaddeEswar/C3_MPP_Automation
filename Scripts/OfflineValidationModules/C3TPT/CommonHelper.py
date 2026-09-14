@@ -4,33 +4,23 @@ import csv
 import json
 from dataclasses import dataclass, field
 from MainModule import JsonOperations,APIOperations,GeneralMethods
-from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
-from typing import List, Dict, Any, Optional
-
-
-
-
+from OfflineValidationModule import CommonMethods
+from Models.Enums import Enums
+from Models.TestConfigs import *
+from Models.JsonConfig import JsonConfig
+@dataclass
 class CommonCTSChecks:
-    def __init__(self,file_list,Header,JapiData,BackupJson,Product,Mode):
-        self.file_list=file_list
-        self.Product=Product
-        self.Mode=Mode
-        self.Header=Header
-        self.JapiData = JapiData
-        self.PktMethod = PacketMethods(file_list,Header)
-        self.PlotMethod = PlotMethods(Header)
-        BKjson = JsonOperations(BackupJson)
-        self.BKjsonData = BKjson.read_file()
-        self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
 
-        
+    file_list = TestObjects.TestCaseConfig.file_list
+    BKjsonData= ProjectConfiguration.BKjsonData
+    PlotMethod= TestObjects.PlotMethod
+    PktMethod= TestObjects.PktMethod
+    Certification= ProjectConfiguration.Certification
+    flows=TestObjects.TestCaseConfig.Flows
+    Flow_limit=TestObjects.TestCaseConfig.Flow_limit
 
-    
     def PktNumCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         count=0
         id=0
         while id < self.Flow_limit[1]:
@@ -46,7 +36,6 @@ class CommonCTSChecks:
 
     def TimingPktCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         DataPacket= str(f'{Check['ExpPkt'][0]}{'_' + Check['ExpPkt'][1].replace('{','').replace('}','').replace(':','_') if Check['ExpPkt'][1] is not None else ''}')
         PingTime= self.PktMethod.GetPacketDetails(packet="Ping Initiated", limit=self.Flow_limit)
         pkt=self.PktMethod.GetPacketDetails(packet=Check['ExpPkt'][0], value=Check['ExpPkt'][1], limit=self.Flow_limit)
@@ -58,7 +47,6 @@ class CommonCTSChecks:
     
     def Major_Minor(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Exp = self.PktMethod.GetPacketDetails(packet=Check['ExpectedPacket'][0], value=Check['ExpectedPacket'][1], limit=self.Flow_limit)
         if len(Exp)>2:
             MajorVersion=GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(Exp[2],'Major_Version')[0]['sRawData'])[1]
@@ -83,7 +71,6 @@ class CommonCTSChecks:
 
     def XIDCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         ID=self.PktMethod.GetPacketDetails(packet="Identification", limit=self.Flow_limit)
         if len(ID)>2:
             ID_bit=GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(ID[2],'Ext')[0]['sRawData'])[1]
@@ -104,7 +91,6 @@ class CommonCTSChecks:
 
     def Neg_Compare(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration",limit=self.Flow_limit)
         if len(CFG)>2:
             if 'false' in self.file_list[CFG[2]]['value']:
@@ -120,7 +106,6 @@ class CommonCTSChecks:
 
     def SDF_Checks(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         for pkt in Check['Pkts']:
             pkt_Details=self.PktMethod.GetPacketDetails(packet=pkt[0],value=pkt[1], limit=self.Flow_limit)
             if len(pkt_Details)>2:
@@ -134,7 +119,6 @@ class CommonCTSChecks:
 
     def Compare_PCH_Count(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PCHcount,PCHValues=self.Pch()
         if not Check['PchLimit']:
             pkt_Details=self.PktMethod.GetPacketDetails(packet="Configuration", limit=self.Flow_limit)
@@ -149,7 +133,6 @@ class CommonCTSChecks:
 
     def OptionalDatapkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Count=0
         ID=self.PktMethod.GetPacketDetails(packet="Identification", limit=self.Flow_limit)
         if len(ID)>2:
@@ -170,7 +153,6 @@ class CommonCTSChecks:
 
     def TimingCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         for TC in Check['TimingCheck']:
             id=self.Flow_limit[0]
             match  TC :
@@ -216,7 +198,6 @@ class CommonCTSChecks:
 
     def CFG_EPX(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration", value="Neg:true",limit=self.Flow_limit)
         if len(CFG)>2:
             Response=self.PktResponse(CFG[2]+1,self.Flow_limit[1])
@@ -246,7 +227,6 @@ class CommonCTSChecks:
                                 
     def PFO(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration", limit=self.Flow_limit)
         if len(CFG)>2:
             id=CFG[2]+1
@@ -273,7 +253,6 @@ class CommonCTSChecks:
     def DSRCheck(self, CTSCheck, Check, flows, flwID):
           # log the PTx packet and look for DSR pkt
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         Pktscount=0
         while id < self.Flow_limit[1]:
@@ -303,7 +282,6 @@ class CommonCTSChecks:
     def DSRATN(self, CTSCheck, Check, flows, flwID):
         # check the ATN response for 2nd rp Packet
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP2=0
         id =self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -329,7 +307,6 @@ class CommonCTSChecks:
     def DSRPOLL(self, CTSCheck, Check, flows, flwID):
         # CHECK response for DSR/poll pckets
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PTxresponse=0
         id =self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -356,7 +333,6 @@ class CommonCTSChecks:
     def ADC(self, CTSCheck, Check, flows, flwID):
         # find PRX ADC data packet
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         ADCpkt=False
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -376,7 +352,6 @@ class CommonCTSChecks:
     def ADT(self, CTSCheck, Check, flows, flwID):
         # find Consecutive ADT Rx packets
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         ADTpkt=False
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -401,7 +376,6 @@ class CommonCTSChecks:
 
     def DSR_Nego(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             id=RP0[2]+1
@@ -432,10 +406,9 @@ class CommonCTSChecks:
 
     def S18_S20(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         def checks(id,limit,Vlimit,ping='S18'):
             # find detach time
-            self.AllChannelData = self.PlotMethod.GetAllChannelData('2',self.JapiData)
+            self.AllChannelData = self.PlotMethod.GetAllChannelData('2',JsonConfig.JapiData)
             vrectS20 = self.CalculateVoltTwindow(id[2],self.AllChannelData,at="start",measure="before")  
             res.append([f"Measured Inverter Voltage for the {ping} ping is {round(vrectS20[0],2)} V, Limit: {Vlimit[0]} V ~ {Vlimit[1]} V", Enums.TestResult.FAIL if round(vrectS20[0],2) <Vlimit[0] or round(vrectS20[0],2) > Vlimit[1] else Enums.TestResult.PASS]) 
             sd=self.PktMethod.GetPacketDetails(packet="Shutdown",Type="TesterMsg",limit=limit)
@@ -460,7 +433,6 @@ class CommonCTSChecks:
 
     def ADC_Auth(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:
             A=self.PktMethod.GetPacketDetails(packet="ADC",value="Auth", limit=[id,self.Flow_limit[1]])
@@ -479,7 +451,6 @@ class CommonCTSChecks:
 
     def PTphasePkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         pkts=["ADC","ADT","Control Error","Charge Status","DSR","End Power Transfer","PROP","16 bit Received Power"]
         res=[]
         id=self.Flow_limit[0]
@@ -500,7 +471,6 @@ class CommonCTSChecks:
     def Auth(self, CTSCheck, Check, flows, flwID):
         # check Authentication initiated or not
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         A=self.PktMethod.GetPacketDetails(packet="ADC",value="Auth", limit=[self.Flow_limit[0],self.Flow_limit[1]])
         if len(A)>2:
             res.append([f'Prx initiated Authentication at @Id {A[2]}', Enums.TestResult.PASS])
@@ -509,7 +479,6 @@ class CommonCTSChecks:
 
     def PktsCountCTS(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Pktscount=0
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -522,7 +491,6 @@ class CommonCTSChecks:
     def Tdsr(self, CTSCheck, Check, flows, flwID):
         #Find RP0
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             id=RP0[2]+1
@@ -554,7 +522,6 @@ class CommonCTSChecks:
 
     def DSRPkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         Pktscount=0
         while id < self.Flow_limit[1]:
@@ -573,7 +540,6 @@ class CommonCTSChecks:
         
     def GeneralRequest(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Generalrequest=False
         PhaseLimit=self.FindPhase(self.Flow_limit[0],Check['SeqPhase'])
         if PhaseLimit is not None:
@@ -594,7 +560,6 @@ class CommonCTSChecks:
         
     def PacketDetails(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id = self.Flow_limit[0]
         for ExpPacket in Check['ExpectedPacket']:
             ExpectedPacket_Details = self.PktMethod.GetPacketDetails(packet=ExpPacket[0], value=ExpPacket[1], limit=[id,self.Flow_limit[1]])
@@ -611,7 +576,6 @@ class CommonCTSChecks:
     def PacketDetails2(self, CTSCheck, Check, flows, flwID):
         
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         DataPacket= str(f'{Check['ExpectedPacket'][0]}{'_' + Check['ExpectedPacket'][1].replace('{','').replace('}','').replace(':','_') if Check['ExpectedPacket'][1] is not None else ''}')
         id = self.Flow_limit[0]
         Pkt=False
@@ -631,7 +595,6 @@ class CommonCTSChecks:
   
     def Tsignal_Tnext(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         res=[]
         id=0
         count=0
@@ -669,7 +632,6 @@ class CommonCTSChecks:
     def DeviceIDMatch(self, CTSCheck, Check, flows, flwID):
         #Get All ID packets and match it's Device ID
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id = 0
         DevID = []
         while id < len(self.file_list):
@@ -684,7 +646,6 @@ class CommonCTSChecks:
     def CFG_S06_BPX(self, CTSCheck, Check, flows, flwID):
 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration", value="Neg:true",limit=self.Flow_limit)
         if len(CFG)>2:
             Response=self.PktResponse(CFG[2]+1,self.Flow_limit[1])
@@ -716,7 +677,6 @@ class CommonCTSChecks:
     def NEG_S07_BPX(self, CTSCheck, Check, flows, flwID):
 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         pkt=f'{Check['pkt'][0]}_{Check['pkt'][1]}'
         FOD=self.PktMethod.GetPacketDetails(packet=Check['pkt'][0], value=Check['pkt'][1],limit=self.Flow_limit)
         if len(FOD)>2:
@@ -775,7 +735,6 @@ class CommonCTSChecks:
      
     def DataPktsCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PhaseLimit=self.FindPhase(self.Flow_limit[0],Check['SeqPhase'])
         if PhaseLimit is not None:
             Pktscount=self.PktsCount(PhaseLimit)
@@ -814,7 +773,6 @@ class CommonCTSChecks:
             
     def Response_TPT(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         ExpectedPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['ExpectedPacket'][0], value=Check['ExpectedPacket'][1], limit=self.Flow_limit)
         DataPacket= str(f'{Check['ExpectedPacket'][0]}{'_' + Check['ExpectedPacket'][1].replace('{','').replace('}','').replace(':','_') if Check['ExpectedPacket'][1] is not None else ''}')
         if len(ExpectedPacket_Details)>2:
@@ -833,7 +791,6 @@ class CommonCTSChecks:
 
     def LogPkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         StartDataPacket= str(f'{Check['StartPacket'][0]}{'_' + Check['StartPacket'][1].replace('{','').replace('}','').replace(':','_') if Check['StartPacket'][1] is not None else ''}')
         StartPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['StartPacket'][0], value=Check['StartPacket'][1], limit=self.Flow_limit)
         if len(StartPacket_Details)>2:
@@ -868,7 +825,6 @@ class CommonCTSChecks:
 
     def PktsCheck(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         StartPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['StartPacket'][0], value=Check['StartPacket'][1], limit=self.Flow_limit)
         if len(StartPacket_Details)>2:
             EndPacket= str(f'{Check['EndPacket'][0]}{'_' + Check['EndPacket'][1].replace('{','').replace('}','').replace(':','_') if Check['EndPacket'][1] is not None else ''}')
@@ -913,7 +869,6 @@ class CommonCTSChecks:
 
     def Nchanged(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         ExpectedPacket_Details = self.PktMethod.GetPacketDetails(packet=Check['ExpectedPacket'][0], value=Check['ExpectedPacket'][1], limit=self.Flow_limit)
         ExpectedPacket= str(f'{Check['ExpectedPacket'][0]}{'_' + Check['ExpectedPacket'][1].replace('{','').replace('}','').replace(':','_') if Check['ExpectedPacket'][1] is not None else ''}')
         if len(ExpectedPacket_Details)>2 :
@@ -930,7 +885,6 @@ class CommonCTSChecks:
 
     def PacketDetails_TPT(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id = self.Flow_limit[0]
         ExpectedPacket_Details = self.PktMethod.GetPacketDetails(packet= Check['ExpectedPacket'][0], value= Check['ExpectedPacket'][1], limit=[id,self.Flow_limit[1]],Type="Response")
         DataPacket= str(f'{ Check['ExpectedPacket'][0]}{'_' +  Check['ExpectedPacket'][1].replace('{','').replace('}','').replace(':','_') if  Check['ExpectedPacket'][1] is not None else ''}')
@@ -945,7 +899,6 @@ class CommonCTSChecks:
 
     def PhasePkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PhaseLimit=self.FindPhase(self.Flow_limit[0],Check['SeqPhase'])
         if PhaseLimit is not None:
             if Check['Count']:
@@ -958,7 +911,6 @@ class CommonCTSChecks:
 
     def Renego(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             i=RP0[2]+1
@@ -981,7 +933,6 @@ class CommonCTSChecks:
 
     def ADTSeq(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             id=RP0[2]+1
@@ -1014,7 +965,6 @@ class CommonCTSChecks:
 
     def RPPkts(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id =self.Flow_limit[0]
         Pktscount=0
         RP={ "1":[0,"NAK"],"2":[0,"NAK"],"0":[0,"NAK"],"4":[0,"NAK"] }
@@ -1070,7 +1020,6 @@ class CommonCTSChecks:
 
     def Tinterval_Treceived(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Timings=[]
         PktsCount=0
         FailCount=0
@@ -1099,7 +1048,6 @@ class CommonCTSChecks:
     def PktReponses(self, CTSCheck, Check, flows, flwID):
    
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PKT= str(f'{Check['Pkt'][0]}{'_' + Check['Pkt'][1].replace('{','').replace('}','').replace(':','_') if Check['Pkt'][1] is not None else ''}')
         id=self.Flow_limit[0]
         Pkts=False
@@ -1128,7 +1076,6 @@ class CommonCTSChecks:
     def Tcontrol_Tdelay(self, CTSCheck, Check, flows, flwID):
 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Pchtime=self.PchTime(Check['Neg'])
         PktsCount=0
         id=self.Flow_limit[0]
@@ -1151,7 +1098,6 @@ class CommonCTSChecks:
     def TsilentChecks(self, CTSCheck, Check, flows, flwID):
         
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PktsCount=0
         id=self.Flow_limit[0]
         
@@ -1189,7 +1135,6 @@ class CommonCTSChecks:
 
     def ResponseNak(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         Count=0
         while id < self.Flow_limit[1]:
@@ -1209,7 +1154,6 @@ class CommonCTSChecks:
     def TimeBetweenPkts(self, CTSCheck, Check, flows, flwID):
        
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         pkt1=self.find_pkt(Check,self.Flow_limit[0],self.Flow_limit[1],Pktstr="Pkt1")            
         if len(pkt1)>2:
             pkt2=self.find_pkt(Check,pkt1[2]+1,self.Flow_limit[1],Pktstr="Pkt2") 
@@ -1223,7 +1167,6 @@ class CommonCTSChecks:
     def WDW(self, CTSCheck, Check, flows, flwID):
 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration",limit=self.Flow_limit)
         if len(CFG)>2:
             Toffset=self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(CFG[2],"Window_Offset")[0]['sRawData'])
@@ -1254,7 +1197,6 @@ class CommonCTSChecks:
 
     def RenegoTiming(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Reneg=False
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:
@@ -1276,7 +1218,6 @@ class CommonCTSChecks:
         
     def RenegoTimingSeq(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             i=RP0[2]+1
@@ -1302,7 +1243,6 @@ class CommonCTSChecks:
 
     def TC8437(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             i=RP0[2]+1
@@ -1333,7 +1273,6 @@ class CommonCTSChecks:
     
     def TC8436(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RP0=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:0", limit=self.Flow_limit)
         if len(RP0)>2:
             i=RP0[2]+1
@@ -1368,7 +1307,6 @@ class CommonCTSChecks:
     
         # check the ATN response for 2nd rp Packet
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CE=self.PktMethod.GetPacketDetails(packet="Control Error",limit=self.Flow_limit)
         if len(CE)>2:
             id =CE[2]+1
@@ -1390,7 +1328,6 @@ class CommonCTSChecks:
     def FtQt(self, CTSCheck, Check, flows, flwID):
 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         for pkt in Check['pkts']:
             FODpkt=self.PktMethod.GetPacketDetails(packet= "FOD Status",value=pkt[0],limit=self.Flow_limit)
             if len(FODpkt)>2:
@@ -1406,7 +1343,6 @@ class CommonCTSChecks:
     def SRQCheck(self, CTSCheck, Check, flows, flwID):
        
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         FP=self.PktMethod.GetPacketDetails(packet= Check['inpkt'][0],value=Check['inpkt'][1],limit=self.Flow_limit)
         if len(FP)>2:
             EP=self.PktMethod.GetPacketDetails(packet= Check['enpkt'][0],value=Check['enpkt'][1],limit=[FP[2]+1,self.Flow_limit[1]])
@@ -1425,7 +1361,6 @@ class CommonCTSChecks:
     def Tsient_Nego(self, CTSCheck, Check, flows, flwID):
         # find the reponse from 
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         FP=self.PktMethod.GetPacketDetails(packet= Check['inpkt'][0],value=Check['inpkt'][1],limit=self.Flow_limit)
         if len(FP)>2:
             EP=self.PktMethod.GetPacketDetails(packet= Check['enpkt'][0],value=Check['enpkt'][1],limit=[FP[2]+1,self.Flow_limit[1]])
@@ -1449,7 +1384,6 @@ class CommonCTSChecks:
 
     def GP(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         res=[]
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration",limit=self.Flow_limit)
         if len(CFG)>2:
@@ -1486,7 +1420,6 @@ class CommonCTSChecks:
 
     def CRC(self, CTSCheck, Check, flows, flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         WPIDPkt=False
         while id < self.Flow_limit[1]:
@@ -1512,7 +1445,6 @@ class CommonCTSChecks:
     def CheckRP(self, CTSCheck, Check, flows, flwID):
       
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RPCount=0
         id=self.Flow_limit[0]
         while id < self.Flow_limit[1]:

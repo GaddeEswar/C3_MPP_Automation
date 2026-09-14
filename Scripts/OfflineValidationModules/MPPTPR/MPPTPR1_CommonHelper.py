@@ -1,4 +1,4 @@
-# from Resources.tkfilebrowser import recent_files
+
 from Scripts import JsonSchema
 import os,re
 import sys
@@ -8,8 +8,9 @@ import zipfile
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
+from Models.Enums import Enums
+from Models.TestConfigs import *
+from Models.JsonConfig import JsonConfig
 from datetime import datetime,date
 
 # from collections import deque
@@ -35,8 +36,8 @@ class CommonCTSChecks():
         self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         #Define modules
-        self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
-        self.PlotMethod = PlotMethods(Header=self.Header)
+        self.PktMethod = PacketMethods()
+        self.PlotMethod = PlotMethods()
         # self.Certification=self.BKjsonData['testBkpAppModeString']
         self.AllChannelData = self.PlotMethod.GetAllChannelData('2',self.JapiData)
         self.GetInitailVoltage(2)
@@ -218,7 +219,7 @@ class CommonCTSChecks():
         res = []
         for pkt in Check['expected']:
             limit = Flow_limit
-            if 'CLOAK' in TestCaseConfig.TestcaseID:
+            if 'CLOAK' in TestObjects.TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
                 limit = Flow_limit
             elif "PktLimit" in pkt:
@@ -1994,7 +1995,7 @@ class CommonCTSChecks():
                     else: 
                         res.append([f"Once in the Cloak state, TPR did not sent ASK packet for 1 sec",Enums.TestResult.PASS])
 
-                if "ENTER" not in TestCaseConfig.TestcaseID:
+                if "ENTER" not in TestObjects.TestCaseConfig.TestcaseID:
                     if len(clk_exit) > 2:
                         res.append([f"Cloak exit found at {round(clk_exit[0], 3)} sec", Enums.TestResult.PASS])
                     else:
@@ -3833,7 +3834,7 @@ class CommonCTSChecks():
             
             id = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0],value=pkt['refpkt'][2] if len(pkt['refpkt']) == 3 else None,limit=xlimit,Type=pkt['refpkt'][1])[2]
 
-            if 'CLOAK' in TestCaseConfig.TestcaseID:
+            if 'CLOAK' in TestObjects.TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
             elif "PktLimit" in pkt:
                 if pkt['PktLimit'] == "refCustom":
@@ -4630,7 +4631,7 @@ class CommonCTSChecks():
         data = self.jsonValues['TestingScope']
 
         for item in data:
-            if item["TestName"] == self.TestCaseName.split(" ")[1]:
+            if item["TestName"] == TestObjects.TestCaseConfig.TestcaseName.split(" ")[1]:
                 return item["Measurements"]                      
         return None
    
@@ -4847,41 +4848,7 @@ class CommonCTSChecks():
             return 'NA'
         except Exception as e:
             print(e)
-    #- Run time of the testcase 
-    def UpdateTestRunTimings(self,TCname,JSONvalues):
-        try:
-            for TCdata in JSONvalues['TestingScope']:
-                if TCdata is not None:
-                    if TCdata['TestName'] == TCname:
-                        self.Header['TestedTime_start']= TCdata['TestStartTime']
-                        self.Header['TestedTime_end']= TCdata['TestEndTime']
-                        stime = [int(num) for num in self.Header['TestedTime_start'].split('T')[1].split('+')[0].replace('.',':').split(':')]
-                        etime = [int(num) for num in self.Header['TestedTime_end'].split('T')[1].split('+')[0].replace('.',':').split(':')]
-                        st = (((stime[0]*1000)*60)*60)+((stime[1]*1000)*60)+(stime[2]*1000)+stime[3]
-                        et = (((etime[0]*1000)*60)*60)+((etime[1]*1000)*60)+(etime[2]*1000)+etime[3]
-                        self.Header['TestedTime'] =abs(st-et)
-                        break
-        except Exception as e:
-            traceback.print_exc()
-    #- General method to retun values from backupjson file for a testcase.
-    def GetTCValuesfromBackUpJSON(self,KeyToFind="_testID"):
-        BKjson = JsonOperations(self.BackupJson)
-        self.BKjsonData = BKjson.read_file()
-        for TCdata in self.BKjsonData['testBkpTestResultsandPath']:
-            if TCdata['testcaseDetails']['m_DisplayName'] == self.TestCaseName:
-                res = self.GetValuefromKey(TCdata,KeyToFind)
-                return res
-    #Get value from matching key of dict
-    def GetValuefromKey(self,TCdata,KeyToFind):
-        for key, value in TCdata.items():
-            if key == KeyToFind:
-                return value
-            elif isinstance(value, dict):
-                # Recursively search in nested dictionaries
-                result = self.GetValuefromKey(value, KeyToFind)
-                if result is not None:
-                    return result
-        return None  
+    #- Run time of the testcase  
     # #- Idetify flow for MPP
     # def Findflow(self,limit):
     #     id = limit[0]

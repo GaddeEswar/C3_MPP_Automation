@@ -1,45 +1,17 @@
+
 import traceback
-import io
-import zipfile
-import pandas as pd
 import sys
 sys.path.append('Scripts')
-import csv
-import json
-from MainModule import JsonOperations,APIOperations,GeneralMethods
-from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
+from Models.Enums import Enums
+from Models.TestConfigs import *
 from OfflineValidationModules.C3TPR.CommonHelper import CommonCTSChecks
 
 
 class CTSChecks_C3TPR():
-    def __init__(self,Header,file_list,JapiData,BackupJson,ProjectJson):
-
-        #Define Global variables
-        CTS = JsonOperations('json/CTSvalidation/C3TPR.json')
-        self.JCTSData =CTS.read_file()
-        # self.JCTSData = JCTSData
-        self.JapiData = JapiData
-        self.Header = Header
-        self.Product = GeneralConfig.Product
-        self.Mode = GeneralConfig.Mode
-        self.file_list = file_list
-        BKjson = JsonOperations(BackupJson)
-        self.BKjsonData = BKjson.read_file()
-        # with open('BckupJson.json', 'w') as json_file:
-        #     json.dump(self.BKjsonData, json_file, indent=4)
-        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
-        self.Auth_file_list = self.AuthPktAPI.GetRequest()
-        #Define modules
-        self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
-        self.PlotMethod = PlotMethods(Header=self.Header)
-        self.CTSMethod=CommonCTSChecks(file_list=self.file_list,Header=self.Header,JapiData=JapiData,BackupJson=BackupJson,Product=GeneralConfig.Product,Mode=GeneralConfig.Mode)
-       
-        self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
 
     def CTSChecks(self,flwID,flows,CTSJson):
-        
+
+        CTSMethod= CommonCTSChecks()
         AllMeasures={}
         for CTSCheck in CTSJson:
             AllMeasures[CTSCheck] = None
@@ -47,14 +19,11 @@ class CTSChecks_C3TPR():
             AllMeasures[f'{CTSCheck}_exp']="NA"
             for Check in CTSJson[CTSCheck]:
                 if Check['flow'] == flwID:
-                    self.Flow_limit = flows[flwID]['Limit']
-                
                     try:
-                        
                         methodcall=getattr(self, CTSCheck)
                         AllMeasures[f"{CTSCheck}_Details"]=methodcall(CTSCheck,Check,flows,flwID)
                     except Exception as e:
-                        methodcall=getattr(self.CTSMethod,CTSCheck)
+                        methodcall=getattr(CTSMethod,CTSCheck)
                         AllMeasures[f"{CTSCheck}_Details"]=methodcall(CTSCheck,Check,flows,flwID)
 
                  #Validation checks starts_______________________
@@ -83,17 +52,17 @@ class CTSChecks_C3TPR():
             
             if Check['Result_check'] == True:
                 # print(Header)
-                if TestCaseConfig.AutomationResult == Enums.TestResult.NOT_RUN:
-                    TestCaseConfig.AutomationResult = AllMeasures[str(CTSCheck)+'_res']
-                elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                    TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
-                elif (TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
-                    TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
-                elif (TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
-                    TestCaseConfig.AutomationResult=Enums.TestResult.FAIL #Add remarks for the test fail
+                if TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.NOT_RUN:
+                    TestObjects.TestCaseConfig.AutomationResult = AllMeasures[str(CTSCheck)+'_res']
+                elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.FAIL) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                    TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
+                elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.INCONCLUSIVE and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.PASS) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res'] ==Enums.TestResult.INCONCLUSIVE) :
+                    TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.INCONCLUSIVE
+                elif (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.PASS and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.FAIL) or (TestObjects.TestCaseConfig.AutomationResult == Enums.TestResult.FAIL and AllMeasures[str(CTSCheck)+'_res']==Enums.TestResult.PASS):
+                    TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.FAIL #Add remarks for the test fail
             
             # Update TestResult to Not-Run if SW result is NotRun
-            if TestCaseConfig.SoftwareResult==Enums.TestResult.NOT_RUN:TestCaseConfig.AutomationResult=Enums.TestResult.NOT_RUN
+            if TestObjects.TestCaseConfig.SoftwareResult==Enums.TestResult.NOT_RUN:TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.NOT_RUN
         
         # Reserved Bit Check
         res=self.ReservedResponseCheck()
@@ -102,16 +71,17 @@ class CTSChecks_C3TPR():
             AllMeasures[f'Reserved_Check_Details']=res
             AllMeasures[f"Reserved_Check_SEQ"]=1
             AllMeasures[f'Reserved_Check_res']=Enums.TestResult.FAIL
-            TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
+            TestObjects.TestCaseConfig.AutomationResult=Enums.TestResult.FAIL
                         
         return AllMeasures
 
-    def ReservedResponseCheck(self):
+    @staticmethod
+    def ReservedResponseCheck():
         res=[]
-        id=self.Flow_limit[0]
-        while id < self.Flow_limit[1]:
-            if self.PktMethod.GetPacketType(id) == 'Response':
-                if 'Reserved' in self.file_list[id]['pktType'] or 'Reserved' in self.file_list[id]['value'] or 'NONE' in self.file_list[id]['pktType']:
+        id= TestObjects.TestCaseConfig.Flow_limit[0]
+        while id < TestObjects.TestCaseConfig.Flow_limit[1]:
+            if TestObjects.PktMethod.GetPacketType(id) == 'Response':
+                if 'Reserved' in TestObjects.TestCaseConfig.file_list[id]['pktType'] or 'Reserved' in TestObjects.TestCaseConfig.file_list[id]['value'] or 'NONE' in TestObjects.TestCaseConfig.file_list[id]['pktType']:
                     res.append([f'Transmitter sent Reserved Response at {{{id}}}',Enums.TestResult.FAIL])
             id+=1
         return res

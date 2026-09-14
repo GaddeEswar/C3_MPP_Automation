@@ -1,39 +1,34 @@
+from Models.JsonConfig import JsonConfig
 import traceback
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from Enums import Enums
-from dataclasses import dataclass
 from typing import List, Any, Union
-from Scripts.TestConfigs import *
+from Models.TestConfigs import *
 import os
 import zipfile
 import io
 
 class PacketMethods:
-    def __init__(self,file_list,Header):
-        # self.Product = Product
-        # self.Mode = Mode
-        self.file_list = file_list
-        self.Header =Header
-        self.Japi = JsonOperations('json/Xpath.json')
-        # self.Japi = JsonOperations('json/Xpath.json')
-        # JapiDatatemp =self.Japi.read_file()
-        # self.JapiData = JapiDatatemp['API']
 
-        if self.Header.get('Mode') == Enums.Mode.TPR: self._get_type = self._classify_tpr
-        else: self._get_type = self._classify_tpt
+    def __init__(self):
+        self.file_list =TestObjects.TestCaseConfig.file_list
+        self.JapiData = JsonConfig.JapiData
+        self.TesterType = self._classify_tpr if GeneralConfig.Mode == Enums.Mode.TPR else self._classify_tpt
 
     def _classify_tpr(self, pkt):
-        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'): return 'TesterMsg'
+        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'):
+            return 'TesterMsg'
         return 'Packet' if pkt.get('isTesterPkt') else 'Response'
 
     def _classify_tpt(self, pkt):
-        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'):return 'TesterMsg'
+        if pkt.get('isTesterPkt') and pkt.get('isFWTestermessage'):
+            return 'TesterMsg'
         return 'Response' if pkt.get('isTesterPkt') else 'Packet'
-    
-    #1.Get packet Type, testermsg/packet/response
+
+    # 1. Get packet Type, testermsg/packet/response
     def GetPacketType(self, id):
         try:
-            return self._get_type(self.file_list[id])
+            return self.TesterType(self.file_list[id])
         except Exception as e:
             print(f"Error in GetPacketType: {e}")
             traceback.print_exc()
@@ -520,12 +515,11 @@ class PacketMethods:
         
     ###______________Common CTS methods_________________
 class PlotMethods():
-    def __init__(self,Header):
-        self.Header = Header
+
     def GetAllChannelData(self,index,JapiData,plottime=None):
         try:
             ACD={}
-            TestTime = CommonMethods.GetRunTime(JapiData,self.Header)
+            TestTime = CommonMethods.GetRunTime()
             if plottime is None:
                 if TestTime[1]/60 >15:
                     # print(TestTime[1]/60)
@@ -534,14 +528,14 @@ class PlotMethods():
                     plottime = int(((TestTime[1]*1000)/1.0510)-80)
                 # print(plottime)
             
-            # SignalAPI = APIOperations(url=JapiData[self.Header['Product']][self.Header['Mode']]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
+            # SignalAPI = APIOperations(url=JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
             # # print(SignalAPI.url)
             # data = SignalAPI.GetRequest()
             # print("data:",len(data))
 
             fulldatta = []
             while len(fulldatta) == 0:
-                SignalAPI = APIOperations(url=JapiData[self.Header['Product']][self.Header['Mode']]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
+                SignalAPI = APIOperations(url=JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
                 # print(SignalAPI.url)
                 data = SignalAPI.GetRequest()
                 fulldatta = data[index]['displayDataChunk']
@@ -568,7 +562,7 @@ class PlotMethods():
     def GetAllChannelData2(self,index,JapiData):
         try:
             ACD={}
-            TestTime = CommonMethods.GetRunTime(JapiData,self.Header)
+            TestTime = CommonMethods.GetRunTime()
             if TestTime[1]/60 >15:
                 # print(TestTime[1]/60)
                 plottime = int(((TestTime[1]*1000)/2.5)-80)
@@ -579,7 +573,7 @@ class PlotMethods():
 
             fulldatta = []
             while len(fulldatta) == 0:
-                SignalAPI = APIOperations(url=JapiData[self.Header['Product']][self.Header['Mode']]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
+                SignalAPI = APIOperations(url=JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetAllChannelData'],retype='json',param1=TestTime[1],param2=plottime)
                 # print(SignalAPI.url)
                 data = SignalAPI.GetRequest()
                 fulldatta = data[index]['displayDataChunk']
@@ -646,15 +640,16 @@ class PlotMethods():
         # print(RawData)
 
 class CommonMethods():
-    def __init__(self):
-        pass
-    #1-Get Run time of the testcase, returns start time and end in nanoseconds,
-    def GetRunTime(JapiData,Header):
-        TcStartAPI = APIOperations(url=JapiData[Header['Product']][Header['Mode']]['GetWaveformStartTime'],retype='json')
+
+    #1-Get Run time of the testcase, returns start time and end in nanoseconds
+    @staticmethod
+    def GetRunTime():
+        TcStartAPI = APIOperations(url=JsonConfig.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStartTime'],retype='json')
         TCstartTime = TcStartAPI.GetRequest()
-        TcStopAPI = APIOperations(url=JapiData[Header['Product']][Header['Mode']]['GetWaveformStopTime'],retype='json')
+        TcStopAPI = APIOperations(url=JsonConfig.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['GetWaveformStopTime'],retype='json')
         TCstopTime = TcStopAPI.GetRequest()
         return[TCstartTime,TCstopTime/100000000]
+
     #2. Find that the measured CTS checks are in limit or not
     def check_measure(exp_val,obsr_val,comp=0):
         res = None

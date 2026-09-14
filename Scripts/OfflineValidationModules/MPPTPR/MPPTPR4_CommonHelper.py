@@ -5,8 +5,9 @@ import os
 import csv
 from MainModule import JsonOperations,APIOperations,GeneralMethods
 from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
+from Models.Enums import Enums
+from Models.TestConfigs import *
+from Models.JsonConfig import JsonConfig
 from pathlib import Path
 import pandas as pd1
 
@@ -23,7 +24,7 @@ class CommonCTSChecks():
         self.Header = Header
         self.Product = GeneralConfig.Product
         self.Mode = GeneralConfig.Mode
-        self.TestCaseName = self.Header['TestcaseName']
+        self.TestCaseName = TestObjects.TestCaseConfig.TestcaseName
         self.ProjectJson = ProjectJson
         self.file_list = file_list
         BKjson = JsonOperations(BackupJson)
@@ -35,8 +36,8 @@ class CommonCTSChecks():
         self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
         #Define modules
-        self.PktMethod = PacketMethods(file_list=self.file_list,Header=self.Header)
-        self.PlotMethod = PlotMethods(Header=self.Header)
+        self.PktMethod = PacketMethods()
+        self.PlotMethod = PlotMethods()
         # self.Certification=self.BKjsonData['testBkpAppModeString']
 
         # Certificate wise packet names
@@ -1006,16 +1007,16 @@ class CommonCTSChecks():
 
     def KestCheck(self,Flow_limit,Check):
         res = []
-        if 'SLIDING' not in TestCaseConfig.TestcaseID:
+        if 'SLIDING' not in TestObjects.TestCaseConfig.TestcaseID:
             #1. Get K_est Value from Estimated_K packet.
             TempPkt1 = self.PktMethod.GetPacketDetails(packet=self.Kest_pkt,limit=Flow_limit,Type="Response")
             # print("TempPkt1:",TempPkt1)
             if len(TempPkt1)>2:
                 # print(GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt1[2],'Estimated_K_Value')[0]['sDescription'])[0])
                 Kest = GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(TempPkt1[2],'Estimated_K_Value')[0]['sDescription'])[0]
-                if 'P1' in TestCaseConfig.TestcaseID:
+                if 'P1' in TestObjects.TestCaseConfig.TestcaseID:
                     Kiactual = self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P1']
-                elif 'P2' in TestCaseConfig.TestcaseID:
+                elif 'P2' in TestObjects.TestCaseConfig.TestcaseID:
                     Kiactual = self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P2']
             
                         
@@ -2114,7 +2115,7 @@ class CommonCTSChecks():
         
         
         for tests in self.BKjsonData['testBkpTestResultsandPath']:
-            if TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
+            if TestObjects.TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
                 basepath = Path(os.path.dirname(self.ProjectJson))
                 path1 = Path(tests["actualIndividualTestcaseFolder"])
                 # # print("\\".join(path1.parts[-2:]))
@@ -2265,7 +2266,7 @@ class CommonCTSChecks():
         for pkt in Check['expected']:
             id = self.PktMethod.GetPacketDetails(packet=pkt['refpkt'][0],value=pkt['refpkt'][2] if len(pkt['refpkt']) == 3 else None,limit=Flow_limit,Type=pkt['refpkt'][1])[2]
 
-            if 'CLOAK' in TestCaseConfig.TestcaseID:
+            if 'CLOAK' in TestObjects.TestCaseConfig.TestcaseID:
                 end = len(self.file_list)
             elif "PktLimit" in pkt:
                 if pkt['PktLimit'] == "refCustom":
@@ -2395,7 +2396,7 @@ class CommonCTSChecks():
 
 
 
-                        if 'Cloak_Ping' in TestCaseConfig.TestcaseID:
+                        if 'Cloak_Ping' in TestObjects.TestCaseConfig.TestcaseID:
                             TempPkt2 = self.PktMethod.GetPacketDetails(packet="Cloak",limit=[id,tmplimit[1]],Type="Packet")
                         else: TempPkt2 = self.PktMethod.GetPacketDetails(packet="Signal strength",limit=[id,tmplimit[1]],Type="Packet")
                         if len(TempPkt2)> 2:
@@ -2511,7 +2512,7 @@ class CommonCTSChecks():
         #     TempPkt1 = self.PktMethod.GetPacketDetails(packet="Ping Detected",limit=[id,tmplimit[1]],Type="TesterMsg")
         #     # # print(TempPkt1)
         #     if len(TempPkt1)>2:
-        #         if 'Cloak_Ping' in TestCaseConfig.TestcaseID:
+        #         if 'Cloak_Ping' in TestObjects.TestCaseConfig.TestcaseID:
         #             TempPkt2 = self.PktMethod.GetPacketDetails(packet="Cloak",limit=[id,tmplimit[1]],Type="Packet")
         #         else: TempPkt2 = self.PktMethod.GetPacketDetails(packet="Signal strength",limit=[id,tmplimit[1]],Type="Packet")
         #         if len(TempPkt2)> 2:
@@ -2976,7 +2977,7 @@ class CommonCTSChecks():
             ExtractedFiles=None
             #After Stabilization find the XCE and PLA packets, fetch the corresponding values from the CSV files extracted from the EyeDebugInfo.GrlEyeInfo
             #1. Extract EyeDebugInfo.GrlEyeInfo file 
-            PathList = self.Header['CapturePath'].split('\\')
+            PathList = TestObjects.TestCaseConfig.TracePath.split('\\')
             EyeInfoPath = CommonMethods.find_file('/'.join(PathList[0:len(PathList)-1]),'EyeDebugInfo.GrlEyeInfo')
             if EyeInfoPath is not None:
                 if any (r in ["Extended Control Error"] for r in check['Packets']):
@@ -3176,16 +3177,16 @@ class CommonCTSChecks():
 
     def PrectVrectRamp(self,Flow_limit,Check):
         res = []
-        if 'NPM' in self.Header['TestcaseName']:
+        if 'NPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "NPM"
             TyepDscr = "Nominal_Power_Mode"
-        elif 'LPM' in self.Header['TestcaseName']:
+        elif 'LPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "LPM"
             TyepDscr = "Low_Power_Mode"
-        elif 'HPM' in self.Header['TestcaseName']:
+        elif 'HPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "HPM"
             TyepDscr = "High_Power_Mode"
-        elif 'CPM' in self.Header['TestcaseName']:
+        elif 'CPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "CPM"
             TyepDscr = "Continuous_Power_Mode"
         #1. Find the MODEXCAP packet
@@ -3197,8 +3198,8 @@ class CommonCTSChecks():
             Vrect_target = {'LPM':12.5,'NPM':12.5,'CPM':12.5,'HPM':18}
             # ref0 = GeneralMethods.GetFloatFromStr(TempVal)[0]
             ref2 = Vrect_target[TypeSD]
-            if '_CAP_360.LPM' in self.Header['TestcaseName']: ref2 = 9.6
-            if '_CAP.LPM' in self.Header['TestcaseName']: ref2 = 9.6
+            if '_CAP_360.LPM' in TestObjects.TestCaseConfig.TestcaseName: ref2 = 9.6
+            if '_CAP.LPM' in TestObjects.TestCaseConfig.TestcaseName: ref2 = 9.6
             
             TempVal = self.PktMethod.GetPayloadDetails(TempPkt1[2],f"{TypeSD}Voltage_Ref1")[0]['sDescription']
             if ':' in TempVal:TempVal = TempVal.split(':')[1]
@@ -3207,11 +3208,11 @@ class CommonCTSChecks():
             TempVal = self.PktMethod.GetPayloadDetails(TempPkt1[2],TyepDscr)[0]['sDescription']
             if ':' in TempVal:TempVal = TempVal.split(':')[1]
             Pwr = GeneralMethods.GetFloatFromStr(TempVal)[0]
-            # if '_P3' in self.Header['TestcaseName']: MaxW=15 if MaxW>15 else MaxW
-            # if '_P4' in self.Header['TestcaseName']: MaxW=5 if MaxW>5 else MaxW
-            # print("Header['TestcaseName']:",self.Header['TestcaseName'])
-            if '.P3' in self.Header['TestcaseName']: Pwr = min(Pwr,15)
-            if '.P4' in self.Header['TestcaseName']: Pwr = min(Pwr,5)
+            # if '_P3' in TestObjects.TestCaseConfig.TestcaseName: MaxW=15 if MaxW>15 else MaxW
+            # if '_P4' in TestObjects.TestCaseConfig.TestcaseName: MaxW=5 if MaxW>5 else MaxW
+            # print("Header['TestcaseName']:",TestObjects.TestCaseConfig.TestcaseName)
+            if '.P3' in TestObjects.TestCaseConfig.TestcaseName: Pwr = min(Pwr,15)
+            if '.P4' in TestObjects.TestCaseConfig.TestcaseName: Pwr = min(Pwr,5)
             # print("MinW:",Pwr)
             res.append([f"Found MODEXCAP at {round(TempPkt1[0],3)}sec, with {TypeSD} Voltage Ref1: {ref1} V and {TypeSD} Potential load power: {Pwr} W",Enums.TestResult.PASS])
             #Condition 1
@@ -3902,7 +3903,7 @@ class CommonCTSChecks():
         res = []
         Flow_limit = Flow_limit
         for tests in self.BKjsonData['testBkpTestResultsandPath']:
-            if TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
+            if TestObjects.TestCaseConfig.TestcaseID == tests['testcaseDetails']['m_TestId']:
                 basepath = Path(os.path.dirname(self.ProjectJson))
                 path1 = tests["actualIndividualTestcaseFolder"]
                 # print(path1.split("\\")[-2])
@@ -5424,17 +5425,17 @@ class CommonCTSChecks():
         res = []
         TypeSD = ""
         TyepDscr = ""
-        # print(self.Header['TestcaseName'])
-        if 'NPM' in self.Header['TestcaseName']:
+        # print(TestObjects.TestCaseConfig.TestcaseName)
+        if 'NPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "NPM"
             TyepDscr = "Nominal_Power_Mode"
-        elif 'LPM' in self.Header['TestcaseName']:
+        elif 'LPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "LPM"
             TyepDscr = "Low_Power_Mode"
-        elif 'HPM' in self.Header['TestcaseName']:
+        elif 'HPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "HPM"
             TyepDscr = "High_Power_Mode"
-        elif 'CPM' in self.Header['TestcaseName']:
+        elif 'CPM' in TestObjects.TestCaseConfig.TestcaseName:
             TypeSD = "CPM"
             TyepDscr = "Continuous_Power_Mode"
 

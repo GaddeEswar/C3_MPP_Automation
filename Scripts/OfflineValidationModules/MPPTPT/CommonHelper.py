@@ -1,42 +1,31 @@
+
+from dataclasses import dataclass
 import traceback
-import io
-import zipfile
-import pandas as pd
 import csv
-import json
 import re
 import math
 from MainModule import JsonOperations,APIOperations,GeneralMethods
-from OfflineValidationModule import PacketMethods,PlotMethods,CommonMethods
-from Scripts.Enums import Enums
-from Scripts.TestConfigs import *
+from OfflineValidationModule import CommonMethods
+from Models.Enums import Enums
+from Models.TestConfigs import *
+from Models.JsonConfig import JsonConfig
 
 
 
-
+@dataclass
 class CommonCTSChecks:
-    def __init__(self,file_list,Header,JapiData,BackupJson,Product=None,Mode=None):
-        self.file_list=file_list
-        self.Product = GeneralConfig.Product
-        self.Mode = GeneralConfig.Mode
-        self.JapiData = JapiData
-        self.Header=Header
-        self.PktMethod = PacketMethods(file_list,Header)
-        self.PlotMethod = PlotMethods(Header)
-        BKjson = JsonOperations(BackupJson)
-        self.BKjsonData = BKjson.read_file()
-        self.AuthPktAPI = APIOperations(url=self.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
-        self.Auth_file_list = self.AuthPktAPI.GetRequest()
-        self.Certification=self.BKjsonData['testBkpProjectConfiguration']['EsdfConfigurationModel']['AllESDFFields']['SpecificationSupported']
-        self.TestResultsjson = JsonOperations("json/TestResults.json")
-        self.TestData = self.TestResultsjson.read_file()
-        CTS = JsonOperations('json/CTSvalidation/MPPTPT.json')
-        self.JCTSData =CTS.read_file()
+
+    file_list = TestObjects.TestCaseConfig.file_list
+    BKjsonData= ProjectConfiguration.BKjsonData
+    PlotMethod= TestObjects.PlotMethod
+    PktMethod= TestObjects.PktMethod
+    Certification= ProjectConfiguration.Certification
+    flows=TestObjects.TestCaseConfig.Flows
+    Flow_limit=TestObjects.TestCaseConfig.Flow_limit
 
 
     def XCE_Measurement(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
             id=PT[2]
@@ -52,7 +41,7 @@ class CommonCTSChecks:
                     PktsCount+=1
                     nextid=self.findTypeid(limit=[pkt1[2]+1,self.Flow_limit[1]],Type='Packet')
                     if nextid is not None:
-                        if 'XCEP_INTERVAL' in TestCaseConfig.TestcaseID:
+                        if 'XCEP_INTERVAL' in TestObjects.TestCaseConfig.TestcaseID:
                             iid=id=nextid
                             while iid < self.Flow_limit[1]:
                                 pkt2= self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0],limit=[iid,self.Flow_limit[1]])
@@ -70,14 +59,14 @@ class CommonCTSChecks:
                             id=nextid
                     else:break
                 else:break
-            if 'XCEP_INTERVAL' in TestCaseConfig.TestcaseID:
+            if 'XCEP_INTERVAL' in TestObjects.TestCaseConfig.TestcaseID:
                 min_item = min(Timings, key=lambda x: x[0])
                 max_item = max(Timings, key=lambda x: x[0])
                 if FailCount >  int(0.05 * len(Timings)):res.append([f'More than 5% of the Intervals met the fail criteria', Enums.TestResult.FAIL])
                 else:res.append([f'More than 95% of the Intervals met the Pass criteria', Enums.TestResult.PASS])
                 res.append([f'Measured  Max {Check['TimingCheck']} from XCE at {max_item[1]}  to XCE at {max_item[2]}  is {max_item[0]} mS , Min {Check['TimingCheck']} from XCE at {min_item[1]}  to XCE at {min_item[2]}  is {min_item[0]} mS Limit : <={Check['Limit'][1] }', Enums.TestResult.PASS])
 
-            if 'XCEP_HANDLING' in TestCaseConfig.TestcaseID:
+            if 'XCEP_HANDLING' in TestObjects.TestCaseConfig.TestcaseID:
                 min_item = min(Handling, key=lambda x: x[0])
                 max_item = max(Handling, key=lambda x: x[0])
                 res.append([f'Measured  Max Interval -- txce_responsetimeout + tdelay + tcontrol from {max_item[1]} Sec to {round(max_item[2],3)} Sec is {max_item[0]} mS , Limit : >={PchTime+24+19 }', Enums.TestResult.PASS if PchTime+24+19 else Enums.TestResult.FAIL])
@@ -90,7 +79,6 @@ class CommonCTSChecks:
     
     def PLA_Handling(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
             id=PT[2]
@@ -151,7 +139,6 @@ class CommonCTSChecks:
     
     def PLA_Fast_Mode(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
             id=PT[2]
@@ -213,7 +200,6 @@ class CommonCTSChecks:
 
     def IllegalPackets(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         # Fun to find mentioned data packet NOT in the Testcase.
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
@@ -249,7 +235,6 @@ class CommonCTSChecks:
         return res
     def TnegTransition(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         # check the Restricted Bit
         MPP=self.PktMethod.GetPacketDetails(packet=Check['XID'], limit=self.Flow_limit)
         if len(MPP)>2:
@@ -284,7 +269,6 @@ class CommonCTSChecks:
         return res
     def EPTR(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
             # Check for stabilization
         Stable=self.PktMethod.GetPacketDetails(packet="Stabilized",Type="TesterMsg",limit=self.Flow_limit)
         if len(Stable)>2:
@@ -320,7 +304,6 @@ class CommonCTSChecks:
 
     def CAL_Pending(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         # check Cal op Commit
         Cal_CMT=self.PktMethod.GetPacketDetails(packet="CAL_OP [0x23] ",value="Operation: CMT", limit=self.Flow_limit)
         if len(Cal_CMT)>2:
@@ -380,7 +363,6 @@ class CommonCTSChecks:
 
     def Q_Deflection(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CoilPlace=False
         Values={"Before":{"Q_Open":[],"F_Open":[]},"After":{"Q_mated":[],"F_mated":[]}}
         CTx=0
@@ -414,7 +396,6 @@ class CommonCTSChecks:
                        
     def DPLoss_Valid(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
             CAL_ENTER=self.PktMethod.GetPacketDetails(packet="CAL_ENTER_RSP [0x34] ",value="Reason: NO_ERR", Type="Response",limit=[PT[2],self.Flow_limit[1]])
@@ -485,11 +466,10 @@ class CommonCTSChecks:
                           
     def Kest_Measure(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         KestMsg=self.PktMethod.GetPacketDetails(packet="K_est Value",Type="TesterMsg", limit=[0,len(self.file_list)-1])
         if len(KestMsg)>2:
             KestVal=float(self.file_list[KestMsg[2]]['pktType'].split("|")[1].replace(";",""))
-            if 'P1' in TestCaseConfig.TestcaseID:
+            if 'P1' in TestObjects.TestCaseConfig.TestcaseID:
                 Kest=self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P1']
             else:Kest=self.BKjsonData['testBkpProjectConfiguration']['TesterConfigurationModel']['kiActual_P2']
             K_Error = round(abs(Kest - KestVal) / Kest,3)
@@ -512,7 +492,6 @@ class CommonCTSChecks:
     
     def Load_RNEG(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PT=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: PT", Type="TesterMsg",limit=self.Flow_limit)
         if len(PT)>2:
             res.append([f'PRx entered Power Transfer Phase at {{{PT[2]}}}',Enums.TestResult.PASS])
@@ -562,7 +541,6 @@ class CommonCTSChecks:
     
     def MatedQ(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
 
         MatedQ=self.PktMethod.GetPacketDetails(packet="MATEDQ-COEFF [0xA8] ", limit=self.Flow_limit)
         if len(MatedQ)>2:
@@ -585,7 +563,6 @@ class CommonCTSChecks:
     
     def ErrorStatus(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         CFG=self.PktMethod.GetPacketDetails(packet="Configuration", limit=self.Flow_limit)
         if len(CFG)>2:
             # Check Response for CFG
@@ -602,7 +579,7 @@ class CommonCTSChecks:
                         if len(result)>0:res.extend(result)   
                     else:res.append([f'TPT did not sent Response for the a GET[Error Status] data packet at {{{Get_Error[2]}}} ',Enums.TestResult.INCONCLUSIVE])
                 
-                if 'MPP1' in self.Header['Coil']:
+                if 'MPP1' in TestObjects.TestCaseConfig.Coil:
                     # Check EPT packet
                     EPT=self.PktMethod.GetPacketDetails(packet="End Power Transfer",value="[EPT/rst]", limit=[CFG[2]+1,self.Flow_limit[1]])
                     res.append([f'PRx {"" if len(EPT)>2 else "did not"} sent EPT/rst data Packet {f"at {{{EPT[2]}}}" if len(EPT)>2 else ''}',Enums.TestResult.PASS if len(EPT)>2 else Enums.TestResult.FAIL])
@@ -649,7 +626,6 @@ class CommonCTSChecks:
     
     def SRQ_Select(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         PhaseLimit=self.FindPhase(self.Flow_limit[0],"Nego")   
         if PhaseLimit is not None:
             if Check['flow']==1:
@@ -679,8 +655,7 @@ class CommonCTSChecks:
         return res
 
     def Response_Valid_Device(self,CTSCheck,Check,flows,flwID):
-        res=[]
-        self.Flow_limit = flows[flwID]['Limit']                   
+        res=[]                   
         # Update Negotiable Load Power in ECAP Pkt
         EcapPkt=  "Extended_Power_Transmitter_Extended_Capabilities" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Power Transmitter Extended Capabilities"
         ECAP=self.PktMethod.GetPacketDetails(packet=EcapPkt, Type="Response",limit=self.Flow_limit)
@@ -709,16 +684,16 @@ class CommonCTSChecks:
                         if AveragePFO==-1:res.append([f'TPT Cannot Calculate the PFO', Enums.TestResult.FAIL])
                         else:
                             TestKey=f'{self.Certification}_Link'
-                            if self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID].get(TestKey,False):
+                            if JsonConfig.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestObjects.TestCaseConfig.TestcaseID].get(TestKey,False):
                                                            
                             # if Check.get("TestLink",False): # Check Average PFO form Other Tcs
                                 TCExist=True
                                 TCPFO=[]
-                                for Tc in self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]:
-                                    if Tc not in self.TestData['TestResults']:TCExist=False
-                                    else:TCPFO.append(self.TestData['TestResults'][Tc])
-                                if TCExist:res.append([f'Average PFO calculated in the current Tc is {AveragePFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets and max PFO value from {self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]} is {max(TCPFO)} mW', Enums.TestResult.PASS if AveragePFO >= max(TCPFO) else Enums.TestResult.FAIL])  
-                                else:res.append([f'Average PFO measurements of TCs { self.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestCaseConfig.TestcaseID][TestKey]["TestLink"]} are not available ', Enums.TestResult.INCONCLUSIVE])
+                                for Tc in JsonConfig.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestObjects.TestCaseConfig.TestcaseID][TestKey]["TestLink"]:
+                                    if Tc not in JsonConfig.TestData['TestResults']:TCExist=False
+                                    else:TCPFO.append(JsonConfig.TestData['TestResults'][Tc])
+                                if TCExist:res.append([f'Average PFO calculated in the current Tc is {AveragePFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets and max PFO value from {JsonConfig.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestObjects.TestCaseConfig.TestcaseID][TestKey]["TestLink"]} is {max(TCPFO)} mW', Enums.TestResult.PASS if AveragePFO >= max(TCPFO) else Enums.TestResult.FAIL])  
+                                else:res.append([f'Average PFO measurements of TCs { JsonConfig.JCTSData[GeneralConfig.Product][GeneralConfig.Mode][TestObjects.TestCaseConfig.TestcaseID][TestKey]["TestLink"]} are not available ', Enums.TestResult.INCONCLUSIVE])
                             else:res.append([f'Calculated Average PFO Value for the {pkts} {Check['Pkt'][0]} Packets  is {AveragePFO} mW  Expected >=0mW', Enums.TestResult.PASS if AveragePFO >=0 else Enums.TestResult.FAIL])                    
             else:
                 result,PowerVals=self.PLA_MSR(NegotiablePower=NPower,Check=Check,limit=[PhaseLimit[0],self.Flow_limit[1]])
@@ -730,8 +705,7 @@ class CommonCTSChecks:
         return res 
     
     def ProtocolVersion(self,CTSCheck,Check,flows,flwID):
-        res=[]
-        self.Flow_limit = flows[flwID]['Limit'] 
+        res=[] 
         random_data = Check.get('random',False)
         PhaseLimit=self.FindPhase(self.Flow_limit[0],"Nego")
         if PhaseLimit is not None:
@@ -822,7 +796,6 @@ class CommonCTSChecks:
     def Power_Check(self,CTSCheck,Check,flows,flwID):
         
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Type= "Packet" if Check["pkt"][-1] else "Response"
         PktName=Check["pkt"][0]+" "+Check["pkt"][1] if Check["pkt"][1]is not None else Check["pkt"][0]
         pkt= self.PktMethod.GetPacketDetails(packet=Check["pkt"][0], value=Check["pkt"][1],Type=Type,limit=self.Flow_limit)
@@ -841,7 +814,6 @@ class CommonCTSChecks:
     def PacketDetails(self,CTSCheck,Check,flows,flwID):
         
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id = self.Flow_limit[0]
         for ExpPacket in Check['ExpectedPacket']:
             Type= "Packet" if ExpPacket[-1] else "Response"
@@ -860,7 +832,6 @@ class CommonCTSChecks:
     def XID_Check(self,CTSCheck,Check,flows,flwID):
         
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         if Check.get('EPT',False):
             res.extend(self.XID_Flow(Check))
             # Check the EPT/ REP packet from PRx
@@ -895,7 +866,6 @@ class CommonCTSChecks:
 
     def DSR_Sequence(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         RPcount=0
         count=0
         # start from PT phase as Power Loass accounting naming is same in Nego Phase
@@ -940,7 +910,6 @@ class CommonCTSChecks:
         return res
     
     def Tdsr(self,CTSCheck,Check,flows,flwID):
-        self.Flow_limit = flows[flwID]['Limit']
         res=[]
         Timings=[]
         count=0
@@ -985,7 +954,6 @@ class CommonCTSChecks:
     
     def FSK_Demod(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Pkt= "MPP_Extended_Identification" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Extended Identification"
         MPP=self.PktMethod.GetPacketDetails(packet=Pkt, limit=self.Flow_limit)
         if len(MPP)>2:
@@ -1023,7 +991,6 @@ class CommonCTSChecks:
     
     def ValidateEyeTest(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         # Check Negotiation Phase
         Nego=self.PktMethod.GetPacketDetails(packet="Phase_Info",value="Phase Type: Nego", Type="TesterMsg",limit=self.Flow_limit)
         if len(Nego)>2:
@@ -1066,7 +1033,6 @@ class CommonCTSChecks:
         return res
     def check_PM(self,CTSCheck,Check,flows,flwID):
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         # with open("data.json", "w") as file:
         #     json.dump(self.file_list, file, indent=4)
         for pkt in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -1083,7 +1049,6 @@ class CommonCTSChecks:
 
     def ValidateEye(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         results,values=self.EyeTest(Check)
         if values['pkts']>0:
 
@@ -1121,7 +1086,6 @@ class CommonCTSChecks:
 
     def ParityBits(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Pkt= "MPP_Extended_Identification" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Extended Identification"
         MPP=self.PktMethod.GetPacketDetails(packet=Pkt, limit=self.Flow_limit)
         if len(MPP)>2:
@@ -1160,7 +1124,6 @@ class CommonCTSChecks:
 
     def Misc_Response(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         id=self.Flow_limit[0]
         count=0
         for pkt in Check['Pkts']:
@@ -1177,7 +1140,7 @@ class CommonCTSChecks:
                         id=Response[2]+1
                     else:
                         if 'ATN' in Response[0]:
-                            if 'RESPONSE_TIME' in TestCaseConfig.TestcaseID: res.append([f'TPT sent {Response[0]} Response for the {'First XCE Packet' if count==1 else f'First XCE Packet at {{{XCE[2]}}} after Stabilization '}',Enums.TestResult.PASS])
+                            if 'RESPONSE_TIME' in TestObjects.TestCaseConfig.TestcaseID: res.append([f'TPT sent {Response[0]} Response for the {'First XCE Packet' if count==1 else f'First XCE Packet at {{{XCE[2]}}} after Stabilization '}',Enums.TestResult.PASS])
                             else:res.append([f'TPT sent {Response[0]} Response for the XCE Packet at {{{XCE[2]}}}',Enums.TestResult.PASS])
                             # check Dsr
                             XcePkt=True
@@ -1220,7 +1183,7 @@ class CommonCTSChecks:
 
     def VerifyPrect_PD(self,CTSCheck,Check,flows,flwID):
         try:
-            self.Flow_limit = flows[flwID]['Limit']
+
             res = []
             EcapPkt=  "Extended_Power_Transmitter_Extended_Capabilities" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Power Transmitter Extended Capabilities"
             ECAP=self.PktMethod.GetPacketDetails(packet=EcapPkt, Type="Response",limit=self.Flow_limit)
@@ -1262,7 +1225,7 @@ class CommonCTSChecks:
     def PD_PLA_PrectVrect(self,CTSCheck,Check,flows,flwID):
         try:
             res=[]
-            self.Flow_limit = flows[flwID]['Limit']
+
             EcapPkt=  "Extended_Power_Transmitter_Extended_Capabilities" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Power Transmitter Extended Capabilities"
             ECAP=self.PktMethod.GetPacketDetails(packet=EcapPkt, Type="Response",limit=self.Flow_limit)
             if len(ECAP)>2:
@@ -1278,7 +1241,7 @@ class CommonCTSChecks:
                 #2.Get the first PLA packet
                 PLA1= self.PktMethod.GetPacketDetails(packet="Power Loss Accounting",limit=[Pkt1[2],self.Flow_limit[1]])
                 if len(PLA1)>2:
-                    self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',self.JapiData)
+                    self.AllChannelData = self.PlotMethod.GetAllChannelData2('2',JsonConfig.JapiData)
                     PLA1_Prect = GeneralMethods.GetFloatFromStr(self.PktMethod.GetPayloadDetails(PLA1[2],"PRECT")[0]['sDescription'])[0]
                     PLA1_Vrect = self.PktMethod.CalculateVoltTwindow(PLA1[2],self.AllChannelData)
                     res.append([f"First PLA packet found at {round(PLA1[0],3)}sec Measured Prect_P1={round(PLA1_Prect,3)}W and V1={round(PLA1_Vrect[0],3)}V",Enums.TestResult.PASS])
@@ -1304,7 +1267,7 @@ class CommonCTSChecks:
 
     def ITPT_MAX(self,CTSCheck,Check,flows,flwID):
         try:
-            self.Flow_limit = flows[flwID]['Limit']
+
             res=[]
             templimit = []
             EcapPkt=  "Extended_Power_Transmitter_Extended_Capabilities" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Power Transmitter Extended Capabilities"
@@ -1396,7 +1359,6 @@ class CommonCTSChecks:
 
     def RestrictedMode(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         Pkt= "MPP_Extended_Identification" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Extended Identification"
         MPP=self.PktMethod.GetPacketDetails(packet=Pkt, limit=self.Flow_limit)
         if len(MPP)>2:
@@ -1428,7 +1390,6 @@ class CommonCTSChecks:
     def ProfileActivation(self,CTSCheck,Check,flows,flwID):
         res1=[]
         res2=[]
-        self.Flow_limit = flows[flwID]['Limit']
         flow1,flow2=flows[1]['Limit'],flows[2]['Limit']
         Pkt= "MPP_Extended_Identification" if self.Certification in [ "2.0.1",  "2.1.0", "2.2.1", "2.3.0","2.0.0"] else "Extended Identification"
         MPP=self.PktMethod.GetPacketDetails(packet=Pkt, limit=flow1)
@@ -1489,7 +1450,6 @@ class CommonCTSChecks:
 
     def MPLA_PrectCheck(self,CTSCheck,Check,flows,flwID):
         res=[]
-        self.Flow_limit = flows[flwID]['Limit']
         # Check Stabilization
         Stable=self.PktMethod.GetPacketDetails(packet="Stabilized",Type="TesterMsg",limit=self.Flow_limit)
         res.append([f'PRx {'did not Stabilized to Negotiable Load Power'  if len(Stable)<2 else ''} Stabilized at {{{Stable[2]}}}',Enums.TestResult.PASS if len(Stable)>2 else Enums.TestResult.INCONCLUSIVE ])
@@ -1546,7 +1506,6 @@ class CommonCTSChecks:
         res=[]
         cl_reason =0
     
-        self.Flow_limit = flows[flwID]['Limit']
         PTPhaseLimit=self.FindPhase(self.Flow_limit[0],"PT")
         if PTPhaseLimit is not None:
             # find DSR /poll
@@ -1619,11 +1578,10 @@ class CommonCTSChecks:
     def MagneticPresenceCheck(self,CTSCheck,Check,flows,flwID):
 
         res=[]
-        if flwID==2: self.Flow_limit = flows[flwID]['Limit']
-        else:
-            if self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['flows'][str(flwID)] is not None:
-                self.Flow_limit = self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['flows'][str(flwID)]['Limit']
-                self.file_list=self.TestData['FileList_Data'][TestCaseConfig.TestcaseID]['Json']
+        if flwID==1: 
+            if JsonConfig.TestData['FileList_Data'][TestObjects.TestCaseConfig.TestcaseID]['flows'][str(flwID)] is not None:
+                self.Flow_limit = JsonConfig.TestData['FileList_Data'][TestObjects.TestCaseConfig.TestcaseID]['flows'][str(flwID)]['Limit']
+                self.file_list=JsonConfig.TestData['FileList_Data'][TestObjects.TestCaseConfig.TestcaseID]['Json']
                 self.PktMethod.file_list=self.file_list
             else: return [f'Test Data not Found after removing the Magnetic Cover',Enums.TestResult.INCONCLUSIVE]
 
@@ -1747,7 +1705,7 @@ class CommonCTSChecks:
             "Npass":0,
             "pkts":0
         }
-        PathList = self.Header['CapturePath'].split('\\')
+        PathList = TestObjects.TestCaseConfig.TracePath.split('\\')
         EyeInfoPath = CommonMethods.find_file('/'.join(PathList[0:len(PathList)-1]),'AnalysisData_EYE.csv')
         Eyeresults=self.csv_to_json(EyeInfoPath)
         # with open('Eye.json', 'w') as json_file:
@@ -2177,8 +2135,8 @@ class CommonCTSChecks:
                
                 results.append([f'Calculated Max PFO Value is {MaxPFO} mW and Min PFO Value is {MinPFO} mW --- for the {pkts} {Check['Pkt'][0]} Packets, Expected range :{ Check['PFORange'][Level]['2']} , Power level : {PL}' ,Enums.TestResult.PASS])
                 AveragePFO=round((sum(AveragePFO)/len(AveragePFO)),3)
-                self.TestData['TestResults'][TestCaseConfig.TestcaseID]=AveragePFO # Store the Average PFO value in Json
-                self.TestResultsjson.update_file(self.TestData)
+                JsonConfig.TestData['TestResults'][TestObjects.TestCaseConfig.TestcaseID]=AveragePFO # Store the Average PFO value in Json
+                JsonConfig.write_file(JsonConfig.TEST_RESULTS_PATH,JsonConfig.TestData)
                 results.append([f'Calculated Average PFO value for the {pkts} {Check['Pkt'][0]} Packets is {AveragePFO} mW , Expected range :{ Check['PFORange'][Level]['1']},Power level : {PL}',Enums.TestResult.FAIL if AveragePFO < Check['PFORange'][Level]['1'][0] or AveragePFO >=Check['PFORange'][Level]['1'][1] else 'pass'])
         return results 
 
@@ -2209,7 +2167,6 @@ class CommonCTSChecks:
 
     def cloak_TC_Natural(self,CTSCheck,Check,flows,flwID):
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         #check sequence entered the PT phase
         pt_pass = False
         cl_pass = False
@@ -2336,7 +2293,6 @@ class CommonCTSChecks:
     
     def cloak_Tc(self,CTSCheck,Check,flows,flwID):
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         #check wheather entered PT phase
         #check sequence entered the PT phase
         pt_pass = False
@@ -2573,7 +2529,6 @@ class CommonCTSChecks:
     
     def cloak_TC_tx_init(self,CTSCheck,Check,flows,flwID):
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         #check wheather entered PT phase
         #check sequence entered the PT phase
         pt_pass = False
@@ -2765,7 +2720,6 @@ class CommonCTSChecks:
     
     def ping_retry(self,CTSCheck,Check,flows,flwID):
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         value = None
         pt_pass = False
         cl_pass = False
@@ -2997,7 +2951,6 @@ class CommonCTSChecks:
         # with open('QI.json', 'w') as json_file:
         #     json.dump(self.file_list, json_file, indent=4)
         res = []
-        self.Flow_limit = flows[flwID]['Limit']
         value = None
         pt_pass = False
         cl_pass = False
@@ -3240,8 +3193,7 @@ class CommonCTSChecks:
             
         
     def EDS_check_1(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit']                   
+        res = []                   
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -3714,8 +3666,7 @@ class CommonCTSChecks:
         return res
     
     def EDS_check_3(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit']         
+        res = []         
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -3814,8 +3765,7 @@ class CommonCTSChecks:
         return res
     
     def EDS_check_2(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit']         
+        res = []         
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -3914,8 +3864,7 @@ class CommonCTSChecks:
         return res
     
     def EDS_cloak(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit'] 
+        res = [] 
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -4068,8 +4017,7 @@ class CommonCTSChecks:
         return res
     
     def EDS_stream(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit'] 
+        res = [] 
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
@@ -4372,8 +4320,7 @@ class CommonCTSChecks:
         return res
     
     def EDS_crc_handling(self,CTSCheck,Check,flows,flwID):
-        res = []
-        self.Flow_limit = flows[flwID]['Limit'] 
+        res = [] 
         #check EDS packet before initiating the Auth sequence
         eds_initiated = False
         for eds in range(self.Flow_limit[0], self.Flow_limit[1]):
