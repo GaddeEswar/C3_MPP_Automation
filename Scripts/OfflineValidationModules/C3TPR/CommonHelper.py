@@ -1463,7 +1463,7 @@ class CommonCTSChecks:
 
                 
         else: res.append([f'Test_stop did not found','Inconclusive'])
-        return resf
+        return res
 
 
     def TimingChecks(self,CTSCheck,Check,flows,flwID):
@@ -3766,13 +3766,10 @@ class CommonCTSChecks:
             for payload in self.PktMethod.GetGeneralPayloadDetails(name=PayLoads[Pd_id].get("Name"),index=Index,Byte=PayLoads[Pd_id].get("Byte"),Bit=PayLoads[Pd_id].get("Bit")):
                 raw_data = payload.get('sRawData')
                 if raw_data:
-                    expected_values = PayLoads[Pd_id].get("Exp")
-                    if self.Header.get("TestcaseID") == "TEST_PTX_CPX_NEG_S09_IDX_001" and isinstance(expected_values, dict):
-                        expected_values = [expected_values.get(self.Certification)]
-                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_hex=raw_data, expected_values=expected_values,comparator= PayLoads[Pd_id].get("comp", "EQL"),Type=PayLoads[Pd_id].get("Type","DEC"))
+                    result, actual_val = self.PktMethod.compare_hex_to_expected(raw_hex=raw_data, expected_values=PayLoads[Pd_id].get("Exp"),comparator= PayLoads[Pd_id].get("comp", "EQL"),Type=PayLoads[Pd_id].get("Type","DEC"))
                     status = ( "Pass" if result else (  "Inconclusive" if PayLoads[Pd_id].get("Inconclusive_Check", False) else "Fail" ) )
                     if (not PayLoads[Pd_id].get("Result_check",True) and not result) or PayLoads[Pd_id].get("Result_check",True):
-                        desp=CommonMethods.GetCompDes(expected_values,PayLoads[Pd_id].get("comp"))
+                        desp=CommonMethods.GetCompDes(PayLoads[Pd_id].get("Exp"),PayLoads[Pd_id].get("comp"))
                         res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} field with value {actual_val} for the {PacketName} data packet , Exp:{desp}', status])
                         # res.append( [f'{'PRx'if Receiver else 'PTx'} sent the {PayLoads[Pd_id].get("Name")} Field with Val {actual_val}  for the  {PacketName} datapacket at Id @{Index}, Exp:{PayLoads[Pd_id].get("Exp")},Comp :{PayLoads[Pd_id].get("comp")}.', status])
                     Check=True
