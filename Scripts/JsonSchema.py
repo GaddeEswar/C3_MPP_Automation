@@ -30,6 +30,7 @@ class C3_MPP_JsonSchema():
         self.Japi = JsonOperations('json/Xpath.json')
         JapiDatatemp =self.Japi.read_file()
         self.JapiData = JapiDatatemp['API']
+        self.excel_report_path = None
        
         
     def validate_with_exceptions(self):
@@ -178,14 +179,31 @@ class C3_MPP_JsonSchema():
                     self.Logs.append('-' * 30 + ' ' + '-' * 30)
         
         # Write logs to a text file
+        output_file = None
         try:
             now = datetime.now()
             timestamp = now.strftime("%d%m%Y_%H%M%S")
-            output_file=  f'Results/C3_MPP Excel Results/JsonSchem_Comparison_{self.Header['Product'] }_{self.Header['Mode'] }_{timestamp}.txt'
+            output_file=  f'Results/C3_MPP Excel Results/JsonSchem_Comparison_{self.Header["Product"]}_{self.Header["Mode"]}_{timestamp}.txt'
             with open(output_file, 'w', encoding='utf-8') as f:
                 f.write('\n'.join(self.Logs))
         except Exception as e:
             print(f"Error writing SchemaReport.txt: {e}")
+
+        # Generate Professional Manual-Tester Friendly Excel Report using the text output as input
+        try:
+            from Scripts.JsonSchemaReportExcel import generate_excel_from_text_logs
+            output_excel_file = f'Results/C3_MPP Excel Results/JsonSchem_Comparison_{self.Header["Product"]}_{self.Header["Mode"]}_{timestamp}.xlsx'
+            generate_excel_from_text_logs(
+                log_lines=self.Logs,
+                excel_file_path=output_excel_file,
+                product=str(self.Header.get('Product', 'Product')),
+                mode=str(self.Header.get('Mode', 'Mode')),
+                timestamp=now.strftime("%d-%m-%Y %H:%M:%S"),
+                txt_filename=os.path.basename(output_file) if output_file else ""
+            )
+            self.excel_report_path = output_excel_file
+        except Exception as e:
+            print(f"Error generating Excel report from text logs: {e}")
 
         return self.Logs
 
@@ -474,14 +492,18 @@ class C3_MPP_PdfSchema():
                     # ---------------- TEST RESULTS ----------------
                     if current_section == "TestingScopeAndResults":
                         keyres=False
+                        clean_line = line.replace(" ", "").upper()
                         for key , value in self.ReportsData['TestResult'].items():
-                            if line.startswith(key):
+                            if line.startswith(key) or clean_line.startswith(key):
                                 current_block=value
                                 if current_block not in res[current_section]:res[current_section][current_block]=[]
                                 keyres=True
                                 break
                         if keyres:continue
+                        if current_block is None:
+                            continue
                         if  not  line.endswith("NONE"):
+                            if current_block not in res[current_section]:res[current_section][current_block]=[]
                             res[current_section][current_block].append(line)
                         continue
                     # ---------------- KEY : VALUE ----------------

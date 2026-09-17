@@ -1089,7 +1089,7 @@ class Run(MPPGUI):
             if res == 200:
                 self.master.JQIData[self.master.Product][self.master.Mode]['ssCheckForTestcases']=True
                 self.master.JQI.update_file(self.master.JQIData)
-                self.update_logs("UI",f"Optimum Coil Values loaded: {", ".join(f"{c['coilType']} : {c['value']}" for c in json_data["Optimum"]["Coil_Values"])}")
+                self.update_logs("UI", f"Optimum Coil Values loaded: " + ", ".join(f"{c['coilType']} : {c['value']}" for c in json_data["Optimum"]["Coil_Values"]))
                 messagebox.showinfo("Optimum values",f"Optimum Coil Values loaded:\n" +"\n".join(f"{c['coilType']} : {c['value']}" for c in json_data["Optimum"]["Coil_Values"]))
             else: messagebox.showerror("Optimum file", "Please load only .xml or .json optimum files")
         else: messagebox.showerror("Optimum file", "Please load only .xml or .json optimum files")

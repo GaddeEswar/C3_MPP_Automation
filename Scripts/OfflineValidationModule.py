@@ -201,7 +201,7 @@ class PacketMethods:
         # # print(result)
         # return result
 
-        return [p for h in headers if h.get('sFieldType')==Byte for p in h.get('childelement', []) if p.get('sBitIndex') == Bit and ( name in p.get('sDecodedValue') or name in p.get('sDescription'))]
+        return [p for h in headers if h.get('sFieldType')==Byte for p in h.get('childelement', []) if Bit in p.get('sBitIndex') and ( name in p.get('sDecodedValue') or name in p.get('sDescription'))]
                 
     def hex_to_decimal(self,raw_hex):
         try:
