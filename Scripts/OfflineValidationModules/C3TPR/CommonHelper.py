@@ -11,15 +11,23 @@ from Models.JsonConfig import JsonConfig
 @dataclass
 class CommonCTSChecks:
 
-    file_list = TestObjects.TestCaseConfig.file_list
+    file_list = TestObjects.TestCaseConfig.file_list if TestObjects.TestCaseConfig else []
     BKjsonData= ProjectConfiguration.BKjsonData
     PlotMethod= TestObjects.PlotMethod
     PktMethod= TestObjects.PktMethod
     Certification= ProjectConfiguration.Certification
-    flows=TestObjects.TestCaseConfig.Flows
-    Flow_limit=TestObjects.TestCaseConfig.Flow_limit
+    flows=TestObjects.TestCaseConfig.Flows if TestObjects.TestCaseConfig else {}
+    Flow_limit=TestObjects.TestCaseConfig.Flow_limit if TestObjects.TestCaseConfig else []
 
     def __post_init__(self):
+        if TestObjects.TestCaseConfig:
+            self.file_list = TestObjects.TestCaseConfig.file_list
+            self.flows = TestObjects.TestCaseConfig.Flows
+            self.Flow_limit = TestObjects.TestCaseConfig.Flow_limit
+        self.BKjsonData = ProjectConfiguration.BKjsonData
+        self.PlotMethod = TestObjects.PlotMethod
+        self.PktMethod = TestObjects.PktMethod
+        self.Certification = ProjectConfiguration.Certification
         self.AuthPktAPI=APIOperations(url=JsonConfig.JapiData[GeneralConfig.Product][GeneralConfig.Mode]['Authmeassges'],retype='json')
         self.Auth_file_list = self.AuthPktAPI.GetRequest()
 

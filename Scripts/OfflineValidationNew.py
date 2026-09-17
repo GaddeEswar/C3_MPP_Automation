@@ -1,3 +1,4 @@
+from Models.TestConfigs import ProjectConfiguration
 import sys
 sys.path.append('Scripts')
 import importlib
@@ -63,7 +64,8 @@ class TestValidation():
                
         self.stability = self.Test.Flows
         # print(self.Test.Flows)
-        self.GetAllPackets()    
+        self.GetAllPackets()
+        self.Header['TCresult'] = self.Test.AutomationResult
         self.UpdateToJsonReport()
 
 
@@ -78,7 +80,7 @@ class TestValidation():
             timestamp = now.strftime("%d%m%Y_%H%M%S")
             self.Test.UID = str(uuid.uuid1())
             self.Test.ChapterName = self.GetTCValuesfromBackUpJSON("_chapter")
-            self.Test.Coil = self.GetJSONTCData(self.Test.TestcaseID, self.Test.BackupJson, "TCcoil")
+            self.Test.Coil = self.GetJSONTCData(self.Test.TestcaseID, ProjectConfiguration.BackupJson, "TCcoil")
             ProjectConfiguration.Transmitter = JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['transmitterType']
             ProjectConfiguration.potentialPower = JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['potentialPower']
 
@@ -104,16 +106,16 @@ class TestValidation():
             """ Update Software TestTimings of a Particular Testcase """
             self.UpdateTestRunTimings(self.Test.TestcaseID, ProjectConfiguration.PRjsonData)
 
-            GeneralConfig.DUTName = ProjectConfiguration.PRjsonData['DutInfo']['BrandName']
-            GeneralConfig.DUTID = ProjectConfiguration.PRjsonData['DutInfo']['ProductName']
-            GeneralConfig.DUTSL = ProjectConfiguration.PRjsonData.get('TestToolInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestPlatformInfo', {}).get('SerialNumber', '')
+            ProjectConfiguration.DUTName = GeneralConfig.DUTName = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('BrandName', '')
+            ProjectConfiguration.DUTID = GeneralConfig.DUTID = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('ProductName', '')
+            ProjectConfiguration.DUTSL = GeneralConfig.DUTSL = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestToolInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestPlatformInfo', {}).get('SerialNumber', '')
             
-            ProjectConfiguration.testLab = ProjectConfiguration.PRjsonData['TestLab']['LabName']
-            ProjectConfiguration.testEngineer = ProjectConfiguration.PRjsonData['TestLab']['TestEngineer']
+            ProjectConfiguration.testLab = ProjectConfiguration.PRjsonData.get('TestLab', {}).get('LabName', '')
+            ProjectConfiguration.testEngineer = ProjectConfiguration.PRjsonData.get('TestLab', {}).get('TestEngineer', '')
             JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testLab'] = ProjectConfiguration.testLab
             JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testEngineer'] = ProjectConfiguration.testEngineer
             
-            self.Test.SoftwareResult = self.GetJSONTCData(self.Test.TestcaseID, self.Test.BackupJson, "TCresult")
+            self.Test.SoftwareResult = self.GetJSONTCData(self.Test.TestcaseID, ProjectConfiguration.BackupJson, "TCresult")
 
             # Update HeaderInfo to Results
             self.Header['UID'] = self.Test.UID
@@ -142,11 +144,10 @@ class TestValidation():
             self.Header['DUTSL']= ProjectConfiguration.DUTSL
             self.Header['TestLab']=ProjectConfiguration.testLab
             self.Header['Engineer']=ProjectConfiguration.testEngineer
-            self.Header['Automationresult']=self.Test.AutomationResult
+            self.Header['TCresult']=self.Test.AutomationResult
             self.Header['SWresult'] = self.Test.SoftwareResult
             self.Header['Product'] = GeneralConfig.Product
             self.Header['Mode'] = GeneralConfig.Mode
-            self.Header['Certification']=ProjectConfiguration.Certification
             
            
            
@@ -332,7 +333,7 @@ class TestValidation():
                 if self.Test.Flows[flwID] is not None:
                    
                     if flwID not in self.Test.timing_map:self.Test.timing_map[flwID]={}
-                    self.Test.FlowLimit = self.Test.Flows[flwID]['Limit']
+                    self.Test.FlowLimit = self.Test.Flow_limit = self.Test.Flows[flwID]['Limit']
                     # print("self.Test.FlowLimit:",self.Test.FlowLimit)
                     id = self.Test.FlowLimit[0]
                     if self.Test.TestcaseID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
@@ -386,11 +387,11 @@ class TestValidation():
                         except ModuleNotFoundError : spec= None
                         if spec is not None:
                             module = importlib.import_module(module_path)
-                            self.CTSClass= getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")
+                            self.CTSClass= getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")()
                         else:
                             module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.Backward.CTSChecks{GeneralConfig.Product}{GeneralConfig.Mode}"
                             module = importlib.import_module(module_path)
-                            self.CTSClass = getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")
+                            self.CTSClass = getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")()
                         self.Test.timing_map[flwID]['Measures']= self.MeasuresCheck(flwID,self.Test.Flows)
 
                     else:
@@ -424,7 +425,7 @@ class TestValidation():
                                     module = importlib.import_module(module_path)
                                     CTSChecks = getattr(module, f"CTSChecks_MPP_TPR4")
                                 
-                            self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=JsonConfig.JapiData,BackupJson=self.Test.BackupJson,ProjectJson=self.Test.ProjectJson)
+                            self.CTSChecksOBJ=CTSChecks(Header=self.Header,file_list=self.file_list,JapiData=JsonConfig.JapiData,BackupJson=ProjectConfiguration.BackupJson,ProjectJson=ProjectConfiguration.ProjectJson)
                             self.Test.timing_map[flwID]['Measures']= self.MeasuresCheck2(flwID,self.Test.Flows,Coil)
                             # print("Measures:",Test.timing_map[flwID]['Measures'])
                        
@@ -906,11 +907,8 @@ class TestValidation():
     #- Get software side high level results
     def GetJSONTCData(self,TestID=None,BackupJson=None,retunData=""):
         try:
-            if BackupJson is None: BackupJson = self.Test.BackupJson
-            if TestID is None: TestID = self.Test.TestcaseID
-            BKjson = JsonOperations(BackupJson)
-            BKjsonData = BKjson.read_file()
-            for TCdata in BKjsonData['testBkpTestResultsandPath']:
+           
+            for TCdata in ProjectConfiguration.BKjsonData['testBkpTestResultsandPath']:
                 if TCdata is not None:
                     if TCdata['testcaseDetails']['m_TestId'] == TestID:
                         if retunData == "TCresult":

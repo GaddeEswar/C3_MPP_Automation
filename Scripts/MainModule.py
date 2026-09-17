@@ -6,6 +6,7 @@ import time
 import psutil
 import subprocess
 import xml.etree.ElementTree as ET
+from Models.TestConfigs import GeneralConfig
 
 # class JsonOperations:
 #     def __init__(self,path):
@@ -206,8 +207,8 @@ class Server:
         self.JapiData = JapiDatatemp['API']
         self.JAllMOI = JsonOperations('json/AllMOIRun.json')
         self.JAllMOIData = self.JAllMOI.read_file()
-        self.Mode = self.JAllMOIData['Mode']
-        self.Product = self.JAllMOIData['Product']
+        self.Mode = GeneralConfig.Mode or self.JAllMOIData['Mode']
+        self.Product = GeneralConfig.Product or self.JAllMOIData['Product']
 
         self.StatusLogs = UpdateStatusLogs()
     def AutoCheck(self):

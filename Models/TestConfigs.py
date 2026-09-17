@@ -84,7 +84,7 @@ class TestObjects:
         Using these references we can access any object in the application
     """
     
-    TestCaseConfig :TestCaseConfig = None
+    TestCaseConfig :TestCaseConfig = TestCaseConfig()
     SQLConn=None
     PktMethod=None
     PlotMethod=None

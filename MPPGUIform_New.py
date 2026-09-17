@@ -2284,15 +2284,13 @@ class Run(MPPGUI):
                     else: self.update_logs("UI","No project loaded")
                     #Sync With DB
                     self.update_logs("UI","Offline validation is complete. Proceeding with the results to update the database.")
-                  
+                    JsonConfig.save_all()
                     self.master.SQLConn.SyncWithJsonReportFile()
                     #Update results into SQLlite DB, for results.
                     #Sync sqlite to mongoDB
                     # self.master.SQLConn.sync_table()
                     self.update_logs("UI","Database Sync completed.")
                 JsonConfig.JsettingsData['_stop_flag'] = True
-                # Save all JSON files at once at the end of validation
-                JsonConfig.save_all()
             else:self.update_logs("UI","Tool is busy with running other progress..! wait/kill the existing thread.")
         except Exception as e:
             traceback.print_exc()

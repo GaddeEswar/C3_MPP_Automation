@@ -1,7 +1,7 @@
 from Models.JsonConfig import JsonConfig
 import traceback
 from MainModule import JsonOperations,APIOperations,GeneralMethods
-from Enums import Enums
+from Models.Enums import Enums
 from typing import List, Any, Union
 from Models.TestConfigs import *
 import os
