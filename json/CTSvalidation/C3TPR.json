@@ -6703,7 +6703,6 @@
                 799.8,
                 800.0
               ],
-              "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -6732,7 +6731,6 @@
                 7957,
                 7977
               ],
-              "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -6761,7 +6759,6 @@
                 7957,
                 7977
               ],
-              "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -6790,7 +6787,6 @@
                 7957,
                 7977
               ],
-              "Tolerance": 0.1,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -18402,7 +18398,7 @@
                     "Byte": "B0",
                     "Bit": "[2:0]",
                     "Exp": [
-                      0
+                      1
                     ],
                     "comp": "EQL",
                     "Type": "DEC",
