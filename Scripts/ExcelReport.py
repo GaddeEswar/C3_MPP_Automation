@@ -1,5 +1,7 @@
+from Models.TestConfigs import TestObjects
 import sqlite3
 import pandas as pd
+from Models.TestConfigs import *
 from datetime import datetime,date
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment, PatternFill
@@ -11,11 +13,9 @@ class ExcelReports():
         #1. get the Data from SQL DB
         # Define the path to the SQLite database
         self.database_path = 'Resources/GRLDB.db'
-        self.SQLcon = SQLiteConnection()
-
-    @property
-    def connection(self):
-        return sqlite3.connect(self.database_path, check_same_thread=False)
+        # Connect to the SQLite database
+        self.connection = sqlite3.connect(self.database_path)
+        self.SQLcon = TestObjects.SQLConn
     def CTSDetailedReport(self,filters,product):
         #Taks
         SW =  f"('{filters['SW'][0]}')" if len (filters['SW']) == 1 else tuple(filters['SW'])

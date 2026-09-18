@@ -13,8 +13,8 @@ class GeneralConfig:
      Created Bydefault variables and assigned defaults when opening the application
      Updated based on selection changes in GUI
     """
-    Product: str = Enums.Product.MPP
-    Mode: str = Enums.Mode.TPT
+    Product: str = Enums.Product.C3
+    Mode: str = Enums.Mode.TPR
     Switch: str = Enums.Switch.OFFLINE
     DBStatus: str = "NotUpdated"
     
@@ -72,7 +72,8 @@ class TestCaseConfig:
     TracePath: str = ""
     file_list: list[dict] = field(default_factory=list)
     Flows: dict[str, Any] | None = None
-    Flow_limit: list[dict[str, Any]] = field(default_factory=list)
+    FlowLimit: list[int] = field(default_factory=list)
+    Flow_limit: list[int] = FlowLimit
     timing_map:dict = field(default_factory=dict)
     PayLoadChecks:dict=field(default_factory=dict)
     TCLogs=[]
@@ -84,7 +85,7 @@ class TestObjects:
         Using these references we can access any object in the application
     """
     
-    TestCaseConfig :TestCaseConfig = TestCaseConfig()
+    TestCaseConfig :TestCaseConfig = None
     SQLConn=None
     PktMethod=None
     PlotMethod=None

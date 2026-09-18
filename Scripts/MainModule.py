@@ -1,12 +1,14 @@
 # import json
+from Models.JsonConfig import JsonConfig
 import orjson
 import requests
-from datetime import datetime
+from datetime import datetime, date
 import time
 import psutil
 import subprocess
+from Models.TestConfigs import *
+from Models.Enums import *
 import xml.etree.ElementTree as ET
-from Models.TestConfigs import GeneralConfig
 
 # class JsonOperations:
 #     def __init__(self,path):
@@ -198,17 +200,9 @@ class GeneralMethods:
 
 class Server:
     def __init__(self):
-        #JSON data
-        self.Jtester = JsonOperations('json/Tester.json')
-        self.JtesterData =self.Jtester.read_file()
-
-        self.Japi = JsonOperations('json/Xpath.json')
-        JapiDatatemp =self.Japi.read_file()
-        self.JapiData = JapiDatatemp['API']
-        self.JAllMOI = JsonOperations('json/AllMOIRun.json')
-        self.JAllMOIData = self.JAllMOI.read_file()
-        self.Mode = GeneralConfig.Mode or self.JAllMOIData['Mode']
-        self.Product = GeneralConfig.Product or self.JAllMOIData['Product']
+       
+        self.Mode = GeneralConfig.Mode
+        self.Product = GeneralConfig.Product
 
         self.StatusLogs = UpdateStatusLogs()
     def AutoCheck(self):
@@ -229,13 +223,13 @@ class Server:
         else:
             self.StatusLogs.update_logs("UI",f"{self.Product}-{self.Mode} software is currently not running,Please wait for the tool to launch the software and establish the connection")
             #SW is not running
-            if self.Product=='MPP' and self.Mode=='TPR':
+            if self.Product==Enums.Product.MPP and self.Mode==Enums.Mode.TPR:
                 self.StatusLogs.update_logs("UI",f"AppProperty file tags are setting to true")
                 self.UpdateAppProperty()
             self.StatusLogs.update_logs("UI",f"Launching the software...")
             self.OpenApp()
     def CheckSelectedAppRunningStatus(self):
-        GetSWversion = APIOperations(url=self.JapiData[self.Product][self.Mode]['GetSoftwareVersion'])
+        GetSWversion = APIOperations(url=JsonConfig.JapiData[self.Product][self.Mode]['GetSoftwareVersion'])
         res = GetSWversion.GetRequest()
         if res is None:
             return False
@@ -243,9 +237,9 @@ class Server:
     def AppPropertyCheck(self):
         res = []
         #check for the mentioned tags are set to true
-        AppPro = JsonOperations(self.JtesterData[self.Product][self.Mode]['PropertyPath'])
+        AppPro = JsonOperations(JsonConfig.JtesterData[self.Product][self.Mode]['PropertyPath'])
         AppProData = AppPro.read_file()
-        for tags in self.JtesterData[self.Product][self.Mode]['PropertyTags']:
+        for tags in JsonConfig.JtesterData[self.Product][self.Mode]['PropertyTags']:
             if tags in AppProData:
                 if AppProData[tags]['DefaultValue'] == True and AppProData[tags]['PropertyValue']==True:
                     res.append("Pass")
@@ -253,9 +247,9 @@ class Server:
             else:print(f"{tags} not available in the AppProperty file")
         return False if 'Fail' in res else True 
     def UpdateAppProperty(self):
-        AppPro = JsonOperations(self.JtesterData[self.Product][self.Mode]['PropertyPath'])
+        AppPro = JsonOperations(JsonConfig.JtesterData[self.Product][self.Mode]['PropertyPath'])
         AppProData = AppPro.read_file()
-        for tags in self.JtesterData[self.Product][self.Mode]['PropertyTags']:
+        for tags in JsonConfig.JtesterData[self.Product][self.Mode]['PropertyTags']:
             if tags in AppProData:
                 AppProData[tags]['DefaultValue'] = True 
                 AppProData[tags]['PropertyValue'] = True
@@ -263,7 +257,7 @@ class Server:
             # print(AppProData[tags])
         AppPro.update_file(AppProData) 
     def CloseApp(self):
-        process_name = self.JtesterData[self.Product][self.Mode]['ProcessName']
+        process_name = JsonConfig.JtesterData[self.Product][self.Mode]['ProcessName']
         if self.is_process_running(process_name):
             try:
                 subprocess.run(["taskkill", "/f", "/im", process_name], check=True)
@@ -277,8 +271,8 @@ class Server:
             print(f"{process_name} is not running.")
         return False
     def OpenApp(self):
-        process_name = self.JtesterData[self.Product][self.Mode]['ProcessName']
-        app_folder = self.JtesterData[self.Product][self.Mode]['ExecutableLocation']
+        process_name = JsonConfig.JtesterData[self.Product][self.Mode]['ProcessName']
+        app_folder = JsonConfig.JtesterData[self.Product][self.Mode]['ExecutableLocation']
         if not self.is_process_running(process_name):
             try:
                 subprocess.run(["start", "cmd", "/c", process_name], cwd= app_folder, shell=True, check=True)

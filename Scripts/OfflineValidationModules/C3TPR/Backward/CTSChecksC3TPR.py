@@ -10,8 +10,6 @@ class CTSChecks_C3TPR():
    
     def CTSChecks(self,flwID,flows,CTSJson):
         CTSMethod= CommonCTSChecks()
-        CTSMethod.Flow_limit = flows[flwID]['Limit']
-        CTSMethod.flows = flows
         AllMeasures={}
         for CTSCheck in CTSJson:
             AllMeasures[CTSCheck] = None

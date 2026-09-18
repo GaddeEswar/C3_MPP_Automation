@@ -64,9 +64,9 @@ class TestValidation():
                
         self.stability = self.Test.Flows
         # print(self.Test.Flows)
-        self.GetAllPackets()
-        self.Header['TCresult'] = self.Test.AutomationResult
-        self.UpdateToJsonReport()
+        self.GetAllPackets()   
+        self.Header['TCresult']=self.Test.AutomationResult 
+        self.UpdateToJsonReport() 
 
 
         # print(Test.timing_map)
@@ -106,12 +106,12 @@ class TestValidation():
             """ Update Software TestTimings of a Particular Testcase """
             self.UpdateTestRunTimings(self.Test.TestcaseID, ProjectConfiguration.PRjsonData)
 
-            ProjectConfiguration.DUTName = GeneralConfig.DUTName = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('BrandName', '')
-            ProjectConfiguration.DUTID = GeneralConfig.DUTID = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('ProductName', '')
-            ProjectConfiguration.DUTSL = GeneralConfig.DUTSL = ProjectConfiguration.PRjsonData.get('DutInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestToolInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestPlatformInfo', {}).get('SerialNumber', '')
+            GeneralConfig.DUTName = ProjectConfiguration.PRjsonData['DutInfo']['BrandName']
+            GeneralConfig.DUTID = ProjectConfiguration.PRjsonData['DutInfo']['ProductName']
+            GeneralConfig.DUTSL = ProjectConfiguration.PRjsonData.get('TestToolInfo', {}).get('SerialNumber', '') or ProjectConfiguration.PRjsonData.get('TestPlatformInfo', {}).get('SerialNumber', '')
             
-            ProjectConfiguration.testLab = ProjectConfiguration.PRjsonData.get('TestLab', {}).get('LabName', '')
-            ProjectConfiguration.testEngineer = ProjectConfiguration.PRjsonData.get('TestLab', {}).get('TestEngineer', '')
+            ProjectConfiguration.testLab = ProjectConfiguration.PRjsonData['TestLab']['LabName']
+            ProjectConfiguration.testEngineer = ProjectConfiguration.PRjsonData['TestLab']['TestEngineer']
             JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testLab'] = ProjectConfiguration.testLab
             JsonConfig.JQIData[GeneralConfig.Product][GeneralConfig.Mode]['testEngineer'] = ProjectConfiguration.testEngineer
             
@@ -148,6 +148,7 @@ class TestValidation():
             self.Header['SWresult'] = self.Test.SoftwareResult
             self.Header['Product'] = GeneralConfig.Product
             self.Header['Mode'] = GeneralConfig.Mode
+            self.Header['Certification']=ProjectConfiguration.Certification
             
            
            
@@ -333,7 +334,7 @@ class TestValidation():
                 if self.Test.Flows[flwID] is not None:
                    
                     if flwID not in self.Test.timing_map:self.Test.timing_map[flwID]={}
-                    self.Test.FlowLimit = self.Test.Flow_limit = self.Test.Flows[flwID]['Limit']
+                    self.Test.FlowLimit =self.Test.Flow_limit= self.Test.Flows[flwID]['Limit']
                     # print("self.Test.FlowLimit:",self.Test.FlowLimit)
                     id = self.Test.FlowLimit[0]
                     if self.Test.TestcaseID not in ["MPP_PTX_CPX_PNG_T_NOPOWER"]:
@@ -387,7 +388,7 @@ class TestValidation():
                         except ModuleNotFoundError : spec= None
                         if spec is not None:
                             module = importlib.import_module(module_path)
-                            self.CTSClass= getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")()
+                            self.CTSClass = getattr(module, f"CTSChecks_{GeneralConfig.Product}{GeneralConfig.Mode}")()
                         else:
                             module_path = f"OfflineValidationModules.{GeneralConfig.Product}{GeneralConfig.Mode}.Backward.CTSChecks{GeneralConfig.Product}{GeneralConfig.Mode}"
                             module = importlib.import_module(module_path)
@@ -410,7 +411,7 @@ class TestValidation():
                                     module = importlib.import_module(module_path)
                                     CTSChecks = getattr(module, f"CTSChecks_MPP_TPR1")
                                 
-                                # self.CTSChecks_obj1 = CTSChecks_MPP_TPR1(Header=self.Header,file_list=self.file_list,JapiData=JsonConfig.JapiData,BackupJson=self.Test.BackupJson,ProjectJson=self.Test.ProjectJson)
+                                # self.CTSChecks_obj1 = CTSChecks_MPP_TPR1(Header=self.Header,file_list=self.file_list,JapiData=JsonConfig.JapiData,BackupJson=ProjectConfiguration.BackupJson,ProjectJson=self.Test.ProjectJson)
                                 # Test.timing_map[flwID]['Measures']= self.CTSChecks_MPPTPR1.MeasuresCheck(flwID,self.Test.Flows,Test.timing_map)
                             elif  self.Test.Coil == "TPR#MPP4" or  self.Test.Coil == "TPR_MPP4":
                                 Coil = "MPPTPR4"

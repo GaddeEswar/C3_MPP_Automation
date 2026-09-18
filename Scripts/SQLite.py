@@ -49,11 +49,7 @@ class SQLiteConnection():
         try:
 
             self.cursor = self.Conn.cursor()
-            from Models.JsonConfig import JsonConfig
-            if hasattr(JsonConfig, 'JTCPData') and JsonConfig.JTCPData and 'test_config_data' in JsonConfig.JTCPData and 'Report_path' in JsonConfig.JTCPData['test_config_data']:
-                self.JTCPData = JsonConfig.JTCPData
-            else:
-                self.JTCPData = self.JTCP.read_file()
+            self.JTCPData = self.JTCP.read_file()
             print("off sync")
             RepPath=[self.JTCPData['test_config_data']['Report_path']]
             for Path in RepPath:
@@ -65,16 +61,11 @@ class SQLiteConnection():
                 for Test in TCdata:
                     print("Header:",Test['Header']['TestcaseID'])
                     #########################################################Sync Headers
-                    header_cols = set(self.get_table_columns('Header'))
-                    header_dict = dict(Test['Header'])
-                    if 'TCresult' not in header_dict and 'Automationresult' in header_dict:
-                        header_dict['TCresult'] = header_dict.pop('Automationresult')
-                    filtered_header = {k: v for k, v in header_dict.items() if k in header_cols}
-                    columns = ', '.join(filtered_header.keys())
-                    placeholders = ', '.join(['?' for _ in filtered_header])
-                    values = tuple(filtered_header.values())
-                    # ensure that the same project with testcase already available in the DB, if so replace with new
-                    # use SWversion, FWversion, ProjectName, testcase name
+                    columns = ', '.join(Test['Header'].keys())
+                    placeholders = ', '.join(['?' for _ in Test['Header']])
+                    values = tuple(Test['Header'].values())
+                    # ensure that the same project with testcase already available in the DB, if so repleace with new
+                    #use SWversion, FWversion, ProjectName, testcase name
                     self.DeleteDuplicateTests(Test['Header'])
                     self.cursor.execute(f"INSERT INTO Header ({columns}) VALUES ({placeholders})", values)
                     # self.Conn.commit()
@@ -200,22 +191,17 @@ class SQLiteConnection():
 
     def DeleteDuplicateTests(self,HeaderData):
         try:
-            tc_name = str(HeaderData.get('TestcaseName', '')).replace("'", "''")
-            proj_name = str(HeaderData.get('ProjectName', '')).replace("'", "''")
-            sw_ver = str(HeaderData.get('SWVersion', '')).replace("'", "''")
-            fw_ver = str(HeaderData.get('FWVersion', '')).replace("'", "''")
-            Header_Qry = f"SELECT * FROM Header WHERE ProjectName = '{proj_name}' and SWVersion='{sw_ver}' and FWVersion='{fw_ver}' and TestcaseName='{tc_name}'"
+            Header_Qry = f"SELECT *FROM Header WHERE ProjectName = '{HeaderData['ProjectName']}' and SWVersion='{HeaderData['SWVersion']}' and FWVersion='{HeaderData['FWVersion']}' and TestcaseName='{HeaderData['TestcaseName']}'"
             # print(Header_Qry)
             Header_df = pd.read_sql_query(Header_Qry, self.Conn)
             if Header_df.shape[0] > 0:
-                for uid in Header_df["UID"]:
-                    print("Deleting the UID:", uid)
-                    deleteHeader = f"DELETE FROM Header WHERE UID = '{uid}'"
-                    deleteCheckHeader = f"DELETE FROM ChecksHeader WHERE UID = '{uid}'"
-                    deleteCheckDetails = f"DELETE FROM ChecksDetails WHERE UID = '{uid}'"
-                    self.cursor.execute(deleteHeader)
-                    self.cursor.execute(deleteCheckHeader)
-                    self.cursor.execute(deleteCheckDetails)
+                print("Deleteing the UID:",Header_df["UID"].iloc[0])
+                deleteHeader = f"DELETE FROM Header WHERE UID = '{Header_df["UID"].iloc[0]}'"
+                deleteCheckHeader = f"DELETE FROM ChecksHeader WHERE UID = '{Header_df["UID"].iloc[0]}'"
+                deleteCheckDetails = f"DELETE FROM ChecksDetails WHERE UID = '{Header_df["UID"].iloc[0]}'"
+                self.cursor.execute(deleteHeader)
+                self.cursor.execute(deleteCheckHeader)
+                self.cursor.execute(deleteCheckDetails)
                 self.Conn.commit()
         except Exception as e:
             traceback.print_exc()
