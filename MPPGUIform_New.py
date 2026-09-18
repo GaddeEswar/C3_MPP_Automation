@@ -835,11 +835,17 @@ class Run(MPPGUI):
     def Disable_Frames(self,frame):
         for child in frame.winfo_children():
             if child.winfo_class() != 'Frame':
-                child.configure(state='disabled')
+                try:
+                    child.configure(state='disabled')
+                except Exception:
+                    pass
     def Enable_frame(self,frame):
         for child in frame.winfo_children():
             if child.winfo_class() != 'Frame':
-                child.configure(state='normal')
+                try:
+                    child.configure(state='normal')
+                except Exception:
+                    pass
     def StatusRefresh(self):
         while self.LicValid_flag:
             time.sleep(1)
@@ -1338,7 +1344,7 @@ class Run(MPPGUI):
                 Labels(self.RN_FR4,text='Select Phase    :',font=self.master.FT12BW,x=1,y=yax,width=14,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],anchor=tk.E)
                 self.PhaseSelCombo = Combo(self.RN_FR4,width=25,state="readonly",font=self.master.FT10BW,val=phase,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=120,y=yax+5)
                 self.PhaseSelCombo.bind("<<ComboboxSelected>>",self.LoadPosTest)
-            self.TestListBox = ListBx(self.RN_FR4,width=45,height=18,font=self.master.FT10BW,x=3,y=120,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
+            self.TestListBox = ListBx(self.RN_FR4,width=33,height=12,font=self.master.FT10BW,x=3,y=120,place_w=318,place_h=290,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
 
             Buttons(self.RN_FR4,text='Keep Selected',width=21,x=5,y=420,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.KeepSelected)
             Buttons(self.RN_FR4,text='Remove Selected',width=21,x=165,y=420,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.RemoveSelected)      
@@ -1351,14 +1357,14 @@ class Run(MPPGUI):
                 proj = []
             Labels(self.RN_FR4,text='Select Project :',font=self.master.FT12BW,x=1,y=25,width=13,bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],anchor=tk.E)
             self.OffValProjCB = Combo(self.RN_FR4,width=26,font=self.master.FT10BW,val=proj,state="readonly",bg=self.master.Ccodes["white"],fg=self.master.Ccodes["black"],x=120,y=30)
-            self.TestListBox = ListBx(self.RN_FR4,width=89,height=24,font=self.master.FT10BW,x=3,y=60,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
+            self.TestListBox = ListBx(self.RN_FR4,width=67,height=16,font=self.master.FT10BW,x=3,y=60,place_w=625,place_h=380,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
             self.OffValProjCB.bind("<<ComboboxSelected>>",self.LoadOffTest)
             Buttons(self.RN_FR4,text='Keep Selected',width=21,x=320,y=29,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.KeepSelected)
             Buttons(self.RN_FR4,text='Remove Selected',width=21,x=480,y=29,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.RemoveSelected)      
             self.master.ClearFrame(self.RN_FR4_2)
             # Labels(self.RN_FR4,text="View Test",x=0,y=0,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],width=50,font=self.master.FT10BW)
             Labels(self.RN_FR4_2,text='Select Phases For Offline Validation',font=self.master.FT12BW,x=3,y=25,width=32,bg=self.master.Ccodes["lyt_cyan"],fg=self.master.Ccodes["black"],anchor=tk.E)
-            self.PhaseListBox = ListBx(self.RN_FR4_2,width=40,height=21,font=self.master.FT10BW,x=5,y=60,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
+            self.PhaseListBox = ListBx(self.RN_FR4_2,width=30,height=15,font=self.master.FT10BW,x=5,y=60,place_w=290,place_h=350,bg=self.master.Ccodes["text_bg"],fg=self.master.Ccodes["black"],values=[])
             Buttons(self.RN_FR4_2,text='Select Phase',width=18,x=5,y=420,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.KeepSelectedPhase)
             Buttons(self.RN_FR4_2,text='Remove Phase',width=18,x=160,y=420,bg=self.master.Ccodes["blue"],fg=self.master.Ccodes["white"],font=self.master.FT10BW,command=self.RemoveSelectedPhase)  
 
@@ -3740,7 +3746,7 @@ class Entries(tk.Entry):
         else:
             self.place(x=x,y=y)
 class ListBx(tk.Listbox):
-    def __init__(self, master,width=10,height=10,font=None,name=None,grid=None,x=0,y=0,bg=None,fg=None,values=None,selectedVal=None):
+    def __init__(self, master,width=10,height=10,font=None,name=None,grid=None,x=0,y=0,bg=None,fg=None,values=None,selectedVal=None,place_w=None,place_h=None):
         super().__init__(master,width=width,height=height,selectmode=tk.MULTIPLE,name=name,exportselection=False)
         if font is not None: self['font']=font
         if bg is not None: self['bg']=bg
@@ -3760,7 +3766,16 @@ class ListBx(tk.Listbox):
         if grid is not None:
             self.grid(row=x,column=y)
         else:
-            self.place(x=x,y=y)
+            if place_w is not None and place_h is not None:
+                self.place(x=x,y=y,width=place_w,height=place_h)
+            elif place_w is not None:
+                self.place(x=x,y=y,width=place_w)
+            elif place_h is not None:
+                self.place(x=x,y=y,height=place_h)
+            else:
+                self.place(x=x,y=y)
+
+        self.bind("<MouseWheel>", lambda event: self.yview_scroll(int(-1 * (event.delta / 120)), "units"))
     def UpdateValues(self,values):
         if self.winfo_exists():
             self.delete(0,tk.END)

@@ -6496,7 +6496,7 @@
                 "End Power Transfer",
                 "EPT/an"
               ],
-              "Limit": 32,
+              "Limit": 60,
               "flow": 1,
               "CheckSEQ": 1,
               "Result_check": true
@@ -6795,7 +6795,8 @@
               "CheckSEQ": 1,
               "Result_check": true
             }
-          ]        }
+          ]
+        }
       },
       "TEST_PTX_CPX_POW_S15_ADC_001": {
         "Certifications": [
@@ -22582,7 +22583,7 @@
               "CheckSEQ": 2,
               "Result_check": true
             }
-            ]
+          ]
         }
       },
       "TEST_PTX_CPX_POW_S13_RP0_001": {
@@ -46965,13 +46966,8 @@
           "2.3.1"
         ],
         "CTSChecks": {
-          "SeqRespTimng": [
+          "PT_ID": [
             {
-              "StartPacket": [
-                "SRQ [0x20] ",
-                "Received Power reporting",
-                false
-              ],
               "ExpectedPacket": [
                 [
                   "General Request",
@@ -46990,9 +46986,6 @@
                               "Name": "Major_Version",
                               "Byte": "B0",
                               "Bit": "[7:4]",
-                              "Exp": [
-                                2
-                              ],
                               "comp": "EQL",
                               "Type": "DEC",
                               "Result_check": true
@@ -47001,9 +46994,6 @@
                               "Name": "Minor_Version",
                               "Byte": "B0",
                               "Bit": "[3:0]",
-                              "Exp": [
-                                2
-                              ],
                               "comp": "EQL",
                               "Type": "DEC",
                               "Result_check": true

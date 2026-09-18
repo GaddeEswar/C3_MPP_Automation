@@ -289,7 +289,44 @@ class CommonCTSChecks:
             else:res.append([f'Cound found response for CFG/ep packet',Enums.TestResult.INCONCLUSIVE])
         else:res.append([f'could not found CFG/ep packet',Enums.TestResult.INCONCLUSIVE])       
         return res   
-        
+
+
+    def PT_ID(self,CTSCheck,Check,flows,flwID):
+        res=[]
+        GRQ_ID=self.PktMethod.GetPacketDetails(packet="General Request",value='PT-ID', limit=[self.Flow_limit[0],self.Flow_limit[1]])
+        if len(GRQ_ID)>2:
+            res.append([f'TPR sent GRQ/ID packet at index@ {GRQ_ID[2]}',Enums.TestResult.PASS])
+            id = GRQ_ID[2]+1
+            PT_ID = False
+            count = 0
+            while id < self.Flow_limit[1]:
+                if not self.file_list[id]['isTesterPkt'] and not self.file_list[id]['isFWTestermessage']:
+                    if "Power Transmitter Identification" in self.file_list[id]['pktType']:
+                        res.append([f"PTx sent {self.file_list[id]['pktType']} packet at index@ {id}", Enums.TestResult.PASS])
+                        PT_ID = True
+                        major_ver = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(id, 'Major_Version')[0]['sRawData']))
+                        minor_ver = int(self.PktMethod.hex_to_decimal(self.PktMethod.GetPayloadDetails(id, 'Minor_Version')[0]['sRawData']))
+                        #Validate Major and Minor Versions
+                        spec = self.BKjsonData['testBkpAppModeString'].replace('V_', '').split('.')
+                        exp_major, exp_minor = int(spec[0]), int(spec[1])
+                        res.append([f'PTx sent the Major_Version field with value {major_ver} for the PT_Identification data packet, Exp:{exp_major}',
+                                    Enums.TestResult.PASS if major_ver == exp_major else Enums.TestResult.FAIL])
+                        res.append([f'PTx sent the Minor_Version field with value {minor_ver} for the PT_Identification data packet, Exp:{exp_minor}',
+                                    Enums.TestResult.PASS if minor_ver == exp_minor else Enums.TestResult.FAIL])
+
+                        break
+
+                elif (self.file_list[id]['isTesterPkt'] and "General Request" in self.file_list[id]['pktType']) or self.file_list[id]['isFWTestermessage']:
+                    id+=1
+                    count += 1
+                    if count >= 3: break
+                id += 1
+
+            if not PT_ID:
+                res.append([f'PTx did not send Power Transmitter Identification packet', Enums.TestResult.FAIL])
+        else: res.append([f'TPR did not send GRQ/ID packet',Enums.TestResult.INCONCLUSIVE])
+        return res
+            
     #-----------------------------------------------------------Power Transfer Phase Tests------------------------------------------------------------------------- #
 
     def POW_RP8(self,CTSCheck,Check,flows,flwID):
@@ -740,22 +777,32 @@ class CommonCTSChecks:
             # Find ACK response
             resp = self.PktMethod.GetPacketResponse(SrqEN,[SrqEN[2]+1,self.Flow_limit[1]])
             if  self.file_list[resp]['pktType'] =="ACK":
-                # find response ACK for RP/2
+                # find RP/2 data packet and ACK response 
                 id=resp+1
-                while id < self.Flow_limit[1]:
-                    RP2=self.PktMethod.GetPacketDetails(packet="16 bit Received Power",value="Mode:2" ,limit=[id,self.Flow_limit[1]])
-                    if len(RP2)>2:
-                        # Find ACK response
-                        resp2 = self.PktMethod.GetPacketResponse(RP2,[RP2[2]+1,self.Flow_limit[1]])
-                        if  self.file_list[resp]['pktType'] =="ACK":
-                            Tcalibrate=round((self.file_list[resp2]['stopTime']-self.file_list[resp]['stopTime'])*1000,2)
-                            res.append([f"Measured t_calibrate time is {Tcalibrate} mS",Enums.TestResult.PASS if Tcalibrate <=10000 else Enums.TestResult.FAIL])
+                rp_count=0
+                while id <= self.Flow_limit[1]:
+                    if self.file_list[id]['pktType'] =="16 bit Received Power" and "Mode:2" in self.file_list[id]['value']:
+                        rp_count+=1
+                        resp2 = self.PktMethod.GetPacketResponse(id,[id+1,self.Flow_limit[1]])
+                        if  self.file_list[resp2]['pktType'] =="ACK":
+                            res.append([f"PTx sent ACK response for 16Bit RP/2 data packet at index@ {resp2}",Enums.TestResult.PASS])
+                            Tcalibrate=round((self.file_list[resp2]['stopTime']-self.file_list[id]['stopTime'])*1000,2)
+                            res.append([f"Measured t_calibrate time is {Tcalibrate} mS, Limit<=10Secs",Enums.TestResult.PASS if Tcalibrate <=10000 else Enums.TestResult.FAIL])
                             break
-                        else:id=resp2+1    
-                    else:
-                        res.append([f"PRx did not sent RP/2 data packet with ACK",Enums.TestResult.INCONCLUSIVE])    
+                        else: 
+                            id+=1
+                            continue
+                    
+                    elif "Shutdown" in self.file_list[id]['pktType']:
+                        if rp_count==0:
+                            res.append([f"TPR did not sent RP/2 data packet",Enums.TestResult.INCONCLUSIVE])
+                        if rp_count>0:
+                            res.append([f"PTx did not sent ACK response for RP/2 data packet",Enums.TestResult.INCONCLUSIVE])
+                        res.append([f"Unable to measure T_calibrate", Enums.TestResult.INCONCLUSIVE])
+                        break
+                    else: id+=1
             else:res.append([f"PTx sent { self.file_list[resp]['pktType']} response for SRQ/en packet",Enums.TestResult.INCONCLUSIVE])
-        else: res.append([f"PRx did not sent SRQ/en packet",Enums.TestResult.INCONCLUSIVE])
+        else: res.append([f"TPR did not sent SRQ/en packet",Enums.TestResult.INCONCLUSIVE])
                         
         return res
 
@@ -1640,7 +1687,7 @@ class CommonCTSChecks:
             VR=self.PktMethod.GetPacketDetails(packet="Voltage_regulation",Type="TesterMsg" ,limit=[phaseCheck,self.Flow_limit[1]])
             if len(VR)>2:
                 self.AllChannelData_Volatge = self.PlotMethod.GetAllChannelData2('2',JsonConfig.JapiData)  #  Voltage Plot
-                Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="start",measure="before")
+                Loadvrect = self.CalculateVoltTwindow(VR[2],self.AllChannelData_Volatge,at="end",measure="after")
                 res.append([f'while TPR Regulating to its Operating Voltage -> Measured Voltage is : {Loadvrect[0]} V , Limits : {Check['RegulationLimit'][0]} V ~ {Check['RegulationLimit'][1]} V', 
                             Enums.TestResult.PASS if Loadvrect[0] >= Check['RegulationLimit'][0] and Loadvrect[0] <= Check['RegulationLimit'][1] else Enums.TestResult.INCONCLUSIVE])
                 CE60=self.PktMethod.GetPacketDetails(packet=Check['Pkt'][0] ,value=Check['Pkt'][1],limit=[VR[2]+1,self.Flow_limit[1]])
